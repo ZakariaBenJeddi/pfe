@@ -25,6 +25,10 @@
   <!-- Nucleo Icons -->
   <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
   <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
+
+  <!-- //!DRIVER JS -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
   
   <!-- CSS Files -->
   <link id="pagestyle" href="../assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
@@ -307,7 +311,7 @@
     <div class="container-fluid py-4">
       <div class="row">
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-          <div class="card">
+          <div class="card" id="nombre_salle">
             <div class="card-body p-3">
               <div class="row">
                 <div class="col-8">
@@ -332,7 +336,7 @@
           </div>
         </div>
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-          <div class="card">
+          <div class="card" id="nombre_eleve">
             <div class="card-body p-3">
               <div class="row">
                 <div class="col-8">
@@ -846,6 +850,86 @@
     };
     new Chart(ctx, config);
   </script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
+
+  <!-- <script>
+    const driver = window.driver.js.driver;
+
+    const driverObj = driver();
+
+    driverObj.highlight(
+      {
+        element: "#nombre_salle",
+        popover: {
+          title: "Title",
+          description: "Description",
+          position: "bottom",
+          buttons: [
+            {
+              text: "Next →",
+              action: driver.next, // Move to the next step
+            },
+          ],
+        }
+        
+      }
+    );
+
+    driver.start();
+  </script> -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script> -->
+
+  <script>
+    const driver = window.driver.js.driver;
+
+    const driverObj = driver();
+
+    // Première étape
+    driverObj.highlight({
+      element: "#nombre_salle",
+      popover: {
+        title: "Étape 1",
+        description: "Description pour le nombre de salles.",
+        position: "bottom",
+        buttons: [
+          {
+            text: "Suivant →",
+            action: () => {
+              // Passe à l'étape suivante
+              driverObj.highlight({
+                element: "#nombre_eleve",
+                popover: {
+                  title: "Étape 2",
+                  description: "Description pour le nombre d'élèves.",
+                  position: "right",
+                  buttons: [
+                    {
+                      text: "← Précédent",
+                      action: () => driverObj.highlight({ 
+                        element: "#nombre_salle",
+                        popover: { title: "Retour", description: "Retour à l'étape 1." }
+                      })
+                    },
+                    {
+                      text: "Terminer",
+                      action: driverObj.reset, // Termine le tour
+                    },
+                  ],
+                },
+              });
+            },
+          },
+        ],
+      },
+    });
+
+    driver.start();
+  </script>
+
+
+
   
   <script>
     var win = navigator.platform.indexOf('Win') > -1;

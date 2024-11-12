@@ -325,11 +325,11 @@ require_once('db-connect.php') ?>
                                         <input type="hidden" name="id" value="">
                                         <div class="form-group mb-2">
                                             <label for="title" class="control-label">Title</label>
-                                            <input type="text" class="form-control form-control-sm rounded-0" name="title" id="title" required>
+                                            <input type="text" class="form-control form-control-sm rounded-0" name="title" id="title" value='a' required>
                                         </div>
                                         <div class="form-group mb-2">
                                             <label for="description" class="control-label">Description</label>
-                                            <textarea rows="3" class="form-control form-control-sm rounded-0" name="description" id="description" required></textarea>
+                                            <textarea rows="3" class="form-control form-control-sm rounded-0" name="description" id="description" required>a</textarea>
                                         </div>
                                         <div class="form-group mb-2">
                                             <label for="title" class="control-label">Prof</label>
@@ -343,15 +343,15 @@ require_once('db-connect.php') ?>
                                         </div>
                                         <div class="form-group mb-2">
                                             <label for="title" class="control-label">salle</label>
-                                            <input type="text" class="form-control form-control-sm rounded-0" name="salle" id="salle" required>
+                                            <input type="text" class="form-control form-control-sm rounded-0" name="salle" id="salle" value='b' required>
                                         </div>
                                         <div class="form-group mb-2">
                                             <label for="start_datetime" class="control-label">Start</label>
-                                            <input type="datetime-local" class="form-control form-control-sm rounded-0" name="start_datetime" id="start_datetime" required>
+                                            <input type="datetime-local" value="2024-11-13T09:00"  class="form-control form-control-sm rounded-0" name="start_datetime" id="start_datetime" required>
                                         </div>
                                         <div class="form-group mb-2">
                                             <label for="end_datetime" class="control-label">End</label>
-                                            <input type="datetime-local" class="form-control form-control-sm rounded-0" name="end_datetime" id="end_datetime" required>
+                                            <input type="datetime-local" value="2024-11-13T17:00" class="form-control form-control-sm rounded-0" name="end_datetime" id="end_datetime" required>
                                         </div>
                                     </form>
                                 </div>
