@@ -48,6 +48,7 @@ try {
 <!DOCTYPE html>
 <html lang="en">
 <style>
+  
     table.dataTable.no-footer {
       border-bottom: 0px solid #fff !important;
     }

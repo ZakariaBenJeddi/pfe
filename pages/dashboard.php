@@ -56,6 +56,7 @@
       .card:hover .see-more-btn {
         display: inline-block;
       }
+
   </style>
 </head>
 
@@ -407,54 +408,66 @@
         </div>
       </div>
       <div class="row mt-4">
+        <!-- //! Abscence chart -->
         <div class="col-lg-7 mb-lg-0 mb-4">
           <div class="card z-index-2 h-100">
             <div class="card-header pb-0 pt-3 bg-transparent">
-              <h6 class="text-capitalize">Sales overview</h6>
+              <h6 class="text-capitalize">Abscence Chart</h6>
               <p class="text-sm mb-0">
                 <i class="fa fa-arrow-up text-success"></i>
-                <span class="font-weight-bold">4% more</span> in 2021
+                <span class="font-weight-bold">4% plus</span> in 2021
               </p>
             </div>
             <div class="card-body p-3">
               <div class="chart">
-                <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
+                <canvas id="chart-bar" class="chart-canvas" height="300"></canvas>
               </div>
             </div>
           </div>
+          
         </div>
         <div class="col-lg-5">
           <div class="card card-carousel overflow-hidden h-100 p-0">
             <div id="carouselExampleCaptions" class="carousel slide h-100" data-bs-ride="carousel">
               <div class="carousel-inner border-radius-lg h-100">
                 <div class="carousel-item h-100 active" style="background-image: url('https://plus.unsplash.com/premium_photo-1687128298182-6a60a37af6d4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8ODl8fHNjaG9vbHxlbnwwfHwwfHx8MA%3D%3D');
-      background-size: cover;"><!-- ../assets/img/carousel-1.jpg -->
+            background-size: cover;">
                   <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
                     <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
                       <i class="ni ni-camera-compact text-dark opacity-10"></i>
                     </div>
-                    <h5 class="text-white mb-1">Get started with Argon</h5>
-                    <p>There’s nothing I really wanted to do in life that I wasn’t able to get good at.</p>
+                    <h5 class="text-white mb-1">Get started with ELARAKI School</h5>
+                    <!-- <p>There’s nothing I really wanted to do in life that I wasn’t able to get good at.</p> -->
                   </div>
                 </div>
                 <div class="carousel-item h-100" style="background-image: url('https://plus.unsplash.com/premium_photo-1671070290623-d6f76bdbb3db?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8c2Nob29sfGVufDB8fDB8fHww');
-      background-size: cover;"><!-- ../assets/img/carousel-2.jpg -->
+              background-size: cover;">
                   <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
                     <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
                       <i class="ni ni-bulb-61 text-dark opacity-10"></i>
                     </div>
-                    <h5 class="text-white mb-1">Faster way to create web pages</h5>
-                    <p>That’s my skill. I’m not really specifically talented at anything except for the ability to learn.</p>
+                    <h5 class="text-white mb-1">Get started with ELARAKI School</h5>
+                    <!-- <p>That’s my skill. I’m not really specifically talented at anything except for the ability to learn.</p> -->
                   </div>
                 </div>
                 <div class="carousel-item h-100" style="background-image: url('https://plus.unsplash.com/premium_photo-1680807869780-e0876a6f3cd5?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8c2Nob29sfGVufDB8fDB8fHww');
-      background-size: cover;"><!-- ../assets/img/carousel-3.jpg -->
+                    background-size: cover;">
                   <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
                     <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
                       <i class="ni ni-trophy text-dark opacity-10"></i>
                     </div>
-                    <h5 class="text-white mb-1">Share with us your design tips!</h5>
-                    <p>Don’t be afraid to be wrong because you can’t learn anything from a compliment.</p>
+                    <h5 class="text-white mb-1">Faster way to create web pages</h5>
+                    <!-- <p>Don’t be afraid to be wrong because you can’t learn anything from a compliment.</p> -->
+                  </div>
+                </div>
+                <div class="carousel-item h-100" style="background-image: url('../assets/img/school/projet\ presentation.png');
+                    background-size: cover;">
+                  <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
+                    <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
+                      <i class="ni ni-trophy text-dark opacity-10"></i>
+                    </div>
+                    <h5 class="text-white mb-1">Presentaion Projet</h5>
+                    <!-- <p>Don’t be afraid to be wrong because you can’t learn anything from a compliment.</p> -->
                   </div>
                 </div>
               </div>
@@ -471,10 +484,22 @@
         </div>
       </div>
       <div class="row mt-4">
-        <div class="col-lg-7 mb-lg-0 mb-4">
-          <div class="card-body p-3">
-            <div class="chart">
-              <canvas id="chart-bar" class="chart-canvas" height="300"></canvas>
+        <!-- //! Sale chart -->
+        <div class="col-lg-7 mb-lg-0 mb-5">
+          <div class="card z-index-2 h-100">
+            <div class="card-header pb-0 pt-3 bg-transparent">
+              <h6 class="text-capitalize">Sales overview</h6>
+              <p class="text-sm mb-0">
+                <i class="fa fa-arrow-up text-success"></i>
+                <span class="font-weight-bold">4% more</span> in 2021
+              </p>
+            </div>
+            <div class="card-body p-3">
+              <div class="card-body p-3">
+                <div class="chart">
+                  <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -749,7 +774,7 @@
     const data = {
       labels: labels,
       datasets: [{
-        label: 'Participation Hebdomadaire',
+        label: 'Abscence',
         data: [65, 59, 80, 81, 56,],
         backgroundColor: [
           'rgba(255, 99, 132, 0.2)',
