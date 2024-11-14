@@ -6,6 +6,8 @@ $host = 'localhost';
 $db = 'dummy_db';
 $user = 'root';
 $password = '';
+//schedule_list
+//dipot
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $password);
@@ -15,7 +17,7 @@ try {
 }
 
 // Récupérer les événements de la base de données
-$sql = "SELECT id, title, description , professeur, start_datetime AS start, end_datetime AS end , salle FROM dipot";
+$sql = "SELECT id, title, description , professeur, start_datetime AS start, end_datetime AS end , salle FROM schedule_list";
 $stmt = $pdo->query($sql);
 $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

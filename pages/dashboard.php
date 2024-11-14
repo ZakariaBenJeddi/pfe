@@ -187,6 +187,9 @@
           </div>
         </div>
       </div>
+      <div class="text-center">
+        <button class="btn btn-primary btn-sm ms-auto" id="startTourButton">Tour Gide</button>
+      </div>
       <!-- <a href="https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard" target="_blank" class="btn btn-dark btn-sm w-100 mb-3">Documentation</a>
       <a class="btn btn-primary btn-sm mb-0 w-100" href="https://www.creative-tim.com/product/argon-dashboard-pro?ref=sidebarfree" type="button">Upgrade to pro</a> -->
     </div>
@@ -361,7 +364,7 @@
           </div>
         </div>
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-          <div class="card">
+          <div class="card" id="ensaignant">
             <div class="card-body p-3">
               <div class="row">
                 <div class="col-8">
@@ -387,7 +390,7 @@
           </div>
         </div>
         <div class="col-xl-3 col-sm-6">
-          <div class="card">
+          <div class="card" id="abscence">
             <div class="card-body p-3">
               <div class="row">
                 <div class="col-8">
@@ -575,38 +578,6 @@
           </div>
         </div>
       </div>
-      <!-- <footer class="footer pt-3  ">
-        <div class="container-fluid">
-          <div class="row align-items-center justify-content-lg-between">
-            <div class="col-lg-6 mb-lg-0 mb-4">
-              <div class="copyright text-center text-sm text-muted text-lg-start">
-                © <script>
-                  document.write(new Date().getFullYear())
-                </script>,
-                made with <i class="fa fa-heart"></i> by
-                <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Creative Tim</a>
-                for a better web.
-              </div>
-            </div>
-            <div class="col-lg-6">
-              <ul class="nav nav-footer justify-content-center justify-content-lg-end">
-                <li class="nav-item">
-                  <a href="https://www.creative-tim.com" class="nav-link text-muted" target="_blank">Creative Tim</a>
-                </li>
-                <li class="nav-item">
-                  <a href="https://www.creative-tim.com/presentation" class="nav-link text-muted" target="_blank">About Us</a>
-                </li>
-                <li class="nav-item">
-                  <a href="https://www.creative-tim.com/blog" class="nav-link text-muted" target="_blank">Blog</a>
-                </li>
-                <li class="nav-item">
-                  <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-muted" target="_blank">License</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </footer> -->
       <!-- FOOTER -->
       <?php include '../includes/footer.php' ?>
     </div>
@@ -668,10 +639,9 @@
             <input class="form-check-input mt-1 ms-auto" type="checkbox" id="dark-version" onclick="darkMode(this)">
           </div>
         </div>
-        <a class="btn bg-gradient-dark w-100" href="https://www.creative-tim.com/product/argon-dashboard">Free Download</a>
-        <a class="btn btn-outline-dark w-100" href="https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard">View documentation</a>
+        <!-- <a class="btn bg-gradient-dark w-100" href="https://www.creative-tim.com/product/argon-dashboard">Free Download</a> -->
+        <button id="startTourButton" class="btn bg-gradient-dark w-100">startTourButton</button>
         <div class="w-100 text-center">
-          <a class="github-button" href="https://github.com/creativetimofficial/argon-dashboard" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star creativetimofficial/argon-dashboard on GitHub">Star</a>
           <h6 class="mt-3">Thank you for sharing!</h6>
           <a href="https://twitter.com/intent/tweet?text=Check%20Argon%20Dashboard%20made%20by%20%40CreativeTim%20%23webdesign%20%23dashboard%20%23bootstrap5&amp;url=https%3A%2F%2Fwww.creative-tim.com%2Fproduct%2Fargon-dashboard" class="btn btn-dark mb-0 me-2" target="_blank">
             <i class="fab fa-twitter me-1" aria-hidden="true"></i> Tweet
@@ -689,6 +659,8 @@
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/chartjs.min.js"></script>
+
+  <!-- //! CHART JS Sales -->
   <script>
     var ctx1 = document.getElementById("chart-line").getContext("2d");
 
@@ -772,6 +744,8 @@
       },
     });
   </script>
+
+  <!-- //! CHART JS ABSCENCE -->
   <script>
     const ctx = document.getElementById("chart-bar").getContext("2d");
     const labels = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"];
@@ -854,83 +828,56 @@
 
   <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
 
-  <!-- <script>
-    const driver = window.driver.js.driver;
-
-    const driverObj = driver();
-
-    driverObj.highlight(
-      {
-        element: "#nombre_salle",
-        popover: {
-          title: "Title",
-          description: "Description",
-          position: "bottom",
-          buttons: [
-            {
-              text: "Next →",
-              action: driver.next, // Move to the next step
-            },
-          ],
-        }
-        
-      }
-    );
-
-    driver.start();
-  </script> -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script> -->
-
   <script>
-    const driver = window.driver.js.driver;
-
-    const driverObj = driver();
-
-    // Première étape
-    driverObj.highlight({
-      element: "#nombre_salle",
-      popover: {
-        title: "Étape 1",
-        description: "Description pour le nombre de salles.",
-        position: "bottom",
-        buttons: [
-          {
-            text: "Suivant →",
-            action: () => {
-              // Passe à l'étape suivante
-              driverObj.highlight({
-                element: "#nombre_eleve",
-                popover: {
-                  title: "Étape 2",
-                  description: "Description pour le nombre d'élèves.",
-                  position: "right",
-                  buttons: [
-                    {
-                      text: "← Précédent",
-                      action: () => driverObj.highlight({ 
-                        element: "#nombre_salle",
-                        popover: { title: "Retour", description: "Retour à l'étape 1." }
-                      })
+        document.getElementById('startTourButton').addEventListener('click', function() {
+            const driverObj = window.driver.js.driver({
+                showProgress: true,
+                showButtons: ['next', 'previous'],
+                steps: [
+                    { 
+                        element: '#nombre_salle', 
+                        popover: { 
+                            title: 'Premier exemple', 
+                            description: 'Voici la première étape du tour',
+                            side: "left", 
+                            align: 'start' 
+                        }
                     },
-                    {
-                      text: "Terminer",
-                      action: driverObj.reset, // Termine le tour
+                    { 
+                        element: '#nombre_eleve', 
+                        popover: { 
+                            title: 'Premier exemple', 
+                            description: 'Voici la première étape du tour',
+                            side: "right", 
+                            align: 'start' 
+                        }
                     },
-                  ],
-                },
-              });
-            },
-          },
-        ],
-      },
-    });
+                    { 
+                        element: '#ensaignant',
+                        popover: { 
+                            title: 'Import de la librairie', 
+                            description: 'Première ligne de code',
+                            side: "bottom", 
+                            align: 'start' 
+                        }
+                    },
+                    { 
+                        element: '#abscence',
+                        popover: {
+                            title: 'Import de la librairie', 
+                            description: 'Première ligne de code',
+                            side: "left", 
+                            align: 'start',
+                        }
+                    },
+                    // ... autres étapes ...
+                ]
+            });
 
-    driver.start();
-  </script>
+            driverObj.drive();
+        });
+    </script>
 
-
-
-  
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
