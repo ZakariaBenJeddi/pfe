@@ -2,11 +2,12 @@
 require '../includes/DatabaseConnexion.php';
 session_start();
 
+//premier code 
 $sql = "SELECT * FROM salle";
 $query = $dbh->query($sql);
 $results = $query->fetchAll(PDO::FETCH_OBJ);
 
-
+//suppresion
 try {
   // Configuration de PDO pour lever des exceptions en cas d'erreur
   $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -49,93 +50,103 @@ try {
 ?>
 <!DOCTYPE html>
 <html lang="en">
-  <style>
-    /* Customize the 'Show entries' select dropdown */
-    .dataTables_length {
-      margin-left: 15px !important;
-    }
+<style>
+  /* Customize the 'Show entries' select dropdown */
+  .dataTables_length {
+    margin-left: 15px !important;
+  }
 
-    .dataTables_length select {
-      margin-left: 13px !important;
-      margin-right: 5px !important;
-      width: 60px;
-      /* Adjust width */
-      height: 35px;
-      /* Adjust height */
-      border: 1px solid #fff;
-      border-radius: 10px;
-      padding: 5px;
-      color: #fff;
-      background-color: #5e72e4;
-      font-size: 14px;
-    }
+  .dataTables_length select {
+    margin-left: 13px !important;
+    margin-right: 5px !important;
+    width: 60px;
+    /* Adjust width */
+    height: 35px;
+    /* Adjust height */
+    border: 1px solid #fff;
+    border-radius: 10px;
+    padding: 5px;
+    color: #fff;
+    background-color: #5e72e4;
+    font-size: 14px;
+  }
 
-    /* Customize the search input */
-    .dataTables_filter input {
-      margin-right: 1.5rem !important;
-      width: 200px;
-      /* Adjust width */
-      height: 35px;
-      /* Adjust height */
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      padding-left: 10px;
-      color: #333;
-      font-size: 14px;
-    }
+  /* Customize the search input */
+  .dataTables_filter input {
+    margin-right: 1.5rem !important;
+    width: 200px;
+    /* Adjust width */
+    height: 35px;
+    /* Adjust height */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding-left: 10px;
+    color: #333;
+    font-size: 14px;
+  }
 
-    /* Customize pagination buttons */
-    .dataTables_paginate .paginate_button {
-      background-color: #007bff;
-      /* Set background color */
-      color: #fff;
-      padding: 5px 10px;
-      border-radius: 5px;
-      margin: 0 2px;
-      font-size: 14px;
-      transition: background-color 0.3s;
-    }
+  /* Customize pagination buttons */
+  .dataTables_paginate .paginate_button {
+    background-color: #007bff;
+    /* Set background color */
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin: 0 2px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+  }
 
-    .dataTables_paginate .paginate_button:hover {
-      background-color: #0056b3;
-      /* Darker color on hover */
-    }
+  .dataTables_paginate .paginate_button:hover {
+    background-color: #0056b3;
+    /* Darker color on hover */
+  }
 
-    /* Customize active pagination button */
-    .dataTables_paginate .paginate_button.current {
-      background-color: #0056b3;
-      color: #fff;
-      font-weight: bold;
-    }
+  /* Customize active pagination button */
+  .dataTables_paginate .paginate_button.current {
+    background-color: #0056b3;
+    color: #fff;
+    font-weight: bold;
+  }
 
-    .dataTables_paginate .paginate_button {
-      background-color: #5e72e3;
-    }
+  .dataTables_paginate .paginate_button {
+    background-color: #5e72e3;
+  }
 
 
-    #table_salle_info {
-      margin-left: 15px !important;
-    }
+  #table_salle_info {
+    margin-left: 15px !important;
+  }
 
-    .dataTables_wrapper .dataTables_length,
-    .dataTables_wrapper .dataTables_filter,
-    .dataTables_wrapper .dataTables_info,
-    .dataTables_wrapper .dataTables_processing,
-    .dataTables_wrapper .dataTables_paginate {
-      color: #cfd3db !important;
-    }
+  .dataTables_wrapper .dataTables_length,
+  .dataTables_wrapper .dataTables_filter,
+  .dataTables_wrapper .dataTables_info,
+  .dataTables_wrapper .dataTables_processing,
+  .dataTables_wrapper .dataTables_paginate {
+    color: #cfd3db !important;
+  }
 
-    /* Remove border between table rows */
-    .dataTable tbody tr {
-      border-bottom: none;
-      border-color: #f4f5f7;
-      /* Remove bottom border for each row */
-    }
+  /* Remove border between table rows */
+  .dataTable tbody tr {
+    border-bottom: none;
+    border-color: #f4f5f7;
+    /* Remove bottom border for each row */
+  }
 
-    #table_salle {
-      border-bottom: 1px solid #f4f5f7;
-    }
-  </style>
+  #table_salle {
+    border-bottom: 1px solid #f4f5f7;
+  }
+
+  /* display action button */
+  #dropdownMenuButton {
+    box-shadow: none !important;
+  }
+
+  #changewidth {
+    width: 6rem !important;
+    min-width: 0 !important;
+  }
+</style>
 <!-- HEAD -->
 <?php include '../includes/head.php' ?>
 
@@ -385,7 +396,10 @@ try {
         <div class="col-12">
           <div class="card mb-4">
             <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-              <h6>Ensaignant table</h6>
+              <div class="">
+                <h6>Ensaignant table</h6>
+                <!-- <input type="text" name="daterange" value="" /> -->
+              </div>
               <div class="">
                 <a class="btn btn-primary btn-sm ms-auto" href="ajouter_salle.php">Ajouter Salle</a>
                 <button type="button" class="btn btn-primary btn-sm ms-auto" onclick="expo()" id='btnexp'>Exporter</button>
@@ -467,15 +481,39 @@ try {
                               <?php endforeach; ?>
                             </td>
                             <td class="align-middle text-center">
-                              <a href="javascript:void(0);">
-                                <i class="ni ni-ruler-pencil text-success me-1 opacity-10 edit_data ni-sm" id="<?php echo $result->id_salle ?>"></i>
-                              </a>
-                              <a href="salle.php?id=<?= $result->id_salle ?>&del=1" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                                <i class="ni ni-fat-remove text-danger ms-1 opacity-10 ni-sm" id="<?= $result->id_salle ?>"></i>
-                              </a>
-                              <a href="description_salle.php?id=<?= $result->id_salle  ?>">
-                                <i class="fas fa-eye text-primary ms-1 opacity-10 fa-sm"></i>
-                              </a>
+                              <div class="">
+                                <div class="dropdown">
+                                  <button id="dropdownMenuButton" type="button" class="btn btn-sm dropdown-toggle border-none " data-bs-toggle="dropdown" aria-expanded="false">
+                                    <svg class="shrink-0" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                      <circle cx="12" cy="12" r="1" />
+                                      <circle cx="19" cy="12" r="1" />
+                                      <circle cx="5" cy="12" r="1" />
+                                    </svg>
+                                  </button>
+                                  <ul id="changewidth" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <li class="text-center">
+                                      <span class="dropdown-item-text text-muted">Actions</span>
+                                    </li>
+                                    <li class="text-center">
+                                      <a href="javascript:void(0);" class="dropdown-item">
+                                        <i class="fas fa-pencil-alt text-gray opacity-10 edit_data ni-sm" id="<?php echo $result->id_salle ?>"></i>
+                                      </a>
+                                    </li>
+                                    <li class="text-center">
+                                      <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
+                                        <i class="fas fa-eye text-primary opacity-10 fa-sm"></i>
+                                      </a>
+                                    </li>
+                                    <li class="text-center">
+                                      <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                        <i class="ni ni-fat-remove text-danger opacity-10" id="<?= $result->id_salle ?>"></i>
+                                        <!-- <i class="ni ni-trash text-danger ms-1 opacity-10" id="<?php //$result->id_salle 
+                                                                                                    ?>"></i> -->
+                                      </a>
+                                    </li>
+                                  </ul>
+                                </div>
+                              </div>
                             </td>
                           </tr>
                         <?php endforeach; ?>
@@ -501,6 +539,7 @@ try {
   </main>
 
   <!-- Ton script AJAX pour l'édition de la salle -->
+  <!-- Export Functio -->
   <script>
     $(document).ready(function() {
       $('#table_salle').DataTable(); // Initialize DataTable
@@ -561,6 +600,7 @@ try {
     }
   </script>
 
+  <!-- Edit data -->
   <script type="text/javascript">
     $(document).ready(function() {
       $(document).on('click', '.edit_data', function() {
@@ -580,6 +620,58 @@ try {
     });
   </script>
 
+  <!-- DropDown Actions -->
+  <script>
+    document.getElementById('dropdownMenuButton').addEventListener('click', function() {
+      var dropdownMenu = document.querySelector('.dropdown-menu');
+      dropdownMenu.classList.toggle('show'); // Affiche ou cache le menu au clic du bouton
+    });
+  </script>
+
+  <!-- Date Picker -->
+  <!-- <script>
+    $(function() {
+      $('input[name="daterange"]').daterangepicker({
+        opens: 'left'
+      }, function(start, end, label) {
+        console.log(start.format('YYYY-MM-DD'))
+        console.log(end.format('YYYY-MM-DD'))
+      });
+    });
+  </script> -->
+
+  <!-- <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script> -->
+  <script>
+    $(function() {
+      // Initialisation du datepicker
+      $('input[name="daterange"]').daterangepicker({
+        opens: 'left'
+      });
+
+      // Capturer l'événement du bouton "Apply"
+      $('button.applyBtn').on('click', function() {
+        // Récupérer les dates sélectionnées
+        const daterange = $('input[name="daterange"]').val();
+        const dates = daterange.split(' - '); // Diviser la date en deux parties (début et fin)
+        const startDate = dates[0];
+        const endDate = dates[1];
+
+        // Envoyer les données au serveur via AJAX
+        $.ajax({
+          url: 'salle.php', // La même page pour traiter la requête
+          method: 'GET', // Utilisation de GET pour rester sur la même page
+          data: {
+            start_date: startDate,
+            end_date: endDate
+          },
+          // success: function(response) {
+          //   //Mettre à jour la table avec les résultats filtrés
+          //   $('#table_salle').html(response);
+          // }
+        });
+      });
+    });
+  </script>
 
   <!-- FIXED PLUGIN  -->
   <?php include '../includes/fixedplugin.php' ?>

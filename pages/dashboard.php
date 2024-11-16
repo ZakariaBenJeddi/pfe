@@ -826,59 +826,60 @@
   </script>
 
 
+  <!-- //! DRIVER JS -->
   <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
-
   <script>
-        document.getElementById('startTourButton').addEventListener('click', function() {
-            const driverObj = window.driver.js.driver({
-                showProgress: true,
-                showButtons: ['next', 'previous'],
-                steps: [
-                    { 
-                        element: '#nombre_salle', 
-                        popover: { 
-                            title: 'Premier exemple', 
-                            description: 'Voici la première étape du tour',
-                            side: "left", 
-                            align: 'start' 
-                        }
-                    },
-                    { 
-                        element: '#nombre_eleve', 
-                        popover: { 
-                            title: 'Premier exemple', 
-                            description: 'Voici la première étape du tour',
-                            side: "right", 
-                            align: 'start' 
-                        }
-                    },
-                    { 
-                        element: '#ensaignant',
-                        popover: { 
-                            title: 'Import de la librairie', 
-                            description: 'Première ligne de code',
-                            side: "bottom", 
-                            align: 'start' 
-                        }
-                    },
-                    { 
-                        element: '#abscence',
-                        popover: {
-                            title: 'Import de la librairie', 
-                            description: 'Première ligne de code',
-                            side: "left", 
-                            align: 'start',
-                        }
-                    },
-                    // ... autres étapes ...
-                ]
-            });
-
-            driverObj.drive();
+    document.getElementById('startTourButton').addEventListener('click', function() {
+        const driverObj = window.driver.js.driver({
+            showProgress: true,
+            showButtons: ['next', 'previous'],
+            steps: [
+                { 
+                    element: '#nombre_salle', 
+                    popover: { 
+                        title: 'Premier exemple', 
+                        description: 'Voici la première étape du tour',
+                        side: "left", 
+                        align: 'start' 
+                    }
+                },
+                { 
+                    element: '#nombre_eleve', 
+                    popover: { 
+                        title: 'Premier exemple', 
+                        description: 'Voici la première étape du tour',
+                        side: "right", 
+                        align: 'start' 
+                    }
+                },
+                { 
+                    element: '#ensaignant',
+                    popover: { 
+                        title: 'Import de la librairie', 
+                        description: 'Première ligne de code',
+                        side: "bottom", 
+                        align: 'start' 
+                    }
+                },
+                { 
+                    element: '#abscence',
+                    popover: {
+                        title: 'Import de la librairie', 
+                        description: 'Première ligne de code',
+                        side: "left", 
+                        align: 'start',
+                    }
+                },
+                // ... autres étapes ...
+            ]
         });
-    </script>
+
+        driverObj.drive();
+    });
+  </script>
 
   <script>
+
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
       var options = {
