@@ -496,7 +496,8 @@ try {
                                     </li>
                                     <li class="text-center">
                                       <a href="javascript:void(0);" class="dropdown-item">
-                                        <i class="fas fa-pencil-alt text-gray opacity-10 edit_data ni-sm" id="<?php echo $result->id_salle ?>"></i>
+                                        <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true" id="<?php echo $result->id_salle ?>"></i>
+                                        <!-- <i class="fas fa-pencil-alt text-gray opacity-10 edit_data ni-sm" id="<?php //echo $result->id_salle ?>"></i> -->
                                       </a>
                                     </li>
                                     <li class="text-center">
