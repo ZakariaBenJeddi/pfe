@@ -137,6 +137,20 @@ try {
     #table_salle {
       border-bottom: 1px solid #f4f5f7;
     }
+
+    /* display action button */
+    #dropdownMenuButton {
+      box-shadow: none !important;
+    }
+
+    .dropdown .dropdown-menu {
+      display: auto !important;
+    }
+
+    #changewidth {
+      width: 6rem !important;
+      min-width: 0 !important;
+    }
 </style>
 <!-- HEAD -->
 <?php include '../includes/head.php' ?>
@@ -407,8 +421,8 @@ try {
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">date embauche</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">salaire</th>
-                      <!-- <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th> -->
-                      <th class="text-secondary opacity-7"></th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
+                      <!-- <th class="text-secondary opacity-7"></th> -->
                     </tr>
                   </thead>
                   <tbody>
@@ -455,10 +469,36 @@ try {
                           <td class="align-middle text-center">
                             <span class="text-secondary text-xs font-weight-bold"><?= $result->salaire ?> DH</span>
                           </td>
-                          <td class="align-middle">
+                          <!-- <td class="align-middle">
                             <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
                               Edit
                             </a>
+                          </td> -->
+                          <td class="align-middle text-center">
+                              <div class="">
+                                <div class="dropdown">
+                                  <button id="dropdownMenuButton" type="button" class="btn btn-sm dropdown-toggle border-none " data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa fa-ellipsis-v text-xs" id="dropdownMenuButton" type="button" data-bs-toggle="dropdown" aria-expanded="false"></i>
+                                  </button>
+                                  <ul id="changewidth" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <li class="text-center">
+                                      <a href="javascript:void(0);" class="dropdown-item">
+                                        <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true" id="<?php echo $result->id_salle ?>"></i>
+                                      </a>
+                                    </li>
+                                    <li class="text-center">
+                                      <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
+                                        <i class="fas fa-eye text-primary opacity-10 fa-sm"></i>
+                                      </a>
+                                    </li>
+                                    <li class="text-center">
+                                      <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                        <i class="ni ni-fat-remove text-danger opacity-10" id="<?= $result->id_salle ?>"></i>
+                                      </a>
+                                    </li>
+                                  </ul>
+                                </div>
+                              </div>
                           </td>
                         </tr>
                       <?php endforeach; ?>

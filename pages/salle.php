@@ -504,8 +504,6 @@ try {
                                     <li class="text-center">
                                       <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
                                         <i class="ni ni-fat-remove text-danger opacity-10" id="<?= $result->id_salle ?>"></i>
-                                        <!-- <i class="ni ni-trash text-danger ms-1 opacity-10" id="<?php //$result->id_salle 
-                                                                                                    ?>"></i> -->
                                       </a>
                                     </li>
                                   </ul>
