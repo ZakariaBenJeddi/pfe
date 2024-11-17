@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bootstrap Stepper Example</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap/dist/css/bootstrap.min.css">
+  <!-- bs-stepper CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bs-stepper/dist/css/bs-stepper.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <div id="stepper" class="bs-stepper">
+      <!-- Stepper Header -->
+      <div class="bs-stepper-header" role="tablist">
+        <!-- Step 1: Logins -->
+        <div class="step" data-target="#logins-part">
+          <button type="button" class="step-trigger" role="tab" aria-controls="logins-part" id="logins-part-trigger">
+            <span class="bs-stepper-circle">1</span>
+            <span class="bs-stepper-label">Logins</span>
+          </button>
+        </div>
+        <div class="line"></div>
+        <!-- Step 2: Password -->
+        <div class="step" data-target="#password-part">
+          <button type="button" class="step-trigger" role="tab" aria-controls="password-part" id="password-part-trigger">
+            <span class="bs-stepper-circle">2</span>
+            <span class="bs-stepper-label">Password</span>
+          </button>
+        </div>
+        <div class="line"></div>
+        <!-- Step 3: Various Information -->
+        <div class="step" data-target="#information-part">
+          <button type="button" class="step-trigger" role="tab" aria-controls="information-part" id="information-part-trigger">
+            <span class="bs-stepper-circle">3</span>
+            <span class="bs-stepper-label">Various Information</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Stepper Content -->
+      <div class="bs-stepper-content">
+        <!-- Content for Step 1: Logins -->
+        <div id="logins-part" class="content" role="tabpanel" aria-labelledby="logins-part-trigger">
+          <h5>Step 1: Logins</h5>
+          <p>Enter your email address here.</p>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email address</label>
+            <input type="email" id="email" class="form-control" placeholder="Enter your email">
+          </div>
+          <button class="btn btn-primary" onclick="stepper.next()">Next</button>
+        </div>
+
+        <!-- Content for Step 2: Password -->
+        <div id="password-part" class="content" role="tabpanel" aria-labelledby="password-part-trigger">
+          <h5>Step 2: Password</h5>
+          <p>Enter your password here.</p>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" class="form-control" placeholder="Enter your password">
+          </div>
+          <button class="btn btn-secondary me-2" onclick="stepper.previous()">Previous</button>
+          <button class="btn btn-primary" onclick="stepper.next()">Next</button>
+        </div>
+
+        <!-- Content for Step 3: Various Information -->
+        <div id="information-part" class="content" role="tabpanel" aria-labelledby="information-part-trigger">
+          <h5>Step 3: Various Information</h5>
+          <p>Provide additional information here.</p>
+          <textarea class="form-control mb-3" rows="3" placeholder="Enter additional information"></textarea>
+          <button class="btn btn-secondary me-2" onclick="stepper.previous()">Previous</button>
+          <button class="btn btn-success">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- bs-stepper JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bs-stepper/dist/js/bs-stepper.min.js"></script>
+  <!-- Initialize bs-stepper -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      window.stepper = new Stepper(document.querySelector('#stepper'), {
+        linear: true,
+        animation: true
+      });
+    });
+  </script>
+</body>
+</html>
