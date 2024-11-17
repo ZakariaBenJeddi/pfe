@@ -142,6 +142,10 @@ try {
     box-shadow: none !important;
   }
 
+  .dropdown .dropdown-menu {
+    display: auto !important;
+  }
+
   #changewidth {
     width: 6rem !important;
     min-width: 0 !important;
@@ -484,20 +488,12 @@ try {
                               <div class="">
                                 <div class="dropdown">
                                   <button id="dropdownMenuButton" type="button" class="btn btn-sm dropdown-toggle border-none " data-bs-toggle="dropdown" aria-expanded="false">
-                                    <svg class="shrink-0" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                      <circle cx="12" cy="12" r="1" />
-                                      <circle cx="19" cy="12" r="1" />
-                                      <circle cx="5" cy="12" r="1" />
-                                    </svg>
+                                    <i class="fa fa-ellipsis-v text-xs" id="dropdownMenuButton" type="button" data-bs-toggle="dropdown" aria-expanded="false"></i>
                                   </button>
                                   <ul id="changewidth" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                     <li class="text-center">
-                                      <span class="dropdown-item-text text-muted">Actions</span>
-                                    </li>
-                                    <li class="text-center">
                                       <a href="javascript:void(0);" class="dropdown-item">
                                         <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true" id="<?php echo $result->id_salle ?>"></i>
-                                        <!-- <i class="fas fa-pencil-alt text-gray opacity-10 edit_data ni-sm" id="<?php //echo $result->id_salle ?>"></i> -->
                                       </a>
                                     </li>
                                     <li class="text-center">
