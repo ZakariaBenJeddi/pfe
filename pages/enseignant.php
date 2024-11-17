@@ -48,109 +48,109 @@ try {
 <!DOCTYPE html>
 <html lang="en">
 <style>
-  
-    table.dataTable.no-footer {
-      border-bottom: 0px solid #fff !important;
-    }
-    /* Customize the 'Show entries' select dropdown */
-    .dataTables_length {
-      margin-left: 15px !important;
-    }
+  table.dataTable.no-footer {
+    border-bottom: 0px solid #fff !important;
+  }
 
-    .dataTables_length select {
-      margin-left: 13px !important;
-      margin-right: 5px !important;
-      width: 60px;
-      /* Adjust width */
-      height: 35px;
-      /* Adjust height */
-      border: 1px solid #fff;
-      border-radius: 10px;
-      padding: 5px;
-      color: #fff;
-      background-color: #5e72e4;
-      font-size: 14px;
-    }
+  /* Customize the 'Show entries' select dropdown */
+  .dataTables_length {
+    margin-left: 15px !important;
+  }
 
-    /* Customize the search input */
-    .dataTables_filter input {
-      margin-right: 1.5rem !important;
-      width: 200px;
-      /* Adjust width */
-      height: 35px;
-      /* Adjust height */
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      padding-left: 10px;
-      color: #333;
-      font-size: 14px;
-    }
+  .dataTables_length select {
+    margin-left: 13px !important;
+    margin-right: 5px !important;
+    width: 60px;
+    /* Adjust width */
+    height: 35px;
+    /* Adjust height */
+    border: 1px solid #fff;
+    border-radius: 10px;
+    padding: 5px;
+    color: #fff;
+    background-color: #5e72e4;
+    font-size: 14px;
+  }
 
-    /* Customize pagination buttons */
-    .dataTables_paginate .paginate_button {
-      background-color: #007bff;
-      /* Set background color */
-      color: #fff;
-      padding: 5px 10px;
-      border-radius: 5px;
-      margin: 0 2px;
-      font-size: 14px;
-      transition: background-color 0.3s;
-    }
+  /* Customize the search input */
+  .dataTables_filter input {
+    margin-right: 1.5rem !important;
+    width: 200px;
+    /* Adjust width */
+    height: 35px;
+    /* Adjust height */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding-left: 10px;
+    color: #333;
+    font-size: 14px;
+  }
 
-    .dataTables_paginate .paginate_button:hover {
-      background-color: #0056b3;
-      /* Darker color on hover */
-    }
+  /* Customize pagination buttons */
+  .dataTables_paginate .paginate_button {
+    background-color: #007bff;
+    /* Set background color */
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin: 0 2px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+  }
 
-    /* Customize active pagination button */
-    .dataTables_paginate .paginate_button.current {
-      background-color: #0056b3;
-      color: #fff;
-      font-weight: bold;
-    }
+  .dataTables_paginate .paginate_button:hover {
+    background-color: #0056b3;
+    /* Darker color on hover */
+  }
 
-    .dataTables_paginate .paginate_button {
-      background-color: #5e72e3;
-    }
+  /* Customize active pagination button */
+  .dataTables_paginate .paginate_button.current {
+    background-color: #0056b3;
+    color: #fff;
+    font-weight: bold;
+  }
+
+  .dataTables_paginate .paginate_button {
+    background-color: #5e72e3;
+  }
 
 
-    #table_salle_info {
-      margin-left: 15px !important;
-    }
+  #table_salle_info {
+    margin-left: 15px !important;
+  }
 
-    .dataTables_wrapper .dataTables_length,
-    .dataTables_wrapper .dataTables_filter,
-    .dataTables_wrapper .dataTables_info,
-    .dataTables_wrapper .dataTables_processing,
-    .dataTables_wrapper .dataTables_paginate {
-      color: #cfd3db !important;
-    }
+  .dataTables_wrapper .dataTables_length,
+  .dataTables_wrapper .dataTables_filter,
+  .dataTables_wrapper .dataTables_info,
+  .dataTables_wrapper .dataTables_processing,
+  .dataTables_wrapper .dataTables_paginate {
+    color: #cfd3db !important;
+  }
 
-    /* Remove border between table rows */
-    .dataTable tbody tr {
-      border-bottom: none;
-      border-color: #f4f5f7;
-      /* Remove bottom border for each row */
-    }
+  /* Remove border between table rows */
+  .dataTable tbody tr {
+    border-bottom: none;
+    border-color: #f4f5f7;
+    /* Remove bottom border for each row */
+  }
 
-    #table_salle {
-      border-bottom: 1px solid #f4f5f7;
-    }
+  #table_salle {
+    border-bottom: 1px solid #f4f5f7;
+  }
 
-    /* display action button */
-    #dropdownMenuButton {
-      box-shadow: none !important;
-    }
+  /* display action button */
+  #dropdownMenuButton {
+    box-shadow: none !important;
+  }
 
-    .dropdown .dropdown-menu {
-      display: auto !important;
-    }
+  .dropdown .dropdown-menu {
+    display: auto !important;
+  }
 
-    #changewidth {
-      width: 6rem !important;
-      min-width: 0 !important;
-    }
+  #changewidth {
+    width: 6rem !important;
+    min-width: 0 !important;
+  }
 </style>
 <!-- HEAD -->
 <?php include '../includes/head.php' ?>
@@ -218,7 +218,7 @@ try {
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Callendar</span>
+            <span class="nav-link-text ms-1">Emplois du Temps</span>
           </a>
         </li>
         <li class="nav-item">
@@ -449,7 +449,18 @@ try {
                               <span class="me-2 text-xs font-weight-bold"><?= $result->degree ?>%</span>
                               <div>
                                 <div class="progress">
-                                  <div class="progress-bar <?php if($result->degree<=30){echo 'bg-gradient-danger';} if($result->degree<=50 && $result->degree>30){echo 'bg-gradient-warning';}  if($result->degree>=30 && $result->degree<90){echo 'bg-gradient-info';} if($result->degree>=90){echo 'bg-gradient-success';} ?>" role="progressbar" aria-valuenow="<?= $result->degree ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $result->degree ?>%;"></div>
+                                  <div class="progress-bar <?php if ($result->degree <= 30) {
+                                                              echo 'bg-gradient-danger';
+                                                            }
+                                                            if ($result->degree <= 50 && $result->degree > 30) {
+                                                              echo 'bg-gradient-warning';
+                                                            }
+                                                            if ($result->degree >= 30 && $result->degree < 90) {
+                                                              echo 'bg-gradient-info';
+                                                            }
+                                                            if ($result->degree >= 90) {
+                                                              echo 'bg-gradient-success';
+                                                            } ?>" role="progressbar" aria-valuenow="<?= $result->degree ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $result->degree ?>%;"></div>
                                 </div>
                               </div>
                             </div>
@@ -475,30 +486,30 @@ try {
                             </a>
                           </td> -->
                           <td class="align-middle text-center">
-                              <div class="">
-                                <div class="dropdown">
-                                  <button id="dropdownMenuButton" type="button" class="btn btn-sm dropdown-toggle border-none " data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa fa-ellipsis-v text-xs" id="dropdownMenuButton" type="button" data-bs-toggle="dropdown" aria-expanded="false"></i>
-                                  </button>
-                                  <ul id="changewidth" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <li class="text-center">
-                                      <a href="javascript:void(0);" class="dropdown-item">
-                                        <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true" id="<?php echo $result->id_salle ?>"></i>
-                                      </a>
-                                    </li>
-                                    <li class="text-center">
-                                      <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
-                                        <i class="fas fa-eye text-primary opacity-10 fa-sm"></i>
-                                      </a>
-                                    </li>
-                                    <li class="text-center">
-                                      <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                                        <i class="ni ni-fat-remove text-danger opacity-10" id="<?= $result->id_salle ?>"></i>
-                                      </a>
-                                    </li>
-                                  </ul>
-                                </div>
+                            <div class="">
+                              <div class="dropdown">
+                                <button id="dropdownMenuButton" type="button" class="btn btn-sm dropdown-toggle border-none " data-bs-toggle="dropdown" aria-expanded="false">
+                                  <i class="fa fa-ellipsis-v text-xs" id="dropdownMenuButton" type="button" data-bs-toggle="dropdown" aria-expanded="false"></i>
+                                </button>
+                                <ul id="changewidth" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                  <li class="text-center">
+                                    <a href="javascript:void(0);" class="dropdown-item">
+                                      <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true" id="<?php echo $result->id_salle ?>"></i>
+                                    </a>
+                                  </li>
+                                  <li class="text-center">
+                                    <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
+                                      <i class="fas fa-eye text-primary opacity-10 fa-sm"></i>
+                                    </a>
+                                  </li>
+                                  <li class="text-center">
+                                    <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                      <i class="ni ni-fat-remove text-danger opacity-10" id="<?= $result->id_salle ?>"></i>
+                                    </a>
+                                  </li>
+                                </ul>
                               </div>
+                            </div>
                           </td>
                         </tr>
                       <?php endforeach; ?>

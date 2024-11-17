@@ -1,9 +1,9 @@
 <?php
-  session_start();
-  require '../includes/DatabaseConnexion.php';
-  $query_nbr_salle = $dbh->query("SELECT COUNT(*) FROM salle ");
-  $nbr_salle = $query_nbr_salle->fetchColumn(); // Récupère le nombre total de salles
-  // $username = $_SESSION['lastname'];
+session_start();
+require '../includes/DatabaseConnexion.php';
+$query_nbr_salle = $dbh->query("SELECT COUNT(*) FROM salle ");
+$nbr_salle = $query_nbr_salle->fetchColumn(); // Récupère le nombre total de salles
+// $username = $_SESSION['lastname'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,52 +15,51 @@
   <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="../assets/img/icons/flags/AU.png">
   <title>Gestion Ecole</title>
-  
+
   <!-- Fonts and icons -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-  
+
   <!-- Font Awesome CDN - Version 6.6.0 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  
+
   <!-- Nucleo Icons -->
   <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
   <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
 
   <!-- //!DRIVER JS -->
   <!-- <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script> -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
-  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css" />
+
   <!-- CSS Files -->
   <link id="pagestyle" href="../assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
   <style>
-      /* CSS styles for the button */
-      .card {
-        position: relative;
-        overflow: hidden;
-      }
+    /* CSS styles for the button */
+    .card {
+      position: relative;
+      overflow: hidden;
+    }
 
-      /* Style the "See More" button */
-      .see-more-btn {
-        display: none;
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        padding: 5px 10px;
-        background-color: #ffc107;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 0.9rem;
-        font-weight: bold;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-      }
+    /* Style the "See More" button */
+    .see-more-btn {
+      display: none;
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      padding: 5px 10px;
+      background-color: #ffc107;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: bold;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    }
 
-      /* Show button on hover */
-      .card:hover .see-more-btn {
-        display: inline-block;
-      }
-
+    /* Show button on hover */
+    .card:hover .see-more-btn {
+      display: inline-block;
+    }
   </style>
 </head>
 
@@ -74,9 +73,9 @@
         <!-- <img src="../assets/img/icons/flags/AU.png" class="navbar-brand-img h-100" alt="main_logo"> -->
         <img src="https://elaraki.ac.ma/images/logo2.png" class="navbar-brand-img h-100" alt="main_logo">
         <span class="ms-1 font-weight-bold">
-        <?= strtoupper($_SESSION['nom_admin']." ".$_SESSION['prenom_admin'])  ?>
+          <?= strtoupper($_SESSION['nom_admin'] . " " . $_SESSION['prenom_admin'])  ?>
         </span>
-        
+
       </a>
     </div>
     <hr class="horizontal dark mt-0">
@@ -105,7 +104,7 @@
             </div>
             <span class="nav-link-text ms-1">Salles</span>
           </a>
-        </li>      
+        </li>
         <li class="nav-item">
           <a class="nav-link " href="../pages/enseignant.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -128,7 +127,7 @@
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Callendar</span>
+            <span class="nav-link-text ms-1">Emplois du Temps</span>
           </a>
         </li>
         <li class="nav-item">
@@ -321,17 +320,18 @@
                   <div class="numbers">
                     <p class="text-sm mb-0 text-uppercase font-weight-bold">Nombre Salle</p>
                     <h5 class="font-weight-bolder">
-                      <?= $nbr_salle //*nombre salle ; ?>
+                      <?= $nbr_salle //*nombre salle ; 
+                      ?>
                     </h5>
                     <p class="mb-0">
                       <span class="text-success text-sm font-weight-bolder">11</span>
-                      Salles actuellement  
+                      Salles actuellement
                     </p>
                   </div>
                 </div>
                 <div class="col-4 text-end">
                   <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
-                    <i class="ni ni-building text-light text-lg opacity-10"  aria-hidden="true"></i>
+                    <i class="ni ni-building text-light text-lg opacity-10" aria-hidden="true"></i>
                   </div>
                 </div>
               </div>
@@ -431,7 +431,7 @@
               </div>
             </div>
           </div>
-          
+
         </div>
         <div class="col-lg-5">
           <div class="card card-carousel overflow-hidden h-100 p-0">
@@ -753,7 +753,7 @@
       labels: labels,
       datasets: [{
         label: 'Abscence',
-        data: [65, 59, 80, 81, 56,],
+        data: [65, 59, 80, 81, 56, ],
         backgroundColor: [
           'rgba(255, 99, 132, 0.2)',
           'rgba(255, 159, 64, 0.2)',
@@ -830,56 +830,54 @@
   <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
   <script>
     document.getElementById('startTourButton').addEventListener('click', function() {
-        const driverObj = window.driver.js.driver({
-            showProgress: true,
-            showButtons: ['next', 'previous'],
-            steps: [
-                { 
-                    element: '#nombre_salle', 
-                    popover: { 
-                        title: 'Premier exemple', 
-                        description: 'Voici la première étape du tour',
-                        side: "left", 
-                        align: 'start' 
-                    }
-                },
-                { 
-                    element: '#nombre_eleve', 
-                    popover: { 
-                        title: 'Premier exemple', 
-                        description: 'Voici la première étape du tour',
-                        side: "right", 
-                        align: 'start' 
-                    }
-                },
-                { 
-                    element: '#ensaignant',
-                    popover: { 
-                        title: 'Import de la librairie', 
-                        description: 'Première ligne de code',
-                        side: "bottom", 
-                        align: 'start' 
-                    }
-                },
-                { 
-                    element: '#abscence',
-                    popover: {
-                        title: 'Import de la librairie', 
-                        description: 'Première ligne de code',
-                        side: "left", 
-                        align: 'start',
-                    }
-                },
-                // ... autres étapes ...
-            ]
-        });
+      const driverObj = window.driver.js.driver({
+        showProgress: true,
+        showButtons: ['next', 'previous'],
+        steps: [{
+            element: '#nombre_salle',
+            popover: {
+              title: 'Premier exemple',
+              description: 'Voici la première étape du tour',
+              side: "left",
+              align: 'start'
+            }
+          },
+          {
+            element: '#nombre_eleve',
+            popover: {
+              title: 'Premier exemple',
+              description: 'Voici la première étape du tour',
+              side: "right",
+              align: 'start'
+            }
+          },
+          {
+            element: '#ensaignant',
+            popover: {
+              title: 'Import de la librairie',
+              description: 'Première ligne de code',
+              side: "bottom",
+              align: 'start'
+            }
+          },
+          {
+            element: '#abscence',
+            popover: {
+              title: 'Import de la librairie',
+              description: 'Première ligne de code',
+              side: "left",
+              align: 'start',
+            }
+          },
+          // ... autres étapes ...
+        ]
+      });
 
-        driverObj.drive();
+      driverObj.drive();
     });
   </script>
 
   <script>
-
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
       var options = {
