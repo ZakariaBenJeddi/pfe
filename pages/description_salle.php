@@ -1,21 +1,6 @@
 <?php
 require '../includes/DatabaseConnexion.php';
 session_start();
-//! Pour une page details_salle.php, l'objectif est d'afficher tous les détails pertinents sur une salle spécifique de l'école. Voici une liste des éléments que vous pourriez afficher, ainsi que des suggestions pour leur présentation :
-//!   1. Informations de base sur la salle
-
-//!       Nom de la salle : Le nom unique ou l'identifiant de la salle.
-//!       Capacité : Nombre maximum d'élèves que la salle peut accueillir.
-//!       Étage : L'étage où se trouve la salle.
-//!       Type de salle : Par exemple, salle de classe, laboratoire, amphithéâtre, salle informatique, etc.
-
-
-//! 2. Équipements disponibles
-
-//!     Équipements : Par exemple, projecteur, tableau blanc, climatisation, etc.
-//!     Nombre de chaises : Total des chaises disponibles.
-//!     Nombre de bureaux : Total des bureaux disponibles.
-//!     Tableaux : Indique s'il y a des tableaux et leur type (ex. tableau blanc, tableau noir).
 
 
 //! 3. Planning des cours dans cette salle
@@ -441,49 +426,114 @@ if (isset($_GET['id'])) {
                 <div class="card-header pb-0 p-3">
                   <div class="row">
                     <div class="col-6 d-flex align-items-center">
-                      <h6 class="mb-0">Payment Method</h6>
-                    </div>
-                    <div class="col-6 text-end">
-                      <a class="btn bg-gradient-dark mb-0" href="javascript:;"><i class="fas fa-plus"></i>&nbsp;&nbsp;Add New Card</a>
+                      <h6 class="mb-0">Ensaignant de cette salles</h6>&nbsp;&nbsp;<i class="fas fa-users text-primary"></i>
                     </div>
                   </div>
                 </div>
                 <div class="card-body p-3">
                   <div class="row">
-                    <div class="col-md-6 mb-md-0 mb-4">
-                      <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row">
-                        <img class="w-10 me-3 mb-0" src="../assets/img/logos/mastercard.png" alt="logo">
-                        <h6 class="mb-0">****&nbsp;&nbsp;&nbsp;****&nbsp;&nbsp;&nbsp;****&nbsp;&nbsp;&nbsp;7852</h6>
-                        <i class="fas fa-pencil-alt ms-auto text-dark cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Card"></i>
+                    <div class="col-md-6 mb-md-0 ">
+                      <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <div class="d-flex px-2 py-1">
+                                  <div>
+                                    <img src="../assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
+                                  </div>
+                                  <div class="d-flex flex-column justify-content-center">
+                                    <h6 class="mb-0 text-sm">John Michael</h6>
+                                    <p class="text-xs text-secondary mb-0">john@creative-tim.com</p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <p class="text-xs font-weight-bold mb-0">Manager</p>
+                                <p class="text-xs text-secondary mb-0">Organization</p>
+                              </td>
+                              
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="d-flex px-2 py-1">
+                                  <div>
+                                    <img src="../assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
+                                  </div>
+                                  <div class="d-flex flex-column justify-content-center">
+                                    <h6 class="mb-0 text-sm">John Michael</h6>
+                                    <p class="text-xs text-secondary mb-0">john@creative-tim.com</p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <p class="text-xs font-weight-bold mb-0">Manager</p>
+                                <p class="text-xs text-secondary mb-0">Organization</p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </div>
-                    <div class="col-md-6">
-                      <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row">
-                        <img class="w-10 me-3 mb-0" src="../assets/img/logos/visa.png" alt="logo">
-                        <h6 class="mb-0">****&nbsp;&nbsp;&nbsp;****&nbsp;&nbsp;&nbsp;****&nbsp;&nbsp;&nbsp;5248</h6>
-                        <i class="fas fa-pencil-alt ms-auto text-dark cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Card"></i>
+                    <div class="col-md-6 mb-md-0 mb-4">
+                      <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <div class="d-flex px-2 py-1">
+                                  <div>
+                                    <img src="../assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
+                                  </div>
+                                  <div class="d-flex flex-column justify-content-center">
+                                    <h6 class="mb-0 text-sm">John Michael</h6>
+                                    <p class="text-xs text-secondary mb-0">john@creative-tim.com</p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <p class="text-xs font-weight-bold mb-0">Manager</p>
+                                <p class="text-xs text-secondary mb-0">Organization</p>
+                              </td>
+                              
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="d-flex px-2 py-1">
+                                  <div>
+                                    <img src="../assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
+                                  </div>
+                                  <div class="d-flex flex-column justify-content-center">
+                                    <h6 class="mb-0 text-sm">John Michael</h6>
+                                    <p class="text-xs text-secondary mb-0">john@creative-tim.com</p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <p class="text-xs font-weight-bold mb-0">Manager</p>
+                                <p class="text-xs text-secondary mb-0">Organization</p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="col-md-3 mb-lg-0 mb-4">
-              <div class="card mt-4">
-                <div class="card-header pb-0 p-3">
-                  <div class="row text-center">
-                    <div class="col-12">
-                      <h6 class="mb-0 btn btn-primary mb-4">Actions</h6>
-                    </div>
-                    <div class="col-12">
-                      <div class="btn btn-success">Edit</div>
-                    </div>
-                    <div class="col-12">
-                      <div class="btn btn-danger">Delete</div>
-                    </div>
+            <div class="col-md-3 mb-lg-0 mb-2">
+              <!-- <div class="card mt-4"> -->
+                <div class="alert alert-danger mt-4 h-75">
+                  <h5 class="text-center text-light">
+                    Alert
+                  </h5>
+                  <hr>
+                  <div class="text-light">
+                      Aucun alert
                   </div>
                 </div>
-              </div>
+              <!-- </div> -->
             </div>
           </div>
         </div>
@@ -543,90 +593,77 @@ if (isset($_GET['id'])) {
             <div class="card-header pb-0 px-3">
               <div class="row">
                 <div class="col-md-6">
-                  <h6 class="mb-0">Your Transaction's</h6>
+                  <h6 class="mb-0">Nombre de sceance chaque annees</h6>
                 </div>
                 <div class="col-md-6 d-flex justify-content-end align-items-center">
                   <i class="far fa-calendar-alt me-2"></i>
-                  <small>23 - 30 March 2020</small>
+                  <small><?php echo (new DateTime('now'))->format('d/m/Y'); ?></small>
                 </div>
               </div>
             </div>
             <div class="card-body pt-4 p-3">
-              <h6 class="text-uppercase text-body text-xs font-weight-bolder mb-3">Newest</h6>
+              <h6 class="text-uppercase text-body text-xs font-weight-bolder mb-3">Annees</h6>
               <ul class="list-group">
                 <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
                   <div class="d-flex align-items-center">
                     <button class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-down"></i></button>
                     <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">Netflix</h6>
-                      <span class="text-xs">27 March 2020, at 12:30 PM</span>
+                      <h6 class="mb-1 text-dark text-sm">2024</h6>
+                      <span class="text-xs">244 Sceance</span>
                     </div>
                   </div>
                   <div class="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold">
-                    - $ 2,500
+                    - 4%
                   </div>
                 </li>
                 <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
                   <div class="d-flex align-items-center">
                     <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
                     <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">Apple</h6>
-                      <span class="text-xs">27 March 2020, at 04:30 AM</span>
+                      <h6 class="mb-1 text-dark text-sm">2023</h6>
+                      <span class="text-xs">271 Sceance</span>
                     </div>
                   </div>
                   <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
-                    + $ 2,000
+                    + 17%
                   </div>
                 </li>
               </ul>
-              <h6 class="text-uppercase text-body text-xs font-weight-bolder my-3">Yesterday</h6>
               <ul class="list-group">
                 <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
                   <div class="d-flex align-items-center">
                     <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
                     <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">Stripe</h6>
-                      <span class="text-xs">26 March 2020, at 13:45 PM</span>
+                      <h6 class="mb-1 text-dark text-sm">2022</h6>
+                      <span class="text-xs">200 Sceance</span>
                     </div>
                   </div>
                   <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
-                    + $ 750
+                    + 1%
+                  </div>
+                </li>
+                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                  <div class="d-flex align-items-center">
+                  <button class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-down"></i></button>
+                  <div class="d-flex flex-column">
+                      <h6 class="mb-1 text-dark text-sm">2021</h6>
+                      <span class="text-xs">191 Sceance</span>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
+                    + 7%
                   </div>
                 </li>
                 <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
                   <div class="d-flex align-items-center">
                     <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
                     <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">HubSpot</h6>
-                      <span class="text-xs">26 March 2020, at 12:30 PM</span>
+                      <h6 class="mb-1 text-dark text-sm">2020</h6>
+                      <span class="text-xs">151 Sceance</span>
                     </div>
                   </div>
                   <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
-                    + $ 1,000
-                  </div>
-                </li>
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                  <div class="d-flex align-items-center">
-                    <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
-                    <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">Creative Tim</h6>
-                      <span class="text-xs">26 March 2020, at 08:30 AM</span>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
-                    + $ 2,500
-                  </div>
-                </li>
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                  <div class="d-flex align-items-center">
-                    <button class="btn btn-icon-only btn-rounded btn-outline-dark mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-exclamation"></i></button>
-                    <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">Webflow</h6>
-                      <span class="text-xs">26 March 2020, at 05:00 AM</span>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center text-dark text-sm font-weight-bold">
-                    Pending
+                    + 100%
                   </div>
                 </li>
               </ul>

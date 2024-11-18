@@ -340,7 +340,7 @@ require_once('db-connect.php') ?>
                                             <select name="professeur" id="professeur">
                                                 <?php if ($prof->num_rows > 0) {
                                                     while ($row = $prof->fetch_assoc()) { ?>
-                                                        <option name="professeur" id="professeur" value="<?= $row['professeur'] ?>"><?= $row['professeur'] ?></option>
+                                                        <option name="professeur" id="professeur" value="<?= $row['nom_enseignant'] ?>"><?= $row['nom_enseignant'] ?> - <?= $row['specialite'] ?></option>
                                                 <?php }
                                                 } ?>
                                             </select>
