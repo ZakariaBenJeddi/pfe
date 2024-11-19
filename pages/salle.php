@@ -6,6 +6,25 @@ if (empty($_SESSION['user'])) {
   header('location:sign-up.php');
 }
 
+//* Durée maximale d'inactivité en secondes (3 minutes)
+$duree_inactive_detruire = 180;
+
+//* Vérifiez si un timestamp d'activité existe dans la session
+if (isset($_SESSION['last_activity'])) {
+    $elapsedTime = time() - $_SESSION['last_activity'];
+    
+    //* Si l'inactivité dépasse la limite, détruisez la session
+    if ($elapsedTime > $duree_inactive_detruire) {
+        session_unset(); //* Supprime les variables de session
+        session_destroy(); //* Détruit la session
+        header("Location: sign-in.php"); //* Redirige vers la page de connexion
+        exit();
+    }
+}
+
+// Mettez à jour le timestamp d'activité à chaque requête
+$_SESSION['last_activity'] = time();
+
 //premier code 
 $sql = "SELECT * FROM salle";
 $query = $dbh->query($sql);

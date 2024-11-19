@@ -36,7 +36,7 @@ if (isset($_POST['login'])) {
         }
       }
     }
-    $aa = $_SESSION['sid'];
+    $aa = $_SESSION['user'];
     $sql = "SELECT * from administrateur  where id_admin=:aa";
     $query = $dbh->prepare($sql);
     $query->bindParam(':aa', $aa, PDO::PARAM_STR);
@@ -112,29 +112,6 @@ if (isset($_POST['login'])) {
 
 
 <body class="">
-  <div class="cursor">
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-  </div>
-    
   <main class="main-content  mt-0">
     <section>
       <div class="page-header min-vh-100">
@@ -204,53 +181,6 @@ if (isset($_POST['login'])) {
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
 
-
-
-
-  <script>
-    const coords = { x: 0, y: 0 };
-const circles = document.querySelectorAll(".circle");
-
-const cursor = document.querySelector(".cursor");
-
-circles.forEach(function (circle, index) {
-  circle.x = 0;
-  circle.y = 0;
-  circle.style.backgroundColor = "white";
-});
-
-window.addEventListener("mousemove", function (e) {
-  coords.x = e.clientX;
-  coords.y = e.clientY;
-});
-
-function animateCircles() {
-  let x = coords.x;
-  let y = coords.y;
-
-  cursor.style.top = x;
-  cursor.style.left = y;
-  
-  circles.forEach(function (circle, index) {
-    circle.style.left = x - 6 + "px";
-    circle.style.top = y - 6 + "px";
-
-    circle.style.scale = (circles.length - index) / circles.length;
-
-    circle.x = x;
-    circle.y = y;
-
-    const nextCircle = circles[index + 1] || circles[0];
-    x += (nextCircle.x - x) * 0.15;
-    y += (nextCircle.y - y) * 0.15;
-  });
-
-  requestAnimationFrame(animateCircles);
-}
-
-animateCircles();
-
-  </script>
 </body>
 
 </html>

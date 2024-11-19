@@ -1,0 +1,184 @@
+Voici une description détaillée pour chaque page, avec le maximum de contenu et fonctionnalités pour un système de gestion d'école :
+1. Dashboard (Page d'accueil)
+
+Le tableau de bord est le point central pour l'administrateur.
+Contenu :
+
+    Statistiques générales :
+        Nombre total d'élèves inscrits.
+        Nombre total d'enseignants.
+        Nombre de classes actives.
+        Taux d'absentéisme général.
+    Graphiques :
+        Histogrammes pour les absences par classe.
+        Camembert des paiements (payés, impayés, partiellement payés).
+        Courbes des performances des élèves (notes).
+    Notifications récentes :
+        Absences non justifiées.
+        Prochains examens.
+        Paiements en retard.
+    Actions rapides :
+        Boutons pour accéder aux pages "Ajouter un élève", "Ajouter un enseignant", "Créer un emploi du temps".
+
+2. Tables
+
+Une page de gestion avancée des données.
+Contenu :
+
+    Affichage des tables dynamiques :
+        Élèves (ID, nom, prénom, classe, date d'inscription).
+        Enseignants (ID, nom, prénom, spécialité).
+        Classes (ID, nom, niveau, nombre d'élèves).
+    Actions possibles sur chaque table :
+        Ajouter une nouvelle entrée.
+        Modifier une entrée existante.
+        Supprimer des données.
+    Recherche avancée :
+        Filtrer par colonne.
+        Rechercher par mot-clé.
+    Exportation des données :
+        Téléchargement en format CSV, Excel, PDF.
+
+3. Salles
+
+Gestion des salles de l'école.
+Contenu :
+
+    Liste des salles avec les colonnes suivantes :
+        Nom de la salle (e.g., "Salle 101").
+        Capacité (nombre maximum d'élèves).
+        Étage (localisation dans le bâtiment).
+        Équipements (projecteur, tableau interactif, etc.).
+    Actions possibles :
+        Ajouter une nouvelle salle (formulaire avec nom, capacité, étage, équipements).
+        Modifier une salle existante.
+        Supprimer une salle.
+    Planification des salles :
+        Visualisation des créneaux horaires de chaque salle (emplois du temps).
+        Disponibilités en temps réel.
+
+4. Enseignants
+
+Page dédiée à la gestion des enseignants.
+Contenu :
+
+    Liste des enseignants avec les colonnes suivantes :
+        Nom et prénom.
+        Spécialité (matière enseignée).
+        Charge horaire hebdomadaire.
+        Email.
+    Détails d’un enseignant spécifique :
+        Liste des cours assignés.
+        Historique des absences.
+        Évaluations données.
+    Actions possibles :
+        Ajouter un enseignant (formulaire avec spécialité, charge horaire, contact).
+        Modifier les informations d’un enseignant.
+        Supprimer un enseignant.
+
+5. Billing (Paiements)
+
+Gestion des paiements effectués par les élèves.
+Contenu :
+
+    Liste des paiements par élève :
+        Nom de l'élève.
+        Classe.
+        Montant payé.
+        Montant restant.
+    Historique des paiements :
+        Détail par mois/année.
+        Factures générées.
+    Actions possibles :
+        Ajouter un paiement.
+        Modifier un paiement existant.
+        Générer une facture en PDF.
+
+6. Emplois du Temps
+
+Création et gestion des plannings.
+Contenu :
+
+    Visualisation de l’emploi du temps :
+        Par classe : créneaux horaires, matières, enseignants.
+        Par enseignant : répartition des cours.
+    Création automatique :
+        Génération en tenant compte des disponibilités des enseignants et salles.
+    Actions possibles :
+        Modifier un créneau (glisser-déposer).
+        Ajouter une session.
+        Supprimer un créneau.
+
+7. Virtual Reality
+
+Simulation 3D des locaux.
+Contenu :
+
+    Vue interactive :
+        Exploration des salles.
+        Recherche rapide pour localiser une salle ou un bureau administratif.
+    Ajout d’informations :
+        Équipements disponibles dans chaque salle.
+
+8. RTL
+
+Support multilingue avec affichage en sens "droite à gauche".
+Contenu :
+
+    Traduction complète en arabe ou une autre langue RTL.
+    Test du rendu pour s’assurer que les textes et icônes sont alignés.
+
+9. Notifications
+
+Système d’alerte en temps réel.
+Contenu :
+
+    Liste des notifications récentes (absences, paiements, évaluations).
+    Alertes priorisées.
+    Option pour envoyer des notifications groupées aux enseignants ou élèves.
+
+10. Paiements
+
+Détails financiers des élèves.
+Contenu :
+
+    Liste des paiements restants.
+    Notifications automatiques pour les rappels.
+    Génération de reçus.
+
+11. Évaluations
+
+Suivi des performances académiques.
+Contenu :
+
+    Liste des évaluations par matière et classe.
+    Notes des élèves.
+    Moyennes générales.
+    Rapports visuels sur la progression.
+
+12. Absences
+
+Gestion des présences et absences.
+Contenu :
+
+    Tableau des absences par classe.
+    Justification des absences.
+    Rapport statistique.
+
+13. Profile
+
+Page du compte utilisateur connecté.
+Contenu :
+
+    Informations personnelles.
+    Changement de mot de passe.
+    Historique des connexions.
+
+14. Sign In & Sign Up
+
+Formulaires d’authentification.
+Contenu :
+
+    Connexion avec validation sécurisée.
+    Inscription avec rôle utilisateur.
+
