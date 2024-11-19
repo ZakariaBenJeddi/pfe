@@ -2,6 +2,10 @@
 require '../includes/DatabaseConnexion.php';
 session_start();
 
+if (empty($_SESSION['user'])) {
+  header('location:sign-up.php');
+}
+
 //premier code 
 $sql = "SELECT * FROM salle";
 $query = $dbh->query($sql);
@@ -45,9 +49,8 @@ try {
   echo "<script>alert('Une erreur est survenue. Veuillez réessayer plus tard.');</script>";
   exit;
 }
-
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <style>

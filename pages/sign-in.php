@@ -16,7 +16,7 @@ if (isset($_POST['login'])) {
   if ($query->rowCount() > 0) {
     foreach ($results as $result) {
       $motDePasseHacheBD = $result->mot_de_passe;
-      $_SESSION['sid'] = $result->id_admin;
+      $_SESSION['user'] = $result->id_admin;
       $_SESSION['nom_admin'] = $result->nom_admin;
       $_SESSION['prenom_admin'] = $result->prenom_admin;
       // $_SESSION['permission'] = $result->permission;
