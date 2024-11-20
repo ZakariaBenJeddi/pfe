@@ -230,7 +230,7 @@ $nbr_salle = $query_nbr_salle->fetchColumn(); // Récupère le nombre total de s
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="../pages/enseignants.php">
+          <a class="nav-link" href="../pages/enseignant.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-single-02 text-primary text-sm opacity-10"></i>
             </div>
@@ -714,7 +714,7 @@ $nbr_salle = $query_nbr_salle->fetchColumn(); // Récupère le nombre total de s
                       <i class="ni ni-mobile-button text-white opacity-10"></i>
                     </div>
                     <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">Devices</h6>
+                      <h6 class="mb-1 text-dark text-sm">Abscence</h6>
                       <span class="text-xs">250 in stock, <span class="font-weight-bold">346+ sold</span></span>
                     </div>
                   </div>
@@ -728,7 +728,7 @@ $nbr_salle = $query_nbr_salle->fetchColumn(); // Récupère le nombre total de s
                       <i class="ni ni-tag text-white opacity-10"></i>
                     </div>
                     <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">Tickets</h6>
+                      <h6 class="mb-1 text-dark text-sm">Evaluation</h6>
                       <span class="text-xs">123 closed, <span class="font-weight-bold">15 open</span></span>
                     </div>
                   </div>
@@ -742,7 +742,7 @@ $nbr_salle = $query_nbr_salle->fetchColumn(); // Récupère le nombre total de s
                       <i class="ni ni-box-2 text-white opacity-10"></i>
                     </div>
                     <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">Error logs</h6>
+                      <h6 class="mb-1 text-dark text-sm">Payement</h6>
                       <span class="text-xs">1 is active, <span class="font-weight-bold">40 closed</span></span>
                     </div>
                   </div>
