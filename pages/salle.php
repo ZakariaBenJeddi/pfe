@@ -135,7 +135,6 @@ try {
         <span class="ms-1 font-weight-bold">
           <?= strtoupper($_SESSION['nom_admin'] . " " . $_SESSION['prenom_admin'])  ?>
         </span>
-
       </a>
     </div>
     <hr class="horizontal dark mt-0">

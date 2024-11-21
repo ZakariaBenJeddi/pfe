@@ -631,7 +631,7 @@ $nbr_salle = $query_nbr_salle->fetchColumn(); // Récupère le nombre total de s
       <div class="row mt-4">
         <!-- //! Sale chart -->
         <div class="col-lg-7 mb-lg-0 mb-5">
-          <div class="card z-index-2 h-100">
+          <!-- <div class="card z-index-2 h-100">
             <div class="card-header pb-0 pt-3 bg-transparent">
               <h6 class="text-capitalize">Sales overview</h6>
               <p class="text-sm mb-0">
@@ -643,6 +643,72 @@ $nbr_salle = $query_nbr_salle->fetchColumn(); // Récupère le nombre total de s
               <div class="card-body p-3">
                 <div class="chart">
                   <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
+                </div>
+              </div>
+            </div>
+          </div> -->
+          <div class="card shadow">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="bg-light rounded p-3 me-3">
+                    <svg class="text-secondary" style="width: 24px; height: 24px;" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 19">
+                      <path d="M14.5 0A3.987 3.987 0 0 0 11 2.1a4.977 4.977 0 0 1 3.9 5.858A3.989 3.989 0 0 0 14.5 0ZM9 13h2a4 4 0 0 1 4 4v2H5v-2a4 4 0 0 1 4-4Z" />
+                      <path d="M5 19h10v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2ZM5 7a5.008 5.008 0 0 1 4-4.9 3.988 3.988 0 1 0-3.9 5.859A4.974 4.974 0 0 1 5 7Zm5 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm5-1h-.424a5.016 5.016 0 0 1-1.942 2.232A6.007 6.007 0 0 1 17 17h2a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5ZM5.424 9H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h2a6.007 6.007 0 0 1 4.366-5.768A5.016 5.016 0 0 1 5.424 9Z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 class="h4 mb-0">3.4k</h3>
+                    <p class="text-secondary small mb-0">Leads generated per week</p>
+                  </div>
+                </div>
+                <div>
+                  <span class="badge bg-success-subtle text-success d-flex align-items-center">
+                    <svg class="me-1" style="width: 10px; height: 14px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 14">
+                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13V1m0 0L1 5m4-4 4 4" />
+                    </svg>
+                    42.5%
+                  </span>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-6">
+                  <div class="d-flex align-items-center">
+                    <span class="text-secondary me-2">Money spent:</span>
+                    <span class="fw-semibold">$3,232</span>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="d-flex align-items-center justify-content-end">
+                    <span class="text-secondary me-2">Conversion rate:</span>
+                    <span class="fw-semibold">1.2%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div id="column-chart"></div>
+
+              <div class="border-top pt-3 mt-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                      Last 7 days
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="#">Yesterday</a></li>
+                      <li><a class="dropdown-item" href="#">Today</a></li>
+                      <li><a class="dropdown-item" href="#">Last 7 days</a></li>
+                      <li><a class="dropdown-item" href="#">Last 30 days</a></li>
+                      <li><a class="dropdown-item" href="#">Last 90 days</a></li>
+                    </ul>
+                  </div>
+                  <a href="#" class="btn btn-link text-decoration-none d-flex align-items-center">
+                    LEADS REPORT
+                    <svg class="ms-2" style="width: 6px; height: 10px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4" />
+                    </svg>
+                  </a>
                 </div>
               </div>
             </div>
@@ -945,6 +1011,158 @@ $nbr_salle = $query_nbr_salle->fetchColumn(); // Récupère le nombre total de s
       },
     };
     new Chart(ctx, config);
+  </script>
+
+  <!-- //! LINE CHART BLEU YELLOW -->
+  <script>
+    const options = {
+      colors: ["#0d6efd", "#ffc107"],
+      series: [{
+          name: "garçon",
+          color: "#0d6efd",
+          data: [{
+              x: "Mon",
+              y: 231
+            },
+            {
+              x: "Tue",
+              y: 122
+            },
+            {
+              x: "Wed",
+              y: 63
+            },
+            {
+              x: "Thu",
+              y: 421
+            },
+            {
+              x: "Fri",
+              y: 122
+            },
+            {
+              x: "Sat",
+              y: 323
+            },
+            {
+              x: "Sun",
+              y: 111
+            },
+          ],
+        },
+        {
+          name: "fille",
+          color: "#f62459",
+          data: [{
+              x: "Mon",
+              y: 232
+            },
+            {
+              x: "Tue",
+              y: 113
+            },
+            {
+              x: "Wed",
+              y: 341
+            },
+            {
+              x: "Thu",
+              y: 224
+            },
+            {
+              x: "Fri",
+              y: 522
+            },
+            {
+              x: "Sat",
+              y: 411
+            },
+            {
+              x: "Sun",
+              y: 243
+            },
+          ],
+        },
+      ],
+      chart: {
+        type: "bar",
+        height: "320px",
+        fontFamily: "system-ui, -apple-system, sans-serif",
+        toolbar: {
+          show: false,
+        },
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: "70%",
+          borderRadiusApplication: "end",
+          borderRadius: 4,
+        },
+      },
+      tooltip: {
+        shared: true,
+        intersect: false,
+        style: {
+          fontFamily: "system-ui, -apple-system, sans-serif",
+        },
+      },
+      states: {
+        hover: {
+          filter: {
+            type: "darken",
+            value: 1,
+          },
+        },
+      },
+      stroke: {
+        show: true,
+        width: 0,
+        colors: ["transparent"],
+      },
+      grid: {
+        show: false,
+        strokeDashArray: 4,
+        padding: {
+          left: 2,
+          right: 2,
+          top: -14
+        },
+      },
+      dataLabels: {
+        enabled: false,
+      },
+      legend: {
+        show: false,
+      },
+      xaxis: {
+        floating: false,
+        labels: {
+          show: true,
+          style: {
+            fontFamily: "system-ui, -apple-system, sans-serif",
+            colors: '#6c757d'
+          }
+        },
+        axisBorder: {
+          show: false,
+        },
+        axisTicks: {
+          show: false,
+        },
+      },
+      yaxis: {
+        show: false,
+      },
+      fill: {
+        opacity: 1,
+      },
+    };
+
+    if (document.getElementById("column-chart") && typeof ApexCharts !== 'undefined') {
+      const chart = new ApexCharts(document.getElementById("column-chart"), options);
+      chart.render();
+    }
   </script>
 
 
