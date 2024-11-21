@@ -1,6 +1,66 @@
 <?php
 require '../includes/DatabaseConnexion.php';
 session_start();
+if (empty($_SESSION['user'])) {
+  header('location:sign-up.php');
+}
+
+//*deconexion apres 300s si aucun evenement deroulle
+$_SESSION['last_activity'] = time();
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 300)) {
+  session_unset();
+  session_destroy();
+  header("location:logout.php");
+  exit;
+}
+
+//* ensaignan ajax
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+  header('Content-Type: application/json');
+  try {
+    // Validation des dates
+    if (!isset($_POST['start_date']) || !isset($_POST['end_date'])) {
+      throw new Exception("Les dates sont requises");
+    }
+
+    // Nettoyage et validation des dates
+    $start_date = filter_var($_POST['start_date'], FILTER_SANITIZE_STRING);
+    $end_date = filter_var($_POST['end_date'], FILTER_SANITIZE_STRING);
+
+    if (!$start_date || !$end_date) {
+      throw new Exception("Format de date invalide");
+    }
+
+    // Conversion des dates au format MySQL
+    $start_date = date("Y-m-d", strtotime($start_date));
+    $end_date = date("Y-m-d", strtotime($end_date));
+
+    // Requête SQL avec préparation
+    $sql = "SELECT * FROM enseignant WHERE date_creation BETWEEN :start_date AND :end_date ORDER BY date_creation DESC";
+
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute([
+      ':start_date' => $start_date,
+      ':end_date' => $end_date
+    ]);
+
+    $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+    echo json_encode([
+      'status' => 'success',
+      'data' => $results,
+      'count' => count($results)
+    ]);
+  } catch (Exception $e) {
+    http_response_code(400);
+    echo json_encode([
+      'status' => 'error',
+      'message' => $e->getMessage()
+    ]);
+  }
+  exit;
+}
+
 
 $sql = "SELECT * FROM enseignant";
 $query = $dbh->query($sql);
@@ -47,111 +107,7 @@ try {
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<style>
-  table.dataTable.no-footer {
-    border-bottom: 0px solid #fff !important;
-  }
 
-  /* Customize the 'Show entries' select dropdown */
-  .dataTables_length {
-    margin-left: 15px !important;
-  }
-
-  .dataTables_length select {
-    margin-left: 13px !important;
-    margin-right: 5px !important;
-    width: 60px;
-    /* Adjust width */
-    height: 35px;
-    /* Adjust height */
-    border: 1px solid #fff;
-    border-radius: 10px;
-    padding: 5px;
-    color: #fff;
-    background-color: #5e72e4;
-    font-size: 14px;
-  }
-
-  /* Customize the search input */
-  .dataTables_filter input {
-    margin-right: 1.5rem !important;
-    width: 200px;
-    /* Adjust width */
-    height: 35px;
-    /* Adjust height */
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding-left: 10px;
-    color: #333;
-    font-size: 14px;
-  }
-
-  /* Customize pagination buttons */
-  .dataTables_paginate .paginate_button {
-    background-color: #007bff;
-    /* Set background color */
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 5px;
-    margin: 0 2px;
-    font-size: 14px;
-    transition: background-color 0.3s;
-  }
-
-  .dataTables_paginate .paginate_button:hover {
-    background-color: #0056b3;
-    /* Darker color on hover */
-  }
-
-  /* Customize active pagination button */
-  .dataTables_paginate .paginate_button.current {
-    background-color: #0056b3;
-    color: #fff;
-    font-weight: bold;
-  }
-
-  .dataTables_paginate .paginate_button {
-    background-color: #5e72e3;
-  }
-
-
-  #table_salle_info {
-    margin-left: 15px !important;
-  }
-
-  .dataTables_wrapper .dataTables_length,
-  .dataTables_wrapper .dataTables_filter,
-  .dataTables_wrapper .dataTables_info,
-  .dataTables_wrapper .dataTables_processing,
-  .dataTables_wrapper .dataTables_paginate {
-    color: #cfd3db !important;
-  }
-
-  /* Remove border between table rows */
-  .dataTable tbody tr {
-    border-bottom: none;
-    border-color: #f4f5f7;
-    /* Remove bottom border for each row */
-  }
-
-  #table_salle {
-    border-bottom: 1px solid #f4f5f7;
-  }
-
-  /* display action button */
-  #dropdownMenuButton {
-    box-shadow: none !important;
-  }
-
-  .dropdown .dropdown-menu {
-    display: auto !important;
-  }
-
-  #changewidth {
-    width: 6rem !important;
-    min-width: 0 !important;
-  }
-</style>
 <!-- HEAD -->
 <?php include '../includes/head.php' ?>
 
@@ -402,11 +358,21 @@ try {
       <div class="row">
         <div class="col-12">
           <div class="card mb-4">
-            <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+            <!-- <div class="card-header pb-0 d-flex justify-content-between align-items-center">
               <h6>Ensaignant table</h6>
               <div class="">
                 <a class="btn btn-primary btn-sm ms-auto" href="#">Ajouter Ensaignant</a>
                 <button type="button" class="btn btn-primary btn-sm ms-auto" onclick="expo()" id='btnexp'>Exporter</button>
+              </div>
+            </div> -->
+            <div class="card-header pb-0 d-flex flex-wrap justify-content-between align-items-center text-center text-md-start">
+              <div class="mb-2 mb-md-0 flex-grow-1 text-center text-md-start">
+                <h6 class="text-primary">Ensaignant</h6>
+              </div>
+              <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
+                <input type="text" class="form-control w-100 w-md-auto mb-3" id="daterange" name="daterange" value="" />
+                <a class="btn btn-primary btn-sm" href="#">Ajouter Ensaignant</a>
+                <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
               </div>
             </div>
             <hr>
@@ -425,7 +391,7 @@ try {
                       <!-- <th class="text-secondary opacity-7"></th> -->
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody id="tableBody">
                     <?php if ($query->rowCount() > 0) { ?>
                       <?php foreach ($results as $result) : ?>
                         <tr>
@@ -449,18 +415,20 @@ try {
                               <span class="me-2 text-xs font-weight-bold"><?= $result->degree ?>%</span>
                               <div>
                                 <div class="progress">
-                                  <div class="progress-bar <?php if ($result->degree <= 30) {
-                                                              echo 'bg-gradient-danger';
-                                                            }
-                                                            if ($result->degree <= 50 && $result->degree > 30) {
-                                                              echo 'bg-gradient-warning';
-                                                            }
-                                                            if ($result->degree >= 30 && $result->degree < 90) {
-                                                              echo 'bg-gradient-info';
-                                                            }
-                                                            if ($result->degree >= 90) {
-                                                              echo 'bg-gradient-success';
-                                                            } ?>" role="progressbar" aria-valuenow="<?= $result->degree ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $result->degree ?>%;"></div>
+                                  <div class="progress-bar 
+                                    <?php if ($result->degree <= 30) {
+                                      echo 'bg-gradient-danger';
+                                    }
+                                    if ($result->degree <= 50 && $result->degree > 30) {
+                                      echo 'bg-gradient-warning';
+                                    }
+                                    if ($result->degree >= 30 && $result->degree < 90) {
+                                      echo 'bg-gradient-info';
+                                    }
+                                    if ($result->degree >= 90) {
+                                      echo 'bg-gradient-success';
+                                    } ?>" role="progressbar" aria-valuenow="<?= $result->degree ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $result->degree ?>%;">
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -480,11 +448,6 @@ try {
                           <td class="align-middle text-center">
                             <span class="text-secondary text-xs font-weight-bold"><?= $result->salaire ?> DH</span>
                           </td>
-                          <!-- <td class="align-middle">
-                            <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                              Edit
-                            </a>
-                          </td> -->
                           <td class="align-middle text-center">
                             <div class="">
                               <div class="dropdown">
@@ -590,6 +553,160 @@ try {
         window.URL.revokeObjectURL(url);
       });
     }
+  </script>
+
+  <!-- //* Date Picker -->
+  <!-- //* AJAX salle intervalle date  -->
+  <script>
+    $(function() {
+      // Configuration du DateRangePicker
+      $('#daterange').daterangepicker({
+        opens: 'left',
+        autoUpdateInput: true,
+        locale: {
+          format: 'MM/DD/YYYY', // Format attendu par votre code PHP
+          applyLabel: 'Valider',
+          cancelLabel: 'Annuler',
+          fromLabel: 'Du',
+          toLabel: 'Au',
+          customRangeLabel: 'Période personnalisée',
+          daysOfWeek: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
+          monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+          firstDay: 1
+        },
+        startDate: moment().subtract(29, 'days'),
+        endDate: moment()
+      }, function(start, end, label) {
+        // Callback pour la sélection de dates
+        const tableBody = $('#tableBody');
+
+        $.ajax({
+          url: '', // Fichier actuel
+          method: 'POST',
+          data: {
+            start_date: start.format('MM/DD/YYYY'),
+            end_date: end.format('MM/DD/YYYY')
+          },
+          dataType: 'json',
+          success: function(response) {
+            // Vider le tableau
+            tableBody.empty();
+
+            // Vérifier s'il y a des résultats
+            if (response.status === 'success' && response.count > 0) {
+              // Parcourir et ajouter chaque salle
+              response.data.forEach(function(enseignant) {
+                tableBody.append(`
+                                <tr>
+                                    <td  class="align-middle text-center text-sm">
+                                      <p class="text-xs font-weight-bold mb-0">${enseignant.nom_enseignant} ${enseignant.prenom_enseignant}</p>
+                                      <div class="d-flex px-2 py-1">
+                                        <div>
+                                          <img src="../assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
+                                        </div>
+                                        <div class="d-flex flex-column justify-content-center">
+                                          <h6 class="mb-0 text-sm">${enseignant.nom_enseignant} ${enseignant.prenom_enseignant} </h6>
+                                          <p class="text-xs text-secondary mb-0">${enseignant.email_enseignant} </p>
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                      <p class="text-xs font-weight-bold mb-0">Enseignant</p>
+                                      <p class="text-xs text-secondary mb-0">${enseignant.specialite}</p>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                      <div class="d-flex align-items-center justify-content-center">
+                                          <span class="me-2 text-xs font-weight-bold">${enseignant.degree} %</span>
+                                          <div>
+                                            <div class="progress">
+                                              <div class="progress-bar 
+                                                <?php if ($enseignant->degree <= 30) {
+                                                  echo 'bg-gradient-danger';
+                                                }
+                                                if ($enseignant->degree <= 50 && $enseignant->degree > 30) {
+                                                  echo 'bg-gradient-warning';
+                                                }
+                                                if ($enseignant->degree >= 30 && $enseignant->degree < 90) {
+                                                  echo 'bg-gradient-info';
+                                                }
+                                                if ($enseignant->degree >= 90) {
+                                                  echo 'bg-gradient-success';
+                                                } ?>" role="progressbar" aria-valuenow="${enseignant.degree} " aria-valuemin="0" aria-valuemax="100" style="width: ${enseignant.degree}%;">
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                      <p class="text-xs font-weight-bold mb-0">${enseignant.nbr_chaise}</p>
+                                    </td>
+                                    <?php if ($result->est_connecte === 0) { ?>
+                                      <td class="align-middle text-center text-sm">
+                                        <span class="badge badge-sm bg-gradient-secondary">Offline</span>
+                                      </td>
+                                    <?php } else { ?>
+                                      <td class="align-middle text-center text-sm">
+                                        <span class="badge badge-sm bg-gradient-success">Online</span>
+                                      </td>
+                                    <?php } ?>
+                                    <td class="align-middle text-center text-sm">
+                                      <p class="text-xs font-weight-bold mb-0">${enseignant.date_embauche}</p>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                      <p class="text-xs font-weight-bold mb-0">${enseignant.salaire}</p>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                      <div class="">
+                                        <div class="dropdown">
+                                          <button id="dropdownMenuButton" type="button" class="btn btn-sm dropdown-toggle border-none " data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fa fa-ellipsis-v text-xs" id="dropdownMenuButton" type="button" data-bs-toggle="dropdown" aria-expanded="false"></i>
+                                          </button>
+                                          <ul id="changewidth" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <li class="text-center">
+                                              <a href="javascript:void(0);" class="dropdown-item">
+                                                <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true" id="<?php echo $result->id_salle ?>"></i>
+                                              </a>
+                                            </li>
+                                            <li class="text-center">
+                                              <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
+                                                <i class="fas fa-eye text-primary opacity-10 fa-sm"></i>
+                                              </a>
+                                            </li>
+                                            <li class="text-center">
+                                              <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                                <i class="ni ni-fat-remove text-danger opacity-10" id="<?= $result->id_salle ?>"></i>
+                                              </a>
+                                            </li>
+                                          </ul>
+                                        </div>
+                                      </div>
+                                    </td>
+                                </tr>
+                            `);
+              });
+            } else {
+              // Aucun résultat
+              tableBody.append(`
+                            <tr>
+                                <td colspan="9" class="text-center">Aucune salle trouvée pour cette période</td>
+                            </tr>
+                        `);
+            }
+          },
+          error: function(xhr) {
+            // Gestion des erreurs
+            console.error('Erreur de requête:', xhr);
+            tableBody.html(`
+                        <tr>
+                            <td colspan="9" class="text-center text-danger">
+                                Erreur lors de la récupération des données
+                            </td>
+                        </tr>
+                    `);
+          }
+        });
+      });
+    });
   </script>
 
   <!--   Core JS Files   -->

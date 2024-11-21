@@ -3,28 +3,28 @@ require '../includes/DatabaseConnexion.php';
 session_start();
 
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") { 
-  header('Content-Type: application/json'); 
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+  header('Content-Type: application/json');
   try {
-      // Validation des dates
-      if (!isset($_POST['start_date']) || !isset($_POST['end_date'])) {
-          throw new Exception("Les dates sont requises");
-      }
+    // Validation des dates
+    if (!isset($_POST['start_date']) || !isset($_POST['end_date'])) {
+      throw new Exception("Les dates sont requises");
+    }
 
-      // Nettoyage et validation des dates
-      $start_date = filter_var($_POST['start_date'], FILTER_SANITIZE_STRING);
-      $end_date = filter_var($_POST['end_date'], FILTER_SANITIZE_STRING);
+    // Nettoyage et validation des dates
+    $start_date = filter_var($_POST['start_date'], FILTER_SANITIZE_STRING);
+    $end_date = filter_var($_POST['end_date'], FILTER_SANITIZE_STRING);
 
-      if (!$start_date || !$end_date) {
-          throw new Exception("Format de date invalide");
-      }
+    if (!$start_date || !$end_date) {
+      throw new Exception("Format de date invalide");
+    }
 
-      // Conversion des dates au format MySQL
-      $start_date = date("Y-m-d", strtotime($start_date));
-      $end_date = date("Y-m-d", strtotime($end_date));
+    // Conversion des dates au format MySQL
+    $start_date = date("Y-m-d", strtotime($start_date));
+    $end_date = date("Y-m-d", strtotime($end_date));
 
-      // Requête SQL avec préparation
-      $sql = "SELECT 
+    // Requête SQL avec préparation
+    $sql = "SELECT 
                   id_salle,
                   nom_salle,
                   etage,
@@ -38,26 +38,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
               WHERE date_creation BETWEEN :start_date AND :end_date
               ORDER BY date_creation DESC";
 
-      $stmt = $dbh->prepare($sql);
-      $stmt->execute([
-          ':start_date' => $start_date,
-          ':end_date' => $end_date
-      ]);
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute([
+      ':start_date' => $start_date,
+      ':end_date' => $end_date
+    ]);
 
-      $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+    $results = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-      echo json_encode([
-          'status' => 'success',
-          'data' => $results,
-          'count' => count($results)
-      ]);
-
+    echo json_encode([
+      'status' => 'success',
+      'data' => $results,
+      'count' => count($results)
+    ]);
   } catch (Exception $e) {
-      http_response_code(400);
-      echo json_encode([
-          'status' => 'error',
-          'message' => $e->getMessage()
-      ]);
+    http_response_code(400);
+    echo json_encode([
+      'status' => 'error',
+      'message' => $e->getMessage()
+    ]);
   }
   exit;
 }
@@ -69,10 +68,10 @@ if (empty($_SESSION['user'])) {
 $_SESSION['last_activity'] = time();
 
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 300)) {
-    session_unset();
-    session_destroy();
-    header("location:logout.php");
-    exit;
+  session_unset();
+  session_destroy();
+  header("location:logout.php");
+  exit;
 }
 
 //premier code 
@@ -122,107 +121,7 @@ try {
 
 <!DOCTYPE html>
 <html lang="en">
-<style>
-  /* Customize the 'Show entries' select dropdown */
-  .dataTables_length {
-    margin-left: 15px !important;
-  }
 
-  .dataTables_length select {
-    margin-left: 13px !important;
-    margin-right: 5px !important;
-    width: 60px;
-    /* Adjust width */
-    height: 35px;
-    /* Adjust height */
-    border: 1px solid #fff;
-    border-radius: 10px;
-    padding: 5px;
-    color: #fff;
-    background-color: #5e72e4;
-    font-size: 14px;
-  }
-
-  /* Customize the search input */
-  .dataTables_filter input {
-    margin-right: 1.5rem !important;
-    width: 200px;
-    /* Adjust width */
-    height: 35px;
-    /* Adjust height */
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding-left: 10px;
-    color: #333;
-    font-size: 14px;
-  }
-
-  /* Customize pagination buttons */
-  .dataTables_paginate .paginate_button {
-    background-color: #007bff;
-    /* Set background color */
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 5px;
-    margin: 0 2px;
-    font-size: 14px;
-    transition: background-color 0.3s;
-  }
-
-  .dataTables_paginate .paginate_button:hover {
-    background-color: #0056b3;
-    /* Darker color on hover */
-  }
-
-  /* Customize active pagination button */
-  .dataTables_paginate .paginate_button.current {
-    background-color: #0056b3;
-    color: #fff;
-    font-weight: bold;
-  }
-
-  .dataTables_paginate .paginate_button {
-    background-color: #5e72e3;
-  }
-
-
-  #table_salle_info {
-    margin-left: 15px !important;
-  }
-
-  .dataTables_wrapper .dataTables_length,
-  .dataTables_wrapper .dataTables_filter,
-  .dataTables_wrapper .dataTables_info,
-  .dataTables_wrapper .dataTables_processing,
-  .dataTables_wrapper .dataTables_paginate {
-    color: #cfd3db !important;
-  }
-
-  /* Remove border between table rows */
-  .dataTable tbody tr {
-    border-bottom: none;
-    border-color: #f4f5f7;
-    /* Remove bottom border for each row */
-  }
-
-  #table_salle {
-    border-bottom: 1px solid #f4f5f7;
-  }
-
-  /* display action button */
-  #dropdownMenuButton {
-    box-shadow: none !important;
-  }
-
-  .dropdown .dropdown-menu {
-    display: auto !important;
-  }
-
-  #changewidth {
-    width: 6rem !important;
-    min-width: 0 !important;
-  }
-</style>
 <!-- HEAD -->
 <?php include '../includes/head.php' ?>
 
@@ -604,7 +503,6 @@ try {
       </div>
       <!-- FOOTER -->
       <?php include '../includes/footer.php' ?>
-
     </div>
   </main>
 
@@ -700,46 +598,46 @@ try {
 
   <!-- //* Date Picker -->
   <!-- //* AJAX salle intervalle date  -->
-    <script>
-      $(function() {
-        // Configuration du DateRangePicker
-        $('#daterange').daterangepicker({
-            opens: 'left',
-            autoUpdateInput: true,
-            locale: {
-                format: 'MM/DD/YYYY', // Format attendu par votre code PHP
-                applyLabel: 'Valider',
-                cancelLabel: 'Annuler',
-                fromLabel: 'Du',
-                toLabel: 'Au',
-                customRangeLabel: 'Période personnalisée',
-                daysOfWeek: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
-                monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
-                firstDay: 1
-            },
-            startDate: moment().subtract(29, 'days'),
-            endDate: moment()
-        }, function(start, end, label) {
-            // Callback pour la sélection de dates
-            const tableBody = $('#tableBody');
-            
-            $.ajax({
-                url: '', // Fichier actuel
-                method: 'POST',
-                data: { 
-                    start_date: start.format('MM/DD/YYYY'), 
-                    end_date: end.format('MM/DD/YYYY') 
-                },
-                dataType: 'json',
-                success: function(response) {
-                    // Vider le tableau
-                    tableBody.empty();
-                    
-                    // Vérifier s'il y a des résultats
-                    if (response.status === 'success' && response.count > 0) {
-                        // Parcourir et ajouter chaque salle
-                        response.data.forEach(function(salle) {
-                            tableBody.append(`
+  <script>
+    $(function() {
+      // Configuration du DateRangePicker
+      $('#daterange').daterangepicker({
+        opens: 'left',
+        autoUpdateInput: true,
+        locale: {
+          format: 'MM/DD/YYYY', // Format attendu par votre code PHP
+          applyLabel: 'Valider',
+          cancelLabel: 'Annuler',
+          fromLabel: 'Du',
+          toLabel: 'Au',
+          customRangeLabel: 'Période personnalisée',
+          daysOfWeek: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
+          monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+          firstDay: 1
+        },
+        startDate: moment().subtract(29, 'days'),
+        endDate: moment()
+      }, function(start, end, label) {
+        // Callback pour la sélection de dates
+        const tableBody = $('#tableBody');
+
+        $.ajax({
+          url: '', // Fichier actuel
+          method: 'POST',
+          data: {
+            start_date: start.format('MM/DD/YYYY'),
+            end_date: end.format('MM/DD/YYYY')
+          },
+          dataType: 'json',
+          success: function(response) {
+            // Vider le tableau
+            tableBody.empty();
+
+            // Vérifier s'il y a des résultats
+            if (response.status === 'success' && response.count > 0) {
+              // Parcourir et ajouter chaque salle
+              response.data.forEach(function(salle) {
+                tableBody.append(`
                                 <tr>
                                     <td  class="align-middle text-center text-sm">
                                       <p class="text-xs font-weight-bold mb-0">${salle.nom_salle}</p>
@@ -796,32 +694,31 @@ try {
                                     </td>
                                 </tr>
                             `);
-                        });
-                    } else {
-                        // Aucun résultat
-                        tableBody.append(`
+              });
+            } else {
+              // Aucun résultat
+              tableBody.append(`
                             <tr>
                                 <td colspan="9" class="text-center">Aucune salle trouvée pour cette période</td>
                             </tr>
                         `);
-                    }
-                },
-                error: function(xhr) {
-                    // Gestion des erreurs
-                    console.error('Erreur de requête:', xhr);
-                    tableBody.html(`
+            }
+          },
+          error: function(xhr) {
+            // Gestion des erreurs
+            console.error('Erreur de requête:', xhr);
+            tableBody.html(`
                         <tr>
                             <td colspan="9" class="text-center text-danger">
                                 Erreur lors de la récupération des données
                             </td>
                         </tr>
                     `);
-                }
-            });
+          }
         });
       });
-    </script>
-
+    });
+  </script>
 
   <!-- FIXED PLUGIN  -->
   <?php include '../includes/fixedplugin.php' ?>
