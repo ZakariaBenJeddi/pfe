@@ -130,7 +130,7 @@ try {
   <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
     <div class="sidenav-header">
       <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-      <a class="navbar-brand m-0" href=" https://demos.creative-tim.com/argon-dashboard/pages/dashboard.html " target="_blank">
+      <a class="navbar-brand m-0" href=" #">
         <img src="https://elaraki.ac.ma/images/logo2.png" class="navbar-brand-img h-100" alt="main_logo">
         <span class="ms-1 font-weight-bold">
           <?= strtoupper($_SESSION['nom_admin'] . " " . $_SESSION['prenom_admin'])  ?>
@@ -139,7 +139,7 @@ try {
     </div>
     <hr class="horizontal dark mt-0">
     <div class="collapse navbar-collapse  w-auto" id="sidenav-collapse-main">
-      <ul class="navbar-nav">
+      <!-- <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link active" href="../pages/dashboard.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -229,6 +229,167 @@ try {
               <i class="ni ni-collection text-info text-sm opacity-10"></i>
             </div>
             <span class="nav-link-text ms-1">Sign Up</span>
+          </a>
+        </li>
+      </ul> -->
+      <ul class="navbar-nav">
+        <!-- Section Dashboard -->
+        <li class="nav-item">
+          <a class="nav-link active" href="../pages/dashboard.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Dashboard</span>
+          </a>
+        </li>
+
+        <!-- Section Gestion des utilisateurs -->
+        <li class="nav-item">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion des Utilisateurs</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/eleves.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-hat-3 text-success text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Élèves</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/enseignant.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-single-02 text-primary text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Enseignants</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/administration.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-badge text-info text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Administration</span>
+          </a>
+        </li>
+
+        <!-- Section Gestion pédagogique -->
+        <li class="nav-item">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion Pédagogique</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/classes.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-building text-warning text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Classes</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/matieres.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-book-bookmark text-danger text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Matières</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/calendrier.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Emplois du Temps</span>
+          </a>
+        </li>
+
+        <!-- Section Suivi -->
+        <li class="nav-item">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Suivi</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/absences.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-user-run text-danger text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Absences</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/evaluations.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-chart-bar-32 text-success text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Évaluations</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/bulletins.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-folder-17 text-primary text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Bulletins</span>
+          </a>
+        </li>
+
+        <!-- Section Gestion des ressources -->
+        <li class="nav-item">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion des Ressources</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/salle.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-building text-info text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Salles</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/equipements.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-laptop text-primary text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Équipements</span>
+          </a>
+        </li>
+
+        <!-- Section Comptabilité -->
+        <li class="nav-item">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Comptabilité</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/payements.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Paiements</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/frais-scolarite.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-money-coins text-warning text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Frais de scolarité</span>
+          </a>
+        </li>
+
+        <!-- Section Compte -->
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Mon Compte</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/profile.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Profil</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/sign-out.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-button-power text-danger text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Déconnexion</span>
           </a>
         </li>
       </ul>
@@ -457,31 +618,16 @@ try {
                                 <p class="text-xs font-weight-bold mb-0">-<?= $equi; ?></p>
                               <?php endforeach; ?>
                             </td>
-                            <td class="align-middle text-center">
-                              <div class="">
-                                <div class="dropdown">
-                                  <button id="dropdownMenuButton" type="button" class="btn btn-sm dropdown-toggle border-none " data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa fa-ellipsis-v text-xs" id="dropdownMenuButton" type="button" data-bs-toggle="dropdown" aria-expanded="false"></i>
-                                  </button>
-                                  <ul id="changewidth" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <li class="text-center">
-                                      <a href="javascript:void(0);" class="dropdown-item">
-                                        <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true" id="<?php echo $result->id_salle ?>"></i>
-                                      </a>
-                                    </li>
-                                    <li class="text-center">
-                                      <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
-                                        <i class="fas fa-eye text-primary opacity-10 fa-sm"></i>
-                                      </a>
-                                    </li>
-                                    <li class="text-center">
-                                      <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                                        <i class="ni ni-fat-remove text-danger opacity-10" id="<?= $result->id_salle ?>"></i>
-                                      </a>
-                                    </li>
-                                  </ul>
-                                </div>
-                              </div>
+                            <td class="align-middle text-center d-flex">
+                              <a href="javascript:void(0);" class="dropdown-item">
+                                <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true" id="<?php echo $result->id_salle ?>"></i>
+                              </a>
+                              <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
+                                <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                              </a>
+                              <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_salle ?>"></i>
+                              </a>
                             </td>
                           </tr>
                         <?php endforeach; ?>
@@ -587,14 +733,6 @@ try {
     });
   </script>
 
-  <!-- DropDown Actions -->
-  <script>
-    document.getElementById('dropdownMenuButton').addEventListener('click', function() {
-      var dropdownMenu = document.querySelector('.dropdown-menu');
-      dropdownMenu.classList.toggle('show'); // Affiche ou cache le menu au clic du bouton
-    });
-  </script>
-
   <!-- //* Date Picker -->
   <!-- //* AJAX salle intervalle date  -->
   <script>
@@ -665,31 +803,16 @@ try {
                                         <p class="text-xs font-weight-bold mb-0">-<?= $equi; ?></p>
                                       <?php endforeach; ?>
                                     </td>
-                                    <td class="align-middle text-center text-sm">
-                                      <div class="">
-                                        <div class="dropdown">
-                                          <button id="dropdownMenuButton" type="button" class="btn btn-sm dropdown-toggle border-none " data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="fa fa-ellipsis-v text-xs" id="dropdownMenuButton" type="button" data-bs-toggle="dropdown" aria-expanded="false"></i>
-                                          </button>
-                                          <ul id="changewidth" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <li class="text-center">
-                                              <a href="javascript:void(0);" class="dropdown-item">
-                                                <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true" id="<?php echo $result->id_salle ?>"></i>
-                                              </a>
-                                            </li>
-                                            <li class="text-center">
-                                              <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
-                                                <i class="fas fa-eye text-primary opacity-10 fa-sm"></i>
-                                              </a>
-                                            </li>
-                                            <li class="text-center">
-                                              <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                                                <i class="ni ni-fat-remove text-danger opacity-10" id="<?= $result->id_salle ?>"></i>
-                                              </a>
-                                            </li>
-                                          </ul>
-                                        </div>
-                                      </div>
+                                    <td class="align-middle text-center d-flex">
+                                      <a href="javascript:void(0);" class="dropdown-item">
+                                        <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true" id="<?php echo $result->id_salle ?>"></i>
+                                      </a>
+                                      <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
+                                        <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                                      </a>
+                                      <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                        <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_salle ?>"></i>
+                                      </a>
                                     </td>
                                 </tr>
                             `);
@@ -719,6 +842,7 @@ try {
     });
   </script>
 
+
   <!-- FIXED PLUGIN  -->
   <?php include '../includes/fixedplugin.php' ?>
   <!--   Core JS Files   -->
@@ -726,6 +850,16 @@ try {
   <script src="../assets/js/core/bootstrap.min.js"></script>
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+
+  <!-- DropDown Actions -->
+  <script>
+    document.getElementById('dropdownMenuButton').addEventListener('click', function() {
+      var dropdownMenu = document.querySelector('.dropdown-menu');
+      dropdownMenu.classList.toggle('show'); // Affiche ou cache le menu au clic du bouton
+    });
+  </script>
+
+
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {

@@ -58,7 +58,7 @@ if (isset($_POST['login'])) {
 
           $uip = $_SERVER['REMOTE_ADDR'];
           $status = 1;
-          $sql = "insert into userlog(userEmail,userip,status,username,name,lastname)values(:email,:uip,:status,:username,:name,:lastname)";
+          $sql = "INSERT INTO userlog(userEmail,userip,status,username,name,lastname)values(:email,:uip,:status,:username,:name,:lastname)";
           $query = $dbh->prepare($sql);
           $query->bindParam(':username', $username, PDO::PARAM_STR);
           $query->bindParam(':name', $name, PDO::PARAM_STR);
@@ -77,13 +77,13 @@ if (isset($_POST['login'])) {
       }
     }
   } else {
-    $extra = "dashboard.php";
+    $extra = "sign-in.php";
     $username = $_POST['username'];
     $uip = $_SERVER['REMOTE_ADDR'];
     $status = 0;
     $email = 'Not registered in system';
     $name = 'Potential Hacker';
-    $sql = "insert into userlog(userEmail,userip,status,username,name)values(:email,:uip,:status,:username,:name)";
+    $sql = "INSERT INTO userlog(userEmail,userip,status,username,name)values(:email,:uip,:status,:username,:name)";
     $query = $dbh->prepare($sql);
     $query->bindParam(':username', $username, PDO::PARAM_STR);
     $query->bindParam(':name', $name, PDO::PARAM_STR);

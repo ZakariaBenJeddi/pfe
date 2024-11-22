@@ -12,7 +12,8 @@ require_once('db-connect.php') ?>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="../assets/img/icons/flags/AU.png"><?php //! changer lien   ?>
+    <link rel="icon" type="image/png" href="../assets/img/icons/flags/AU.png"><?php //! changer lien   
+                                                                                ?>
     <title>
         Emplois du temps
     </title>
@@ -40,8 +41,8 @@ require_once('db-connect.php') ?>
     <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
     <!-- CSS Files -->
     <link id="pagestyle" href="../assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
-    
-    
+
+
     <!-- //!DATA -->
     <script src="calendar.js"></script>
     <style>
@@ -86,12 +87,12 @@ require_once('db-connect.php') ?>
                 <span class="ms-1 font-weight-bold">
                     <?= strtoupper($_SESSION['nom_admin'] . " " . $_SESSION['prenom_admin'])  ?>
                 </span>
-
             </a>
         </div>
         <hr class="horizontal dark mt-0">
-        <div class="collapse navbar-collapse  w-auto" id="sidenav-collapse-main">
+        <!-- <div class="collapse navbar-collapse  w-auto" id="sidenav-collapse-main"> -->
             <ul class="navbar-nav">
+                <!-- Section Dashboard -->
                 <li class="nav-item">
                     <a class="nav-link active" href="../pages/dashboard.php">
                         <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -100,87 +101,154 @@ require_once('db-connect.php') ?>
                         <span class="nav-link-text ms-1">Dashboard</span>
                     </a>
                 </li>
+
+                <!-- Section Gestion des utilisateurs -->
                 <li class="nav-item">
-                    <a class="nav-link " href="../pages/tables.php">
+                    <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion des Utilisateurs</h6>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../pages/eleves.php">
                         <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
+                            <i class="ni ni-hat-3 text-success text-sm opacity-10"></i>
                         </div>
-                        <span class="nav-link-text ms-1">Tables</span>
+                        <span class="nav-link-text ms-1">Élèves</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link " href="../pages/salle.php">
+                    <a class="nav-link" href="../pages/enseignant.php">
                         <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="ni ni-building text-primary text-sm opacity-10"></i>
+                            <i class="ni ni-single-02 text-primary text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Enseignants</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../pages/administration.php">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-badge text-info text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Administration</span>
+                    </a>
+                </li>
+
+                <!-- Section Gestion pédagogique -->
+                <li class="nav-item">
+                    <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion Pédagogique</h6>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../pages/classes.php">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-building text-warning text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Classes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../pages/matieres.php">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-book-bookmark text-danger text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Matières</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../pages/calendrier.php">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Emplois du Temps</span>
+                    </a>
+                </li>
+
+                <!-- Section Suivi -->
+                <li class="nav-item">
+                    <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Suivi</h6>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../pages/absences.php">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-user-run text-danger text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Absences</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../pages/evaluations.php">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-chart-bar-32 text-success text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Évaluations</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../pages/bulletins.php">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-folder-17 text-primary text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Bulletins</span>
+                    </a>
+                </li>
+
+                <!-- Section Gestion des ressources -->
+                <li class="nav-item">
+                    <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion des Ressources</h6>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../pages/salle.php">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-building text-info text-sm opacity-10"></i>
                         </div>
                         <span class="nav-link-text ms-1">Salles</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link " href="../pages/enseignant.php">
+                    <a class="nav-link" href="../pages/equipements.php">
                         <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
+                            <i class="ni ni-laptop text-primary text-sm opacity-10"></i>
                         </div>
-                        <span class="nav-link-text ms-1">Enseignant</span>
+                        <span class="nav-link-text ms-1">Équipements</span>
                     </a>
                 </li>
+
+                <!-- Section Comptabilité -->
                 <li class="nav-item">
-                    <a class="nav-link " href="../pages/billing.php">
+                    <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Comptabilité</h6>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../pages/payements.php">
                         <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
                         </div>
-                        <span class="nav-link-text ms-1">Billing</span>
+                        <span class="nav-link-text ms-1">Paiements</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link " href="../pages/calendrier.php">
+                    <a class="nav-link" href="../pages/frais-scolarite.php">
                         <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
+                            <i class="ni ni-money-coins text-warning text-sm opacity-10"></i>
                         </div>
-                        <span class="nav-link-text ms-1">Callendar</span>
+                        <span class="nav-link-text ms-1">Frais de scolarité</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link " href="../pages/virtual-reality.php">
-                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="ni ni-app text-info text-sm opacity-10"></i>
-                        </div>
-                        <span class="nav-link-text ms-1">Virtual Reality</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link " href="../pages/rtl.php">
-                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="ni ni-world-2 text-danger text-sm opacity-10"></i>
-                        </div>
-                        <span class="nav-link-text ms-1">RTL</span>
-                    </a>
-                </li>
+
+                <!-- Section Compte -->
                 <li class="nav-item mt-3">
-                    <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
+                    <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Mon Compte</h6>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link " href="../pages/profile.php">
+                    <a class="nav-link" href="../pages/profile.php">
                         <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
                         </div>
-                        <span class="nav-link-text ms-1">Profile</span>
+                        <span class="nav-link-text ms-1">Profil</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link " href="../pages/sign-in.php">
+                    <a class="nav-link" href="../pages/sign-out.php">
                         <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="ni ni-single-copy-04 text-warning text-sm opacity-10"></i>
+                            <i class="ni ni-button-power text-danger text-sm opacity-10"></i>
                         </div>
-                        <span class="nav-link-text ms-1">Sign In</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link " href="../pages/sign-up.php">
-                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="ni ni-collection text-info text-sm opacity-10"></i>
-                        </div>
-                        <span class="nav-link-text ms-1">Sign Up</span>
+                        <span class="nav-link-text ms-1">Déconnexion</span>
                     </a>
                 </li>
             </ul>
@@ -354,7 +422,7 @@ require_once('db-connect.php') ?>
                                         </div>
                                         <div class="form-group mb-2">
                                             <label for="start_datetime" class="control-label">Start</label>
-                                            <input type="datetime-local" value="2024-11-13T09:00"  class="form-control form-control-sm rounded-0" name="start_datetime" id="start_datetime" required>
+                                            <input type="datetime-local" value="2024-11-13T09:00" class="form-control form-control-sm rounded-0" name="start_datetime" id="start_datetime" required>
                                         </div>
                                         <div class="form-group mb-2">
                                             <label for="end_datetime" class="control-label">End</label>
