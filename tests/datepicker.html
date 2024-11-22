@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DateRangePicker Test</title>
+
+  <!-- CSS et JS nécessaires -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+</head>
+<body>
+  <input type="text" id="daterange" name="daterange" />
+
+  <script>
+    $(function() {
+      // Initialiser le DateRangePicker
+      $('#daterange').daterangepicker({
+        opens: 'left',
+        autoUpdateInput: true,
+        locale: {
+          format: 'MM/DD/YYYY', // Format de la date
+          applyLabel: 'Valider',
+          cancelLabel: 'Annuler',
+          daysOfWeek: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
+          monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+          firstDay: 1
+        },
+        startDate: moment().subtract(29, 'days'),
+        endDate: moment()
+      }, function(start, end, label) {
+        console.log(`Période sélectionnée : ${start.format('MM/DD/YYYY')} - ${end.format('MM/DD/YYYY')}`);
+        
+        // Requête AJAX pour récupérer les données
+        $.ajax({
+          url: 'traitement.php', // Assurez-vous d'avoir un fichier PHP ici
+          method: 'POST',
+          data: {
+            start_date: start.format('MM/DD/YYYY'),
+            end_date: end.format('MM/DD/YYYY')
+          },
+          dataType: 'json',
+          success: function(response) {
+            console.log('Réponse reçue :', response);
+            // Traitez la réponse ici
+          },
+          error: function(xhr) {
+            console.error('Erreur AJAX :', xhr);
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

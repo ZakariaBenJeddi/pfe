@@ -1,12 +1,14 @@
 <?php
+
 require '../includes/DatabaseConnexion.php';
 session_start();
+
 if (empty($_SESSION['user'])) {
-  header('location:sign-up.php');
+  header('location:sign-in.php');
 }
 
-//*deconexion apres 300s si aucun evenement deroulle
 $_SESSION['last_activity'] = time();
+
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 300)) {
   session_unset();
   session_destroy();
@@ -14,103 +16,16 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
   exit;
 }
 
-//* ensaignan ajax
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  header('Content-Type: application/json');
-  try {
-    // Validation des dates
-    if (!isset($_POST['start_date']) || !isset($_POST['end_date'])) {
-      throw new Exception("Les dates sont requises");
-    }
-
-    // Nettoyage et validation des dates
-    $start_date = filter_var($_POST['start_date'], FILTER_SANITIZE_STRING);
-    $end_date = filter_var($_POST['end_date'], FILTER_SANITIZE_STRING);
-
-    if (!$start_date || !$end_date) {
-      throw new Exception("Format de date invalide");
-    }
-
-    // Conversion des dates au format MySQL
-    $start_date = date("Y-m-d", strtotime($start_date));
-    $end_date = date("Y-m-d", strtotime($end_date));
-
-    // Requête SQL avec préparation
-    $sql = "SELECT * FROM enseignant WHERE date_creation BETWEEN :start_date AND :end_date ORDER BY date_creation DESC";
-
-    $stmt = $dbh->prepare($sql);
-    $stmt->execute([
-      ':start_date' => $start_date,
-      ':end_date' => $end_date
-    ]);
-
-    $results = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-    echo json_encode([
-      'status' => 'success',
-      'data' => $results,
-      'count' => count($results)
-    ]);
-  } catch (Exception $e) {
-    http_response_code(400);
-    echo json_encode([
-      'status' => 'error',
-      'message' => $e->getMessage()
-    ]);
-  }
-  exit;
-}
-
-
-$sql = "SELECT * FROM enseignant";
+$sql = "SELECT * FROM eleves";
 $query = $dbh->query($sql);
 $results = $query->fetchAll(PDO::FETCH_OBJ);
 
-
-try {
-  // Configuration de PDO pour lever des exceptions en cas d'erreur
-  $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-  // Vérification de l'existence des paramètres GET et validation de l'ID
-  if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
-    $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
-
-    // Si l'ID n'est pas valide, redirigez vers une page d'erreur ou arrêtez le script
-    if ($id === false) {
-      echo "<script>alert('ID invalide. Opération annulée.');</script>";
-      exit;
-    }
-
-    // Requête sécurisée avec PDO
-    $sql = "DELETE FROM enseignant WHERE id_enseignant = :id";
-    $query = $dbh->prepare($sql);
-    $query->bindParam(':id', $id, PDO::PARAM_INT);
-
-    // Exécution de la requête et gestion des erreurs
-    if ($query->execute()) {
-      echo "<script>alert('enseignant Bien Supprimée');</script>";
-
-      // Utilisez une redirection sécurisée
-      header("Location: enseignant.php");
-      exit;
-    } else {
-      // Affichage d'un message d'erreur générique pour éviter de donner des détails à un attaquant
-      echo "<script>alert('Erreur lors de la suppression.');</script>";
-    }
-  }
-} catch (PDOException $e) {
-  // Journalisez l'erreur dans un fichier sécurisé
-  error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
-  echo "<script>alert('Une erreur est survenue. Veuillez réessayer plus tard.');</script>";
-  exit;
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <!-- HEAD -->
 <?php include '../includes/head.php' ?>
-
 
 
 <body class="g-sidenav-show   bg-gray-100">
@@ -129,7 +44,6 @@ try {
     <hr class="horizontal dark mt-0">
     <div class="collapse navbar-collapse  w-auto" id="sidenav-collapse-main">
       <ul class="navbar-nav">
-        <!-- Section Dashboard -->
         <li class="nav-item">
           <a class="nav-link active" href="../pages/dashboard.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -138,160 +52,94 @@ try {
             <span class="nav-link-text ms-1">Dashboard</span>
           </a>
         </li>
-
-        <!-- Section Gestion des utilisateurs -->
         <li class="nav-item">
-          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion des Utilisateurs</h6>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="../pages/eleves.php">
+          <a class="nav-link " href="../pages/tables.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-hat-3 text-success text-sm opacity-10"></i>
+              <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Élèves</span>
+            <span class="nav-link-text ms-1">Tables</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="../pages/enseignant.php">
+          <a class="nav-link " href="../pages/salle.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-building text-primary text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Salles</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="../pages/enseignant.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-single-02 text-primary text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Enseignants</span>
+            <span class="nav-link-text ms-1">Enseignant</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="../pages/administration.php">
+          <a class="nav-link " href="../pages/billing.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-badge text-info text-sm opacity-10"></i>
+              <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Administration</span>
-          </a>
-        </li>
-
-        <!-- Section Gestion pédagogique -->
-        <li class="nav-item">
-          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion Pédagogique</h6>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="../pages/classes.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-building text-warning text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Classes</span>
+            <span class="nav-link-text ms-1">Billing</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="../pages/matieres.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-book-bookmark text-danger text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Matières</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="../pages/calendrier.php">
+          <a class="nav-link " href="../pages/calendrier.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
             </div>
             <span class="nav-link-text ms-1">Emplois du Temps</span>
           </a>
         </li>
-
-        <!-- Section Suivi -->
         <li class="nav-item">
-          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Suivi</h6>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="../pages/absences.php">
+          <a class="nav-link " href="../pages/virtual-reality.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-user-run text-danger text-sm opacity-10"></i>
+              <i class="ni ni-app text-info text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Absences</span>
+            <span class="nav-link-text ms-1">Virtual Reality</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="../pages/evaluations.php">
+          <a class="nav-link " href="../pages/rtl.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-chart-bar-32 text-success text-sm opacity-10"></i>
+              <i class="ni ni-world-2 text-danger text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Évaluations</span>
+            <span class="nav-link-text ms-1">RTL</span>
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="../pages/bulletins.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-folder-17 text-primary text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Bulletins</span>
-          </a>
-        </li>
-
-        <!-- Section Gestion des ressources -->
-        <li class="nav-item">
-          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion des Ressources</h6>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="../pages/salle.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-building text-info text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Salles</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="../pages/equipements.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-laptop text-primary text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Équipements</span>
-          </a>
-        </li>
-
-        <!-- Section Comptabilité -->
-        <li class="nav-item">
-          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Comptabilité</h6>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="../pages/payements.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Paiements</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="../pages/frais-scolarite.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-money-coins text-warning text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Frais de scolarité</span>
-          </a>
-        </li>
-
-        <!-- Section Compte -->
         <li class="nav-item mt-3">
-          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Mon Compte</h6>
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="../pages/profile.php">
+          <a class="nav-link " href="../pages/profile.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Profil</span>
+            <span class="nav-link-text ms-1">Profile</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="../pages/sign-out.php">
+          <a class="nav-link " href="../pages/sign-in.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-button-power text-danger text-sm opacity-10"></i>
+              <i class="ni ni-single-copy-04 text-warning text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Déconnexion</span>
+            <span class="nav-link-text ms-1">Sign In</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="../pages/sign-up.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-collection text-info text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Sign Up</span>
           </a>
         </li>
       </ul>
     </div>
     <div class="sidenav-footer mx-3 ">
       <div class="card card-plain shadow-none" id="sidenavCard">
+        <!-- <img class="w-50 mx-auto" src="../assets/img/illustrations/icon-documentation.svg" alt="sidebar_illustration"> -->
         <img class="w-50 mx-auto mt-5" src="https://elaraki.ac.ma/images/logo2.png" alt="sidebar_illustration">
         <div class="card-body text-center p-3 w-100 pt-0">
           <div class="docs-info">
@@ -300,6 +148,8 @@ try {
           </div>
         </div>
       </div>
+      <!-- <a href="https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard" target="_blank" class="btn btn-dark btn-sm w-100 mb-3">Documentation</a>
+      <a class="btn btn-primary btn-sm mb-0 w-100" href="https://www.creative-tim.com/product/argon-dashboard-pro?ref=sidebarfree" type="button">Upgrade to pro</a> -->
     </div>
   </aside>
   <main class="main-content position-relative border-radius-lg ">
@@ -423,37 +273,29 @@ try {
       <div class="row">
         <div class="col-12">
           <div class="card mb-4">
-            <!-- <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-              <h6>Ensaignant table</h6>
-              <div class="">
-                <a class="btn btn-primary btn-sm ms-auto" href="#">Ajouter Ensaignant</a>
-                <button type="button" class="btn btn-primary btn-sm ms-auto" onclick="expo()" id='btnexp'>Exporter</button>
-              </div>
-            </div> -->
             <div class="card-header pb-0 d-flex flex-wrap justify-content-between align-items-center text-center text-md-start">
               <div class="mb-2 mb-md-0 flex-grow-1 text-center text-md-start">
-                <h6 class="text-primary">Ensaignant</h6>
+                <h6 class="text-primary">Eleves</h6>
               </div>
               <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
                 <input type="text" class="form-control w-100 w-md-auto mb-3" id="daterange" name="daterange" value="" />
-                <a class="btn btn-primary btn-sm" href="#">Ajouter Ensaignant</a>
+                <a class="btn btn-primary btn-sm" href="ajouter_salle.php">Ajouter Salle</a>
                 <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
               </div>
             </div>
-            <hr>
             <div class="card-body px-0 pt-0 pb-2">
               <div class="table-responsive p-0">
-                <table class="table align-items-center mb-0" id="table_ensaignant">
+                <table class="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Author</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">specialite</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder text-center opacity-7 ps-2">Completion</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">date embauche</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">salaire</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nom & prenom</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">niveau scolaire</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">classe</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">filiere</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">telephone</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">date inscription</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">statut</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
-                      <!-- <th class="text-secondary opacity-7"></th> -->
                     </tr>
                   </thead>
                   <tbody id="tableBody">
@@ -463,85 +305,65 @@ try {
                           <td>
                             <div class="d-flex px-2 py-1">
                               <div>
-                                <img src="../assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
+                                <img src="https://elaraki.ac.ma/images/logo2.png" class="avatar avatar-sm me-3" alt="user1">
                               </div>
                               <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->nom_enseignant . ' ' . $result->prenom_enseignant ?></h6>
-                                <p class="text-xs text-secondary mb-0"><?= $result->email_enseignant ?></p>
+                                <h6 class="mb-0 text-sm"><?= $result->nom . ' ' . $result->prenom ?></h6>
+                                <p class="text-xs text-secondary mb-0"><?= $result->email ?></p>
                               </div>
                             </div>
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <p class="text-xs font-weight-bold mb-0"><?= $result->niveau_scolaire; ?></p>
                           </td>
                           <td>
-                            <p class="text-xs font-weight-bold mb-0">Enseignant</p>
-                            <p class="text-xs text-secondary mb-0"><?= $result->specialite ?></p>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">Class</p>
                           </td>
                           <td class="align-middle text-center">
-                            <div class="d-flex align-items-center justify-content-center">
-                              <span class="me-2 text-xs font-weight-bold"><?= $result->degree ?>%</span>
-                              <div>
-                                <div class="progress">
-                                  <div class="progress-bar 
-                                    <?php if ($result->degree <= 30) {
-                                      echo 'bg-gradient-danger';
-                                    }
-                                    if ($result->degree <= 50 && $result->degree > 30) {
-                                      echo 'bg-gradient-warning';
-                                    }
-                                    if ($result->degree >= 30 && $result->degree < 90) {
-                                      echo 'bg-gradient-info';
-                                    }
-                                    if ($result->degree >= 90) {
-                                      echo 'bg-gradient-success';
-                                    } ?>" role="progressbar" aria-valuenow="<?= $result->degree ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $result->degree ?>%;">
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
+                            <p class="text-xs font-weight-bold mb-0">Filiere</p>
                           </td>
-                          <?php if ($result->est_connecte === 0) { ?>
-                            <td class="align-middle text-center text-sm">
-                              <span class="badge badge-sm bg-gradient-secondary">Offline</span>
-                            </td>
-                          <?php } else { ?>
+                          <td class="align-middle text-center">
+                            <p class="text-xs font-weight-bold mb-0"><?= $result->telephone; ?></p>
+                            <p class="text-xs font-weight-bold mb-0"><?= $result->telephone_tuteur; ?></p>
+                          </td>
+                          <td class="align-middle text-center">
+                            <p class="text-xs font-weight-bold mb-0"><?= $result->date_inscription; ?></p>
+                          </td>
+                          <?php if ($result->statut === 'Actif') { ?>
                             <td class="align-middle text-center text-sm">
                               <span class="badge badge-sm bg-gradient-success">Online</span>
                             </td>
                           <?php } ?>
-                          <td class="align-middle text-center">
-                            <span class="text-secondary text-xs font-weight-bold"><?= $result->date_naissance ?></span>
-                          </td>
-                          <td class="align-middle text-center">
-                            <span class="text-secondary text-xs font-weight-bold"><?= $result->salaire ?> DH</span>
-                          </td>
-                          <td class="align-middle text-center">
-                            <div class="">
-                              <div class="dropdown">
-                                <button id="dropdownMenuButton" type="button" class="btn btn-sm dropdown-toggle border-none " data-bs-toggle="dropdown" aria-expanded="false">
-                                  <i class="fa fa-ellipsis-v text-xs" id="dropdownMenuButton" type="button" data-bs-toggle="dropdown" aria-expanded="false"></i>
-                                </button>
-                                <ul id="changewidth" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                  <li class="text-center">
-                                    <a href="javascript:void(0);" class="dropdown-item">
-                                      <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true" id="<?php echo $result->id_salle ?>"></i>
-                                    </a>
-                                  </li>
-                                  <li class="text-center">
-                                    <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
-                                      <i class="fas fa-eye text-primary opacity-10 fa-sm"></i>
-                                    </a>
-                                  </li>
-                                  <li class="text-center">
-                                    <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                                      <i class="ni ni-fat-remove text-danger opacity-10" id="<?= $result->id_salle ?>"></i>
-                                    </a>
-                                  </li>
-                                </ul>
-                              </div>
-                            </div>
+                          <?php if ($result->statut === 'Inactif') { ?>
+                            <td class="align-middle text-center text-sm">
+                              <span class="badge badge-sm bg-gradient-secondary">Offline</span>
+                            </td>
+                          <?php } ?>
+                          <?php if ($result->statut === 'Retraité') { ?>
+                            <td class="align-middle text-center text-sm">
+                              <span class="badge badge-sm bg-gradient-secondary">Retraité</span>
+                            </td>
+                          <?php } ?>
+                          <td class="align-middle text-center d-flex">
+                            <a href="edit_salle.php?id_salle=<?= $result->id_salle ?>" class="dropdown-item">
+                              <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
+                            </a>
+                            <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
+                              <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                            </a>
+                            <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                              <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_salle ?>"></i>
+                            </a>
                           </td>
                         </tr>
                       <?php endforeach; ?>
-                    <?php } ?>
+                    <?php } else { ?>
+                      <tr rowspan="7" class="text-center">
+                        <td class="text-center">
+                          No Content
+                        </td>
+                      </tr>
+                    <?php  } ?>
                   </tbody>
                 </table>
               </div>
@@ -555,33 +377,34 @@ try {
     </div>
   </main>
 
-  <!-- FIXED PLUGIN  -->
-  <?php include '../includes/fixedplugin.php' ?>
+  <!-- Export Functio -->
+  <script>
+    // $(document).ready(function() {
+    //   $('#table_eleves').DataTable(); // Initialize DataTable
+    // });
 
-  <!-- call script export ensaignant -->
-  <!-- <script src="../assets/js/ensaignant/export.js"></script> -->
-  <script type="text/javascript">
     $(document).ready(function() {
-      $('#table_ensaignant').DataTable(); // Initialize DataTable
+      $('table:first').DataTable(); // Initialiser DataTable pour la première table
     });
 
-    function expo() {
-      // Obtain DataTable instance
-      var table = $('#table_ensaignant').DataTable();
 
-      // Create data array for headers and rows
+    function expo() {
+      // Obtenir l'instance de DataTable pour la première table
+      var table = $('table:first').DataTable();
+
+      // Créer un tableau pour les en-têtes et les lignes
       var data = [];
       var headers = [];
 
-      // Extract headers, skipping "Action" column
+      // Extraire les en-têtes, en sautant la colonne "Action"
       table.columns().every(function() {
         if (this.header().textContent !== "Action") {
-          headers.push(this.header().textContent.trim()); // Trim to remove extra whitespace
+          headers.push(this.header().textContent.trim()); // Enlever les espaces en trop
         }
       });
       data.push(headers);
 
-      // Extract filtered data
+      // Extraire les données filtrées
       var filteredData = table.rows({
         filter: 'applied'
       }).data();
@@ -589,15 +412,14 @@ try {
       filteredData.each(function(valueArray) {
         var rowData = [];
         valueArray.forEach(function(value, index) {
-          if (index !== 7) { // Skip "Action" column
-            // Use jQuery to get the text content directly
-            rowData.push($('<div>').html(value).text().trim()); // Wrap value in a div to extract text
+          if (index !== 7) { // Sauter la colonne "Action"
+            rowData.push($('<div>').html(value).text().trim()); // Extraire le texte propre
           }
         });
         data.push(rowData);
       });
 
-      // Export to Excel with ExcelJS
+      // Exporter vers Excel avec ExcelJS
       var workbook = new ExcelJS.Workbook();
       var worksheet = workbook.addWorksheet('Data Export');
 
@@ -645,6 +467,8 @@ try {
     });
   </script>
 
+  <!-- FIXED PLUGIN  -->
+  <?php include '../includes/fixedplugin.php' ?>
   <!--   Core JS Files   -->
   <script src="../assets/js/core/popper.min.js"></script>
   <script src="../assets/js/core/bootstrap.min.js"></script>

@@ -106,6 +106,7 @@
         .card:hover .see-more-btn {
             display: inline-block;
         }
+
         /* //! END DASHBOARD STYLES */
 
         /* //! START SALLE STYLE */
@@ -212,109 +213,114 @@
         /* //! END SALLE STYLE */
 
         /* //! START ENSAIGNANT TABLE */
-            table.dataTable.no-footer {
-                border-bottom: 0px solid #fff !important;
-            }
+        table.dataTable.no-footer {
+            border-bottom: 0px solid #fff !important;
+        }
 
-            /* Customize the 'Show entries' select dropdown */
-            .dataTables_length {
-                margin-left: 15px !important;
-            }
+        /* Customize the 'Show entries' select dropdown */
+        .dataTables_length {
+            margin-left: 15px !important;
+        }
 
-            .dataTables_length select {
-                margin-left: 13px !important;
-                margin-right: 5px !important;
-                width: 60px;
-                /* Adjust width */
-                height: 35px;
-                /* Adjust height */
-                border: 1px solid #fff;
-                border-radius: 10px;
-                padding: 5px;
-                color: #fff;
-                background-color: #5e72e4;
-                font-size: 14px;
-            }
+        .dataTables_length select {
+            margin-left: 13px !important;
+            margin-right: 5px !important;
+            width: 60px;
+            /* Adjust width */
+            height: 35px;
+            /* Adjust height */
+            border: 1px solid #fff;
+            border-radius: 10px;
+            padding: 5px;
+            color: #fff;
+            background-color: #5e72e4;
+            font-size: 14px;
+        }
 
-            /* Customize the search input */
-            .dataTables_filter input {
-                margin-right: 1.5rem !important;
-                width: 200px;
-                /* Adjust width */
-                height: 35px;
-                /* Adjust height */
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                padding-left: 10px;
-                color: #333;
-                font-size: 14px;
-            }
+        /* Customize the search input */
+        .dataTables_filter input {
+            margin-right: 1.5rem !important;
+            width: 200px;
+            /* Adjust width */
+            height: 35px;
+            /* Adjust height */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding-left: 10px;
+            color: #333;
+            font-size: 14px;
+        }
 
-            /* Customize pagination buttons */
-            .dataTables_paginate .paginate_button {
-                background-color: #007bff;
-                /* Set background color */
-                color: #fff;
-                padding: 5px 10px;
-                border-radius: 5px;
-                margin: 0 2px;
-                font-size: 14px;
-                transition: background-color 0.3s;
-            }
+        #DataTables_Table_0_info{
+            font-size: 12px !important;
+        }
 
-            .dataTables_paginate .paginate_button:hover {
-                background-color: #0056b3;
-                /* Darker color on hover */
-            }
+        /* Customize pagination buttons */
+        .dataTables_paginate .paginate_button {
+            background-color: #007bff;
+            /* Set background color */
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin: 0 2px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
 
-            /* Customize active pagination button */
-            .dataTables_paginate .paginate_button.current {
-                background-color: #0056b3;
-                color: #fff;
-                font-weight: bold;
-            }
+        .dataTables_paginate .paginate_button:hover {
+            background-color: #0056b3;
+            /* Darker color on hover */
+        }
 
-            .dataTables_paginate .paginate_button {
-                background-color: #5e72e3;
-            }
+        /* Customize active pagination button */
+        .dataTables_paginate .paginate_button.current {
+            background-color: #0056b3;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .dataTables_paginate .paginate_button {
+            background-color: #5e72e3;
+        }
 
 
-            #table_salle_info {
-                margin-left: 15px !important;
-            }
+        #table_salle_info {
+            margin-left: 15px !important;
+        }
 
-            .dataTables_wrapper .dataTables_length,
-            .dataTables_wrapper .dataTables_filter,
-            .dataTables_wrapper .dataTables_info,
-            .dataTables_wrapper .dataTables_processing,
-            .dataTables_wrapper .dataTables_paginate {
-                color: #cfd3db !important;
-            }
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_processing,
+        .dataTables_wrapper .dataTables_paginate {
+            color: #cfd3db !important;
+        }
 
-            /* Remove border between table rows */
-            .dataTable tbody tr {
-                border-bottom: none;
-                border-color: #f4f5f7;
-                /* Remove bottom border for each row */
-            }
+        /* Remove border between table rows */
+        .dataTable tbody tr {
+            border-bottom: none;
+            border-color: #f4f5f7;
+            /* Remove bottom border for each row */
+        }
 
-            #table_salle {
-                border-bottom: 1px solid #f4f5f7;
-            }
+        #table_salle {
+            border-bottom: 1px solid #f4f5f7;
+        }
 
-            /* display action button */
-            #dropdownMenuButton {
-                box-shadow: none !important;
-            }
+        /* display action button */
+        #dropdownMenuButton {
+            box-shadow: none !important;
+        }
 
-            .dropdown .dropdown-menu {
-                display: auto !important;
-            }
+        .dropdown .dropdown-menu {
+            display: auto !important;
+        }
 
-            #changewidth {
-                width: 6rem !important;
-                min-width: 0 !important;
-            }
+        #changewidth {
+            width: 6rem !important;
+            min-width: 0 !important;
+        }
+
         /* //! END ENSAIGNANT TABLE */
     </style>
 

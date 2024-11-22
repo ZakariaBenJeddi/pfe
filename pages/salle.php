@@ -36,17 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $end_date = date("Y-m-d", strtotime($end_date));
 
     // Requête SQL avec préparation
-    $sql = "SELECT 
-                  id_salle,
-                  nom_salle,
-                  etage,
-                  capacite_salle,
-                  nbr_chaise,
-                  nbr_bureau,
-                  nbr_tableau,
-                  equipements,
-                  date_creation
-              FROM salle 
+    $sql = "SELECT id_salle, nom_salle, etage, capacite_salle, nbr_chaise, nbr_bureau, nbr_tableau, equipements, date_creation FROM salle 
               WHERE date_creation BETWEEN :start_date AND :end_date
               ORDER BY date_creation DESC";
 
@@ -633,6 +623,7 @@ try {
 
   <!-- //* Date Picker -->
   <!-- //* AJAX salle intervalle date  -->
+  <!-- Date Picker -->
   <script>
     $(function() {
       // Configuration du DateRangePicker
