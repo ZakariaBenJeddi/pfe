@@ -1,5 +1,18 @@
 <?php
 session_start();
+if (empty($_SESSION['user'])) {
+  header('location:sign-in.php');
+}
+
+$_SESSION['last_activity'] = time();
+
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 300)) {
+  session_unset();
+  session_destroy();
+  header("location:logout.php");
+  exit;
+}
+
 require '../includes/DatabaseConnexion.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
   // Récupérer et valider les données du formulaire

@@ -2,6 +2,18 @@
 require '../includes/DatabaseConnexion.php';
 session_start();
 
+if (empty($_SESSION['user'])) {
+  header('location:sign-in.php');
+}
+
+$_SESSION['last_activity'] = time();
+
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 300)) {
+  session_unset();
+  session_destroy();
+  header("location:logout.php");
+  exit;
+}
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
   header('Content-Type: application/json');
@@ -61,58 +73,45 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   exit;
 }
 
-if (empty($_SESSION['user'])) {
-  header('location:sign-up.php');
-}
-
-$_SESSION['last_activity'] = time();
-
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 300)) {
-  session_unset();
-  session_destroy();
-  header("location:logout.php");
-  exit;
-}
-
-//premier code 
+//* Récupère le nombre total de salles
 $sql = "SELECT * FROM salle";
 $query = $dbh->query($sql);
 $results = $query->fetchAll(PDO::FETCH_OBJ);
 
-//suppresion
+//* suppresion de salle
 try {
-  // Configuration de PDO pour lever des exceptions en cas d'erreur
+  //* Configuration de PDO pour lever des exceptions en cas d'erreur
   $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-  // Vérification de l'existence des paramètres GET et validation de l'ID
+  //* Vérification de l'existence des paramètres GET et validation de l'ID
   if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
     $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
 
-    // Si l'ID n'est pas valide, redirigez vers une page d'erreur ou arrêtez le script
+    //* Si l'ID n'est pas valide, redirigez vers une page d'erreur ou arrêtez le script
     if ($id === false) {
       echo "<script>alert('ID invalide. Opération annulée.');</script>";
       exit;
     }
 
-    // Requête sécurisée avec PDO
+    //* Requête sécurisée avec PDO
     $sql = "DELETE FROM salle WHERE id_salle = :id";
     $query = $dbh->prepare($sql);
     $query->bindParam(':id', $id, PDO::PARAM_INT);
 
-    // Exécution de la requête et gestion des erreurs
+    //* Exécution de la requête et gestion des erreurs
     if ($query->execute()) {
       echo "<script>alert('Salle Bien Supprimée');</script>";
 
-      // Utilisez une redirection sécurisée
+      //* Utilisez une redirection sécurisée
       header("Location: salle.php");
       exit;
     } else {
-      // Affichage d'un message d'erreur générique pour éviter de donner des détails à un attaquant
+      //* Affichage d'un message d'erreur générique pour éviter de donner des détails à un attaquant
       echo "<script>alert('Erreur lors de la suppression.');</script>";
     }
   }
 } catch (PDOException $e) {
-  // Journalisez l'erreur dans un fichier sécurisé
+  //* Journalisez l'erreur dans un fichier sécurisé
   error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
   echo "<script>alert('Une erreur est survenue. Veuillez réessayer plus tard.');</script>";
   exit;
@@ -139,99 +138,6 @@ try {
     </div>
     <hr class="horizontal dark mt-0">
     <div class="collapse navbar-collapse  w-auto" id="sidenav-collapse-main">
-      <!-- <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link active" href="../pages/dashboard.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Dashboard</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/tables.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Tables</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/salle.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-building text-primary text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Salles</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/enseignant.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-single-02 text-primary text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Enseignant</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/billing.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Billing</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/calendrier.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Emplois du Temps</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/virtual-reality.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-app text-info text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Virtual Reality</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/rtl.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-world-2 text-danger text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">RTL</span>
-          </a>
-        </li>
-        <li class="nav-item mt-3">
-          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/profile.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Profile</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/sign-in.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-single-copy-04 text-warning text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Sign In</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/sign-up.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-collection text-info text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Sign Up</span>
-          </a>
-        </li>
-      </ul> -->
       <ul class="navbar-nav">
         <!-- Section Dashboard -->
         <li class="nav-item">
@@ -396,7 +302,6 @@ try {
     </div>
     <div class="sidenav-footer mx-3 ">
       <div class="card card-plain shadow-none" id="sidenavCard">
-        <!-- <img class="w-50 mx-auto" src="../assets/img/illustrations/icon-documentation.svg" alt="sidebar_illustration"> -->
         <img class="w-50 mx-auto mt-5" src="https://elaraki.ac.ma/images/logo2.png" alt="sidebar_illustration">
         <div class="card-body text-center p-3 w-100 pt-0">
           <div class="docs-info">
@@ -405,8 +310,6 @@ try {
           </div>
         </div>
       </div>
-      <!-- <a href="https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard" target="_blank" class="btn btn-dark btn-sm w-100 mb-3">Documentation</a>
-      <a class="btn btn-primary btn-sm mb-0 w-100" href="https://www.creative-tim.com/product/argon-dashboard-pro?ref=sidebarfree" type="button">Upgrade to pro</a> -->
     </div>
   </aside>
   <main class="main-content position-relative border-radius-lg ">
@@ -540,10 +443,8 @@ try {
                 <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
               </div>
             </div>
-
-
             <!-- Edit data -->
-            <div id="editData" class="modal fade text-center" tabindex="-1">
+            <!-- <div id="editData" class="modal fade text-center" tabindex="-1">
               <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -553,17 +454,14 @@ try {
                     </button>
                   </div>
                   <div class="modal-body" id="info_update">
-                    <!-- Le contenu sera chargé ici par AJAX -->
-                    <?php
-                    include("edit_salle.php");
-                    ?>
+                    <?php // include("edit_salle.php"); ?>
                   </div>
                   <div class="modal-footer ">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
                   </div>
                 </div>
               </div>
-            </div>
+            </div> -->
             <form method="post">
               <div class="card-body px-0 pt-0 pb-2">
                 <div class="table-responsive p-0">
@@ -619,8 +517,8 @@ try {
                               <?php endforeach; ?>
                             </td>
                             <td class="align-middle text-center d-flex">
-                              <a href="javascript:void(0);" class="dropdown-item">
-                                <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true" id="<?php echo $result->id_salle ?>"></i>
+                              <a href="edit_salle.php?id_salle=<?= $result->id_salle ?>" class="dropdown-item">
+                                <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                               </a>
                               <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
                                 <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>

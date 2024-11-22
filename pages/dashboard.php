@@ -1,10 +1,28 @@
 <?php
 session_start();
+
+if (empty($_SESSION['user'])) {
+  header('location:sign-in.php');
+}
+
+$_SESSION['last_activity'] = time();
+
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 300)) {
+  session_unset();
+  session_destroy();
+  header("location:logout.php");
+  exit;
+}
+
 require '../includes/DatabaseConnexion.php';
+
+
+//! Récupère le nombre total de salles
 $query_nbr_salle = $dbh->query("SELECT COUNT(*) FROM salle ");
-$nbr_salle = $query_nbr_salle->fetchColumn(); // Récupère le nombre total de salles
-// $username = $_SESSION['lastname'];
+$nbr_salle = $query_nbr_salle->fetchColumn();
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <!-- HEAD -->
