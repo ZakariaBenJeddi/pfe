@@ -1,5 +1,4 @@
 <?php
-
 require '../includes/DatabaseConnexion.php';
 session_start();
 
@@ -345,10 +344,10 @@ $results = $query->fetchAll(PDO::FETCH_OBJ);
                             </td>
                           <?php } ?>
                           <td class="align-middle text-center d-flex">
-                            <a href="edit_salle.php?id_salle=<?= $result->id_salle ?>" class="dropdown-item">
+                            <a href="#.php?id_salle=<?= $result->id_salle ?>" class="dropdown-item">
                               <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                             </a>
-                            <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
+                            <a href="description_eleve.php?id=<?= $result->id_eleve ?>" class="dropdown-item">
                               <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                             </a>
                             <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">

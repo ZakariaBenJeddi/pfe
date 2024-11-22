@@ -2,69 +2,35 @@
 require '../includes/DatabaseConnexion.php';
 session_start();
 
+if (empty($_SESSION['user'])) {
+  header('location:sign-in.php');
+}
 
-//! 3. Planning des cours dans cette salle
+$_SESSION['last_activity'] = time();
 
-//! Afficher un planning des cours ou des événements qui se tiennent dans la salle.
-//! Exemple :
-//! Lundi 10:00-12:00 : Mathématiques.
-//! Mercredi 14:00-16:00 : Physique.
-
-
-//! 4. Historique d’utilisation (optionnel)
-
-//!     Nombre de fois où la salle a été utilisée dans le passé.
-//!     Si disponible, un tableau avec les événements passés.
-//!     Exemple :
-//!         2024-10-01 : Réunion administrative.
-//!         2024-10-02 : Séance de formation.
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 300)) {
+  session_unset();
+  session_destroy();
+  header("location:logout.php");
+  exit;
+}
 
 
-//! 5. Actions possibles
-
-//!     Modifier les informations : Bouton pour rediriger vers une page de modification (ex. modifier_salle.php?id=ID_SALLE).
-//!     Supprimer la salle : Bouton ou lien pour supprimer la salle après confirmation.
-//!     Ajouter un cours : Bouton pour associer de nouveaux cours à cette salle.
-
-//! 1. Photos de la salle
-
-//!     Ajoutez une ou plusieurs photos de la salle pour une meilleure visualisation.
-//!     Utilisez un slider ou une galerie si plusieurs photos sont disponibles
-
-//! 2. Disponibilité de la salle
-
-//!     Indiquez si la salle est actuellement occupée ou disponible.
-//!     Exemple : "Disponible pour réservation" ou "Occupée jusqu'à 15:00".
-
-//! 7. Alertes (si nécessaire)
-
-//!     Si la salle a des restrictions ou des problèmes, affichez-les clairement.
-//!     Exemple :
-//!         Alertes :
-//!             "Problème technique : Vidéoprojecteur non fonctionnel."
-//!             "Climatisation indisponible jusqu'au 2024-12-01."
 
 if (isset($_GET['id'])) {
-  $id_salle = isset($_GET['id']) ? $_GET['id'] : null;
-  if ($id_salle && filter_var($id_salle, FILTER_VALIDATE_INT)) {
-    $sql = "SELECT * FROM salle WHERE id_salle = :id_salle";
+  $id_eleve = isset($_GET['id']) ? $_GET['id'] : null;
+  if ($id_eleve && filter_var($id_eleve, FILTER_VALIDATE_INT)) {
+    $sql = "SELECT * FROM eleves WHERE id_eleve = :id_eleve";
     $query = $dbh->prepare($sql);
-    $query->bindParam(':id_salle', $id_salle, PDO::PARAM_INT);
+    $query->bindParam(':id_eleve', $id_eleve, PDO::PARAM_INT);
     $query->execute();
     $results = $query->fetchAll(PDO::FETCH_OBJ);
-
-    $projecteur = 0;
-    if (strpos($results[0]->equipements, "projecteur") !== false) {
-      $projecteur = 1;
-    } else {
-      $projecteur = 0;
-    }
   } else {
     // Gérer l'erreur si l'ID est invalide
-    header('location:salle.php');
+    header('location:eleves.php');
   }
 } else {
-  header('location:salle.php');
+  header('location:eleves.php');
 }
 
 ?>
@@ -331,30 +297,49 @@ if (isset($_GET['id'])) {
           <div class="row">
             <div class="col-xl-4 mb-xl-0 mb-4">
               <div class="card bg-transparent shadow-xl">
-                <div class="overflow-hidden position-relative border-radius-xl" style="background-image: url('../assets/img/school/salle/salle1.jpg');
+                <!-- <div class="overflow-hidden position-relative border-radius-xl" style="background-image: url('../assets/img/school/eleve/eleve1.jpg');">
+                  <span class="mask bg-gradient-dark"></span>
+                  <div class="card-body position-relative z-index-1 p-3">
+                    <i class="fas fa-user text-white p-2">&nbsp;&nbsp;<?= $results[0]->nom . " " . $results[0]->prenom ?></i>
+                    <h5 class="text-white mt-4 mb-5 pb-2">
+                    </h5>
+                    <div class="d-flex">
+                      <div class="d-flex">
+                        <div class="me-4">
+                          <p class="text-white mb-0">Class</p>
+                          <h6 class="text-white mb-0">Filiere</h6>
+                        </div>
+                        <div>
+                          <p class="text-white mb-0">Classe201 &nbsp;&nbsp;&nbsp;<i class="fas fa-map"></i></p>
+                          <h6 class="text-white mb-0">Filiere1 &nbsp;<i class="fas fa-users"></i></h6>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div> -->
+                <div class="overflow-hidden position-relative border-radius-xl" style="background-image: url('../assets/img/school/eleve/eleve1.jpg'); 
                   background-repeat: no-repeat; 
                   background-size: cover;
                   background-position: center;">
                   <span class="mask bg-gradient-dark"></span>
                   <div class="card-body position-relative z-index-1 p-3">
-                    <i class="fas fa-building text-white p-2">&nbsp;&nbsp;<?= $results[0]->nom_salle ?></i>
-                    <h5 class="text-white mt-4 mb-5 pb-2">
-                      <!-- 4562&nbsp;&nbsp;&nbsp;1122&nbsp;&nbsp;&nbsp;4594&nbsp;&nbsp;&nbsp;7852 -->
-                    </h5>
+                    <i class="fas fa-user text-white p-2">&nbsp;&nbsp;<?= $results[0]->nom . " " . $results[0]->prenom ?></i>
+                    <h5 class="text-white mt-4 mb-5 pb-2"></h5>
                     <div class="d-flex">
                       <div class="d-flex">
                         <div class="me-4">
-                          <p class="text-white mb-0">Etage</p>
-                          <h6 class="text-white mb-0">Capacite</h6>
+                          <p class="text-white mb-0">Class</p>
+                          <h6 class="text-white mb-0">Filiere</h6>
                         </div>
                         <div>
-                          <p class="text-white mb-0"><?= $results[0]->etage ?> &nbsp;&nbsp;&nbsp;<i class="fas fa-map"></i></p>
-                          <h6 class="text-white mb-0"><?= $results[0]->capacite_salle ?> &nbsp;<i class="fas fa-users"></i></h6>
+                          <p class="text-white mb-0">Classe201 &nbsp;&nbsp;&nbsp;<i class="fas fa-map"></i></p>
+                          <h6 class="text-white mb-0">Filiere1 &nbsp;<i class="fas fa-users"></i></h6>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+
               </div>
             </div>
             <div class="col-xl-8">
@@ -367,10 +352,10 @@ if (isset($_GET['id'])) {
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
-                      <h6 class="text-center mb-0">Chaise</h6>
-                      <span class="text-xs">Chaise d'eleves</span>
+                      <h6 class="text-center mb-0">Niveau</h6>
+                      <span class="text-xs">Niveau Scolaire</span>
                       <hr class="horizontal dark my-3">
-                      <h5 class="mb-0"><?= $results[0]->nbr_chaise ?> </h5>
+                      <h5 class="mb-0"><?= $results[0]->niveau_scolaire  ?> </h5>
                     </div>
                   </div>
                 </div>
@@ -383,10 +368,10 @@ if (isset($_GET['id'])) {
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
-                      <h6 class="text-center mb-0">Projecteur</h6>
-                      <span class="text-xs">Video Projecteur</span>
+                      <h6 class="text-center mb-0">Satisfaction</h6>
+                      <span class="text-xs">Niveau De Satisfaction</span>
                       <hr class="horizontal dark my-3">
-                      <h5 class="mb-0"><?= $projecteur ?> </h5>
+                      <h5 class="mb-0"><?= $results[0]->niveau_de_satisfaction   ?> </h5>
                     </div>
                   </div>
                 </div>
@@ -399,10 +384,10 @@ if (isset($_GET['id'])) {
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
-                      <h6 class="text-center mb-0">Tableau</h6>
-                      <span class="text-xs">Tableau marquere</span>
+                      <h6 class="text-center mb-0">Nationalite </h6>
+                      <span class="text-xs">Nationalite Origin</span>
                       <hr class="horizontal dark my-3">
-                      <h5 class="mb-0"><?= $results[0]->nbr_tableau ?> </h5>
+                      <h5 class="mb-0"><?= $results[0]->nationalite ?> </h5>
                     </div>
                   </div>
                 </div>
@@ -417,13 +402,15 @@ if (isset($_GET['id'])) {
                       <h6 class="text-center mb-0">Climat</h6>
                       <span class="text-xs">salle climatise</span>
                       <hr class="horizontal dark my-3">
-                      <h5 class="mb-0"><?= $results[0]->est_climatisee ?></h5>
+                      <h5 class="mb-0"><?php // $results[0]->est_climatisee 
+                                        ?></h5>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div><div class="row"> <!-- Delete this ligne if something wrong-->
+          </div>
+          <div class="row"> <!-- Delete this ligne if something wrong-->
             <div class="col-md-8 mb-lg-0 mb-4">
               <div class="card mt-4">
                 <div class="card-header pb-0 p-3">
@@ -455,7 +442,7 @@ if (isset($_GET['id'])) {
                                 <p class="text-xs font-weight-bold mb-0">Manager</p>
                                 <p class="text-xs text-secondary mb-0">Organization</p>
                               </td>
-                              
+
                             </tr>
                             <tr>
                               <td>
@@ -498,7 +485,7 @@ if (isset($_GET['id'])) {
                                 <p class="text-xs font-weight-bold mb-0">Manager</p>
                                 <p class="text-xs text-secondary mb-0">Organization</p>
                               </td>
-                              
+
                             </tr>
                             <tr>
                               <td>
@@ -527,15 +514,15 @@ if (isset($_GET['id'])) {
             </div>
             <div class="col-md-3 mb-lg-0 mb-2">
               <!-- <div class="card mt-4"> -->
-                <div class="alert alert-danger mt-4 h-75">
-                  <h5 class="text-center text-light">
-                    Alert
-                  </h5>
-                  <hr>
-                  <div class="text-light">
-                      Aucun alert
-                  </div>
+              <div class="alert alert-danger mt-4 h-75">
+                <h5 class="text-center text-light">
+                  Alert
+                </h5>
+                <hr>
+                <div class="text-light">
+                  Aucun alert
                 </div>
+              </div>
               <!-- </div> -->
             </div>
           </div>
@@ -544,7 +531,7 @@ if (isset($_GET['id'])) {
       <div class="row">
         <div class="col-md-8 mt-4">
           <div class="card">
-            
+
             <div class="card-header pb-0 px-3">
               <h6 class="mb-0">Billing Information</h6>
             </div>
@@ -588,7 +575,7 @@ if (isset($_GET['id'])) {
                 </li>
               </ul>
             </div>
-            
+
           </div>
         </div>
         <div class="col-md-4 mt-4">
@@ -647,8 +634,8 @@ if (isset($_GET['id'])) {
                 </li>
                 <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
                   <div class="d-flex align-items-center">
-                  <button class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-down"></i></button>
-                  <div class="d-flex flex-column">
+                    <button class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-down"></i></button>
+                    <div class="d-flex flex-column">
                       <h6 class="mb-1 text-dark text-sm">2021</h6>
                       <span class="text-xs">191 Sceance</span>
                     </div>
