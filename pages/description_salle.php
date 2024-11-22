@@ -423,7 +423,8 @@ if (isset($_GET['id'])) {
                 </div>
               </div>
             </div>
-          </div><div class="row"> <!-- Delete this ligne if something wrong-->
+          </div>
+          <div class="row"> <!-- Delete this ligne if something wrong-->
             <div class="col-md-8 mb-lg-0 mb-4">
               <div class="card mt-4">
                 <div class="card-header pb-0 p-3">
@@ -455,7 +456,7 @@ if (isset($_GET['id'])) {
                                 <p class="text-xs font-weight-bold mb-0">Manager</p>
                                 <p class="text-xs text-secondary mb-0">Organization</p>
                               </td>
-                              
+
                             </tr>
                             <tr>
                               <td>
@@ -498,7 +499,7 @@ if (isset($_GET['id'])) {
                                 <p class="text-xs font-weight-bold mb-0">Manager</p>
                                 <p class="text-xs text-secondary mb-0">Organization</p>
                               </td>
-                              
+
                             </tr>
                             <tr>
                               <td>
@@ -527,15 +528,15 @@ if (isset($_GET['id'])) {
             </div>
             <div class="col-md-3 mb-lg-0 mb-2">
               <!-- <div class="card mt-4"> -->
-                <div class="alert alert-danger mt-4 h-75">
-                  <h5 class="text-center text-light">
-                    Alert
-                  </h5>
-                  <hr>
-                  <div class="text-light">
-                      Aucun alert
-                  </div>
+              <div class="alert alert-danger mt-4 h-75">
+                <h5 class="text-center text-light">
+                  Alert
+                </h5>
+                <hr>
+                <div class="text-light">
+                  Aucun alert
                 </div>
+              </div>
               <!-- </div> -->
             </div>
           </div>
@@ -544,7 +545,7 @@ if (isset($_GET['id'])) {
       <div class="row">
         <div class="col-md-8 mt-4">
           <div class="card">
-            
+
             <div class="card-header pb-0 px-3">
               <h6 class="mb-0">Billing Information</h6>
             </div>
@@ -588,7 +589,7 @@ if (isset($_GET['id'])) {
                 </li>
               </ul>
             </div>
-            
+
           </div>
         </div>
         <div class="col-md-4 mt-4">
@@ -647,8 +648,8 @@ if (isset($_GET['id'])) {
                 </li>
                 <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
                   <div class="d-flex align-items-center">
-                  <button class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-down"></i></button>
-                  <div class="d-flex flex-column">
+                    <button class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-down"></i></button>
+                    <div class="d-flex flex-column">
                       <h6 class="mb-1 text-dark text-sm">2021</h6>
                       <span class="text-xs">191 Sceance</span>
                     </div>

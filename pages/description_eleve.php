@@ -348,7 +348,7 @@ if (isset($_GET['id'])) {
                   <div class="card">
                     <div class="card-header mx-4 p-3 text-center">
                       <div class="icon icon-shape  icon-lg bg-gradient-primary shadow text-center border-radius-lg cursor-pointer">
-                        <i class="fas fa-chair icon-container" style="transition: transform 0.4s ease; "></i>
+                        <i class="fas fa-book icon-container" style="transition: transform 0.4s ease;"></i>
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
@@ -363,15 +363,14 @@ if (isset($_GET['id'])) {
                   <div class="card">
                     <div class="card-header mx-4 p-3 text-center">
                       <div class="icon icon-shape icon-lg bg-gradient-primary shadow text-center border-radius-lg cursor-pointer">
-                        <!-- <i class="fab fa-paypal opacity-10 " ></i> -->
-                        <i class="fas fa-video icon-container" style="transition: transform 0.4s ease;"></i>
+                        <i class="fas fa-smile icon-container" style="transition: transform 0.4s ease;"></i>
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
                       <h6 class="text-center mb-0">Satisfaction</h6>
-                      <span class="text-xs">Niveau De Satisfaction</span>
+                      <span class="text-xs">Happy</span>
                       <hr class="horizontal dark my-3">
-                      <h5 class="mb-0"><?= $results[0]->niveau_de_satisfaction   ?> </h5>
+                      <h5 class="mb-0"><?= $results[0]->niveau_de_satisfaction ?>% </h5>
                     </div>
                   </div>
                 </div>
@@ -379,8 +378,7 @@ if (isset($_GET['id'])) {
                   <div class="card">
                     <div class="card-header mx-4 p-3 text-center">
                       <div class="icon icon-shape icon-lg bg-gradient-primary shadow text-center border-radius-lg  cursor-pointer">
-                        <!-- <i class="fas fa-chalkboard"></i> -->
-                        <i class="fas fa-chalkboard-teacher icon-container" style="transition: transform 0.4s ease;"></i>
+                        <i class="fas fa-globe icon-container" style="transition: transform 0.4s ease;"></i>
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
@@ -395,15 +393,14 @@ if (isset($_GET['id'])) {
                   <div class="card">
                     <div class="card-header mx-4 p-3 text-center">
                       <div class="icon icon-shape icon-lg bg-gradient-primary shadow text-center border-radius-lg cursor-pointer">
-                        <i class="fas fa-wind icon-container" style="transition: transform 0.4s ease; "></i>
+                        <i class="fas fa-user-tie icon-container" style="transition: transform 0.4s ease;"></i>
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
-                      <h6 class="text-center mb-0">Climat</h6>
-                      <span class="text-xs">salle climatise</span>
+                      <h6 class="text-center mb-0">Tuteur</h6>
+                      <span class="text-xs">Nom Tuteur</span>
                       <hr class="horizontal dark my-3">
-                      <h5 class="mb-0"><?php // $results[0]->est_climatisee 
-                                        ?></h5>
+                      <h5 class="mb-0"><?= $results[0]->nom_tuteur  ?></h5>
                     </div>
                   </div>
                 </div>
