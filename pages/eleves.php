@@ -15,10 +15,49 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
   exit;
 }
 
+//* read 
 $sql = "SELECT * FROM eleves";
 $query = $dbh->query($sql);
 $results = $query->fetchAll(PDO::FETCH_OBJ);
 
+//* delete
+try {
+  //* Configuration de PDO pour lever des exceptions en cas d'erreur
+  $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+  //* Vérification de l'existence des paramètres GET et validation de l'ID
+  if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
+    $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
+
+    //* Si l'ID n'est pas valide, redirigez vers une page d'erreur ou arrêtez le script
+    if ($id === false) {
+      echo "<script>alert('ID invalide. Opération annulée.');</script>";
+      exit;
+    }
+
+    //* Requête sécurisée avec PDO
+    $sql = "DELETE FROM eleves WHERE id_eleve = :id";
+    $query = $dbh->prepare($sql);
+    $query->bindParam(':id', $id, PDO::PARAM_INT);
+
+    //* Exécution de la requête et gestion des erreurs
+    if ($query->execute()) {
+      echo "<script>alert('Salle Bien Supprimée');</script>";
+
+      //* Utilisez une redirection sécurisée
+      header("Location: eleves.php");
+      exit;
+    } else {
+      //* Affichage d'un message d'erreur générique pour éviter de donner des détails à un attaquant
+      echo "<script>alert('Erreur lors de la suppression.');</script>";
+    }
+  }
+} catch (PDOException $e) {
+  //* Journalisez l'erreur dans un fichier sécurisé
+  error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+  echo "<script>alert('Une erreur est survenue. Veuillez réessayer plus tard.');</script>";
+  exit;
+} 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -344,14 +383,14 @@ $results = $query->fetchAll(PDO::FETCH_OBJ);
                             </td>
                           <?php } ?>
                           <td class="align-middle text-center d-flex">
-                            <a href="#.php?id_salle=<?= $result->id_salle ?>" class="dropdown-item">
+                            <a href="edit_eleve.php?id_eleve=<?= $result->id_eleve ?>" class="dropdown-item">
                               <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                             </a>
                             <a href="description_eleve.php?id=<?= $result->id_eleve ?>" class="dropdown-item">
                               <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                             </a>
-                            <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                              <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_salle ?>"></i>
+                            <a href="eleve.php?id=<?= $result->id_eleve ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                              <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_eleve ?>"></i>
                             </a>
                           </td>
                         </tr>
@@ -378,10 +417,6 @@ $results = $query->fetchAll(PDO::FETCH_OBJ);
 
   <!-- Export Functio -->
   <script>
-    // $(document).ready(function() {
-    //   $('#table_eleves').DataTable(); // Initialize DataTable
-    // });
-
     $(document).ready(function() {
       $('table:first').DataTable(); // Initialiser DataTable pour la première table
     });

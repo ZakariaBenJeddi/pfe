@@ -397,10 +397,13 @@ if (isset($_GET['id'])) {
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
-                      <h6 class="text-center mb-0">Tuteur</h6>
-                      <span class="text-xs">Nom Tuteur</span>
+                      <h6 class="text-center mb-0">Notes</h6>
+                      <span class="text-xs">Decouvrir notes</span>
                       <hr class="horizontal dark my-3">
-                      <h5 class="mb-0"><?= $results[0]->nom_tuteur  ?></h5>
+                      <!-- <h5 class="mb-0"><?php //$results[0]->nom_tuteur ?></h5> -->
+                      <div class="icon icon-shape icon-sm bg-gradient-primary shadow text-center cursor-pointer" style="border-radius:100%;">
+                        <a href="notes.php?id_eleves=0"><i class="fas fa-arrow-right"></i></a>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -413,7 +416,7 @@ if (isset($_GET['id'])) {
                 <div class="card-header pb-0 p-3">
                   <div class="row">
                     <div class="col-6 d-flex align-items-center">
-                      <h6 class="mb-0">Ensaignant de cette salles</h6>&nbsp;&nbsp;<i class="fas fa-users text-primary"></i>
+                      <h6 class="mb-0">Dernier notes :</h6>&nbsp;&nbsp;<i class="fas fa-users text-primary"></i>
                     </div>
                   </div>
                 </div>
@@ -580,7 +583,7 @@ if (isset($_GET['id'])) {
             <div class="card-header pb-0 px-3">
               <div class="row">
                 <div class="col-md-6">
-                  <h6 class="mb-0">Nombre de sceance chaque annees</h6>
+                  <h6 class="mb-0">informatio teur</h6>
                 </div>
                 <div class="col-md-6 d-flex justify-content-end align-items-center">
                   <i class="far fa-calendar-alt me-2"></i>
