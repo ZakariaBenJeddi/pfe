@@ -2,7 +2,7 @@
 require '../includes/DatabaseConnexion.php';
 // update
 // Vérifier si le formulaire a été soumis
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['modifier'])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
   // Récupérer les données du formulaire
   $id_eleve = $_POST['id_eleve'];
   $nom = $_POST['nom_eleve'];
@@ -134,7 +134,7 @@ if (isset($_GET['id_eleve'])) {
     besoins_speciaux <input type="text" name="besoins_speciaux_eleve" value="<?= $eleve->besoins_speciaux ?>"><br>
     langue_etrangere <input type="text" name="langue_etrangere_eleve" value="<?= $eleve->langue_etrangere ?>"><br>
     niveau_de_satisfaction <input type="text" name="niveau_de_satisfaction_eleve" value="<?= $eleve->niveau_de_satisfaction ?>"><br>
-    <input type="submit" value="modifier" name="modifier">
+    <input type="submit" value="edit" name="edit">
   </form>
 </body>
 
