@@ -1,33 +1,33 @@
 <?php
 require '../includes/DatabaseConnexion.php';
-
+// update
 // Vérifier si le formulaire a été soumis
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['modifier'])) {
-    // Récupérer les données du formulaire
-    $id_eleve = $_POST['id_eleve'];
-    $nom = $_POST['nom_eleve'];
-    $prenom = $_POST['prenom_eleve'];
-    $date_naissance = $_POST['date_naissance_eleve'];
-    $genre = $_POST['genre_eleve'];
-    $nationalite = $_POST['nationalite_eleve'];
-    $adresse = $_POST['adresse_eleve'];
-    $telephone = $_POST['telephone_eleve'];
-    $email = $_POST['email_eleve'];
-    $date_inscription = $_POST['date_inscription_eleve'];
-    $statut = $_POST['statut_eleve'];
-    $historique_scolaire = $_POST['historique_scolaire_eleve'];
-    $langues_parlees = $_POST['langues_parlees_eleve'];
-    $nom_tuteur = $_POST['nom_tuteur_eleve'];
-    $telephone_tuteur = $_POST['telephone_tuteur_eleve'];
-    $email_tuteur = $_POST['email_tuteur_eleve'];
-    $profession_tuteur = $_POST['profession_tuteur_eleve'];
-    $niveau_scolaire = $_POST['niveau_scolaire_eleve'];
-    $besoins_speciaux = $_POST['besoins_speciaux_eleve'];
-    $langue_etrangere = $_POST['langue_etrangere_eleve'];
-    $niveau_de_satisfaction = $_POST['niveau_de_satisfaction_eleve'];
+  // Récupérer les données du formulaire
+  $id_eleve = $_POST['id_eleve'];
+  $nom = $_POST['nom_eleve'];
+  $prenom = $_POST['prenom_eleve'];
+  $date_naissance = $_POST['date_naissance_eleve'];
+  $genre = $_POST['genre_eleve'];
+  $nationalite = $_POST['nationalite_eleve'];
+  $adresse = $_POST['adresse_eleve'];
+  $telephone = $_POST['telephone_eleve'];
+  $email = $_POST['email_eleve'];
+  $date_inscription = $_POST['date_inscription_eleve'];
+  $statut = $_POST['statut_eleve'];
+  $historique_scolaire = $_POST['historique_scolaire_eleve'];
+  $langues_parlees = $_POST['langues_parlees_eleve'];
+  $nom_tuteur = $_POST['nom_tuteur_eleve'];
+  $telephone_tuteur = $_POST['telephone_tuteur_eleve'];
+  $email_tuteur = $_POST['email_tuteur_eleve'];
+  $profession_tuteur = $_POST['profession_tuteur_eleve'];
+  $niveau_scolaire = $_POST['niveau_scolaire_eleve'];
+  $besoins_speciaux = $_POST['besoins_speciaux_eleve'];
+  $langue_etrangere = $_POST['langue_etrangere_eleve'];
+  $niveau_de_satisfaction = $_POST['niveau_de_satisfaction_eleve'];
 
-    // Préparer la requête de mise à jour
-    $sql = "UPDATE eleves 
+  // Préparer la requête de mise à jour
+  $sql = "UPDATE eleves 
             SET nom = :nom,
                 prenom = :prenom,
                 date_naissance = :date_naissance,
@@ -51,36 +51,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['modifier'])) {
                 date_derniere_mise_a_jour = NOW()
             WHERE id_eleve = :id_eleve";
 
-    try {
-        $stmt = $dbh->prepare($sql);
-        $stmt->execute([
-            ':nom' => $nom,
-            ':prenom' => $prenom,
-            ':date_naissance' => $date_naissance,
-            ':genre' => $genre,
-            ':nationalite' => $nationalite,
-            ':adresse' => $adresse,
-            ':telephone' => $telephone,
-            ':email' => $email,
-            ':id_eleve' => $id_eleve,
-            ':date_inscription' => $date_inscription,
-            ':statut' => $statut,
-            ':historique_scolaire' => $historique_scolaire,
-            ':langues_parlees' => $langues_parlees,
-            ':nom_tuteur' => $nom_tuteur,
-            ':telephone_tuteur' => $telephone_tuteur,
-            ':email_tuteur' => $email_tuteur,
-            ':profession_tuteur' => $profession_tuteur,
-            ':niveau_scolaire' => $niveau_scolaire,
-            ':besoins_speciaux' => $besoins_speciaux,
-            ':langue_etrangere' => $langue_etrangere,
-            ':niveau_de_satisfaction' => $niveau_de_satisfaction,
-        ]);
+  try {
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute([
+      ':nom' => $nom,
+      ':prenom' => $prenom,
+      ':date_naissance' => $date_naissance,
+      ':genre' => $genre,
+      ':nationalite' => $nationalite,
+      ':adresse' => $adresse,
+      ':telephone' => $telephone,
+      ':email' => $email,
+      ':id_eleve' => $id_eleve,
+      ':date_inscription' => $date_inscription,
+      ':statut' => $statut,
+      ':historique_scolaire' => $historique_scolaire,
+      ':langues_parlees' => $langues_parlees,
+      ':nom_tuteur' => $nom_tuteur,
+      ':telephone_tuteur' => $telephone_tuteur,
+      ':email_tuteur' => $email_tuteur,
+      ':profession_tuteur' => $profession_tuteur,
+      ':niveau_scolaire' => $niveau_scolaire,
+      ':besoins_speciaux' => $besoins_speciaux,
+      ':langue_etrangere' => $langue_etrangere,
+      ':niveau_de_satisfaction' => $niveau_de_satisfaction,
+    ]);
 
-        echo "Les informations de l'élève ont été mises à jour avec succès.";
-    } catch (PDOException $e) {
-        echo "Erreur lors de la mise à jour : " . $e->getMessage();
-    }
+    echo "Les informations de l'élève ont été mises à jour avec succès.";
+  } catch (PDOException $e) {
+    echo "Erreur lors de la mise à jour : " . $e->getMessage();
+  }
 }
 
 if (isset($_GET['id_eleve'])) {
@@ -90,10 +90,10 @@ if (isset($_GET['id_eleve'])) {
   $stmt = $dbh->prepare($sql);
 
   try {
-      $stmt->execute([':id_eleve' => $id_eleve]);
-      $eleve = $stmt->fetch(PDO::FETCH_OBJ);
+    $stmt->execute([':id_eleve' => $id_eleve]);
+    $eleve = $stmt->fetch(PDO::FETCH_OBJ);
   } catch (PDOException $e) {
-      echo "Erreur lors de la récupération des données : " . $e->getMessage();
+    echo "Erreur lors de la récupération des données : " . $e->getMessage();
   }
 } else {
   echo "ID de l'élève non fourni.";
@@ -104,11 +104,13 @@ if (isset($_GET['id_eleve'])) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
 </head>
+
 <body>
   <form method="post">
     <input type="text" readonly name="id_eleve" value="<?= $eleve->id_eleve ?>"><br>
@@ -135,4 +137,5 @@ if (isset($_GET['id_eleve'])) {
     <input type="submit" value="modifier" name="modifier">
   </form>
 </body>
+
 </html>
