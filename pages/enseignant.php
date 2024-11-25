@@ -513,31 +513,16 @@ try {
                           <td class="align-middle text-center">
                             <span class="text-secondary text-xs font-weight-bold"><?= $result->salaire ?> DH</span>
                           </td>
-                          <td class="align-middle text-center">
-                            <div class="">
-                              <div class="dropdown">
-                                <button id="dropdownMenuButton" type="button" class="btn btn-sm dropdown-toggle border-none " data-bs-toggle="dropdown" aria-expanded="false">
-                                  <i class="fa fa-ellipsis-v text-xs" id="dropdownMenuButton" type="button" data-bs-toggle="dropdown" aria-expanded="false"></i>
-                                </button>
-                                <ul id="changewidth" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                  <li class="text-center">
-                                    <a href="edit_ensaignant.php?id=<?= $result->id_enseignant ?>" class="dropdown-item">
-                                      <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>
-                                    </a>
-                                  </li>
-                                  <li class="text-center">
-                                    <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
-                                      <i class="fas fa-eye text-primary opacity-10 fa-sm"></i>
-                                    </a>
-                                  </li>
-                                  <li class="text-center">
-                                    <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                                      <i class="ni ni-fat-remove text-danger opacity-10" id="<?= $result->id_salle ?>"></i>
-                                    </a>
-                                  </li>
-                                </ul>
-                              </div>
-                            </div>
+                          <td class="align-middle text-center d-flex">
+                            <a href="edit_ensaignant.php?id=<?= $result->id_enseignant ?>" class="dropdown-item">
+                              <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
+                            </a>
+                            <a href="description_enseignant.php?id=<?= $result->id_enseignant ?>" class="dropdown-item">
+                              <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                            </a>
+                            <a href="enseignant.php?id=<?= $result->id_enseignant ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                              <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_enseignant ?>"></i>
+                            </a>
                           </td>
                         </tr>
                       <?php endforeach; ?>
