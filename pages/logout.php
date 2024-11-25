@@ -7,7 +7,6 @@ date_default_timezone_set('Africa/Kampala');
 
 // Récupérer la date et l'email de l'utilisateur
 $ldate = date('d-m-Y h:i:s A');
-// $ldate = 'hhhhh';
 $email = $_SESSION['email_admin'];
 
 try {

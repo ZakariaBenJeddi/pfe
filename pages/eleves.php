@@ -6,14 +6,69 @@ if (empty($_SESSION['user'])) {
   header('location:sign-in.php');
 }
 
-$_SESSION['last_activity'] = time();
 
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 300)) {
-  session_unset();
-  session_destroy();
-  header("location:logout.php");
+//* deconnexion
+$inactivity_limit = 300; // 5 minutes
+if (isset($_SESSION['last_action'])) {
+  $inactivity_duration = time() - $_SESSION['last_action'];
+  if ($inactivity_duration > $inactivity_limit) {
+    session_unset();
+    session_destroy();
+    header("Location: logout.php");
+    exit();
+  }
+}
+$_SESSION['last_action'] = time();
+
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+  header('Content-Type: application/json');
+  try {
+    // Validation des dates
+    if (!isset($_POST['start_date']) || !isset($_POST['end_date'])) {
+      throw new Exception("Les dates sont requises");
+    }
+
+    // Nettoyage et validation des dates
+    $start_date = filter_var($_POST['start_date'], FILTER_SANITIZE_STRING);
+    $end_date = filter_var($_POST['end_date'], FILTER_SANITIZE_STRING);
+
+    if (!$start_date || !$end_date) {
+      throw new Exception("Format de date invalide");
+    }
+
+    // Conversion des dates au format MySQL
+    $start_date = date("Y-m-d", strtotime($start_date));
+    $end_date = date("Y-m-d", strtotime($end_date));
+
+    // Requête SQL avec préparation
+    $sql = "SELECT * FROM eleves 
+              WHERE date_inscription BETWEEN :start_date AND :end_date
+              ORDER BY date_inscription DESC";
+
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute([
+      ':start_date' => $start_date,
+      ':end_date' => $end_date
+    ]);
+
+    $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+    echo json_encode([
+      'status' => 'success',
+      'data' => $results,
+      'count' => count($results)
+    ]);
+  } catch (Exception $e) {
+    http_response_code(400);
+    echo json_encode([
+      'status' => 'error',
+      'message' => $e->getMessage()
+    ]);
+  }
   exit;
 }
+
 
 //* read 
 $sql = "SELECT * FROM eleves";
@@ -57,7 +112,7 @@ try {
   error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
   echo "<script>alert('Une erreur est survenue. Veuillez réessayer plus tard.');</script>";
   exit;
-} 
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -343,7 +398,7 @@ try {
                           <td>
                             <div class="d-flex px-2 py-1">
                               <div>
-                                <img src="https://elaraki.ac.ma/images/logo2.png" class="avatar avatar-sm me-3" alt="user1">
+                                <img src="../assets/img/team-4.jpg" class="avatar avatar-sm me-3" alt="user1">
                               </div>
                               <div class="d-flex flex-column justify-content-center">
                                 <h6 class="mb-0 text-sm"><?= $result->nom . ' ' . $result->prenom ?></h6>
@@ -477,7 +532,7 @@ try {
   </script>
 
   <!-- //* Date Picker -->
-  <!-- //* AJAX salle intervalle date  -->
+  <!-- //* AJAX eleves intervalle date  -->
   <script>
     $(function() {
       // Configuration du DateRangePicker
@@ -497,6 +552,105 @@ try {
         },
         startDate: moment().subtract(29, 'days'),
         endDate: moment()
+      }, function(start, end, label) {
+        // Callback pour la sélection de dates
+        const tableBody = $('#tableBody');
+
+        $.ajax({
+          url: '', // Fichier actuel
+          method: 'POST',
+          data: {
+            start_date: start.format('MM/DD/YYYY'),
+            end_date: end.format('MM/DD/YYYY')
+          },
+          dataType: 'json',
+          success: function(response) {
+            // Vider le tableau
+            tableBody.empty();
+
+            // Vérifier s'il y a des résultats
+            if (response.status === 'success' && response.count > 0) {
+              // Parcourir et ajouter chaque eleve
+              response.data.forEach(function(eleve) {
+                tableBody.append(`
+                        <tr>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div>
+                                <img src="https://elaraki.ac.ma/images/logo2.png" class="avatar avatar-sm me-3" alt="user1">
+                              </div>
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm"><?= $result->nom . ' ' . $result->prenom ?></h6>
+                                <p class="text-xs text-secondary mb-0"><?= $result->email ?></p>
+                              </div>
+                            </div>
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <p class="text-xs font-weight-bold mb-0"><?= $result->niveau_scolaire; ?></p>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">Class</p>
+                          </td>
+                          <td class="align-middle text-center">
+                            <p class="text-xs font-weight-bold mb-0">Filiere</p>
+                          </td>
+                          <td class="align-middle text-center">
+                            <p class="text-xs font-weight-bold mb-0"><?= $result->telephone; ?></p>
+                            <p class="text-xs font-weight-bold mb-0"><?= $result->telephone_tuteur; ?></p>
+                          </td>
+                          <td class="align-middle text-center">
+                            <p class="text-xs font-weight-bold mb-0"><?= $result->date_inscription; ?></p>
+                          </td>
+                          <?php if ($result->statut === 'Actif') { ?>
+                            <td class="align-middle text-center text-sm">
+                              <span class="badge badge-sm bg-gradient-success">Online</span>
+                            </td>
+                          <?php } ?>
+                          <?php if ($result->statut === 'Inactif') { ?>
+                            <td class="align-middle text-center text-sm">
+                              <span class="badge badge-sm bg-gradient-secondary">Offline</span>
+                            </td>
+                          <?php } ?>
+                          <?php if ($result->statut === 'Retraité') { ?>
+                            <td class="align-middle text-center text-sm">
+                              <span class="badge badge-sm bg-gradient-secondary">Retraité</span>
+                            </td>
+                          <?php } ?>
+                          <td class="align-middle text-center d-flex">
+                            <a href="edit_eleve.php?id_eleve=<?= $result->id_eleve ?>" class="dropdown-item">
+                              <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
+                            </a>
+                            <a href="description_eleve.php?id=<?= $result->id_eleve ?>" class="dropdown-item">
+                              <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                            </a>
+                            <a href="eleve.php?id=<?= $result->id_eleve ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                              <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_eleve ?>"></i>
+                            </a>
+                          </td>
+                        </tr>
+                            `);
+              });
+            } else {
+              // Aucun résultat
+              tableBody.append(`
+                            <tr>
+                                <td colspan="8" class="text-center">Aucune salle trouvée pour cette période</td>
+                            </tr>
+                        `);
+            }
+          },
+          error: function(xhr) {
+            // Gestion des erreurs
+            console.error('Erreur de requête:', xhr);
+            tableBody.html(`
+                        <tr>
+                            <td colspan="9" class="text-center text-danger">
+                                Erreur lors de la récupération des données
+                            </td>
+                        </tr>
+                    `);
+          }
+        });
       });
     });
   </script>

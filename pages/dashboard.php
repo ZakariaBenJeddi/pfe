@@ -1,33 +1,32 @@
 <?php
 session_start();
-
 if (empty($_SESSION['user'])) {
   header('location:sign-in.php');
 }
-
-$_SESSION['last_activity'] = time();
-
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 300)) {
-  session_unset();
-  session_destroy();
-  header("location:logout.php");
-  exit;
-}
-
 require '../includes/DatabaseConnexion.php';
 
+//* deconnexion
+$inactivity_limit = 300; // 5 minutes
+if (isset($_SESSION['last_action'])) {
+  $inactivity_duration = time() - $_SESSION['last_action'];
+  if ($inactivity_duration > $inactivity_limit) {
+    session_unset();
+    session_destroy();
+    header("Location: logout.php");
+    exit();
+  }
+}
+$_SESSION['last_action'] = time();
 
-//! Récupère le nombre total de salles
+//!Récupère le nombre total de salles
 $query_nbr_salle = $dbh->query("SELECT COUNT(*) FROM salle ");
 $nbr_salle = $query_nbr_salle->fetchColumn();
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
 <!-- HEAD -->
 <?php include '../includes/head.php' ?>
-
 
 <body class="g-sidenav-show  bg-gray-100">
   <div class="min-height-300 bg-primary position-absolute w-100"></div>

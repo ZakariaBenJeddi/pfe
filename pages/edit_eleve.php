@@ -1,6 +1,28 @@
 <?php
 require '../includes/DatabaseConnexion.php';
 session_start();
+
+if (empty($_SESSION['user'])) {
+  header('location:sign-in.php');
+}
+
+// Définir une limite d'inactivité (en secondes)
+$inactivity_limit = 120; // 2 minutes
+
+// Vérifier si l'utilisateur est inactif
+if (isset($_SESSION['last_action'])) {
+    $inactivity_duration = time() - $_SESSION['last_action'];
+    if ($inactivity_duration > $inactivity_limit) {
+        session_unset();
+        session_destroy();
+        header("Location: logout.php");
+        exit();
+    }
+}
+
+// Mettre à jour l'horodatage de la dernière action
+$_SESSION['last_action'] = time();
+
 // update
 // Vérifier si le formulaire a été soumis
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
@@ -78,8 +100,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
       ':niveau_de_satisfaction' => $niveau_de_satisfaction,
     ]);
 
-    echo "<script>alert('Les informations de l'élève ont été mises à jour avec succès.')</script>";
-    header('location:eleves.php');
+    echo "<script>
+        alert('Les informations de l\'élève ont été mises à jour avec succès.');
+        window.location.href = 'eleves.php';
+      </script>";
   } catch (PDOException $e) {
     echo "Erreur lors de la mise à jour : " . $e->getMessage();
   }
@@ -100,9 +124,7 @@ if (isset($_GET['id_eleve'])) {
 } else {
   echo "ID de l'élève non fourni.";
 }
-
 ?>
-
 
 <!-- <!DOCTYPE html>
 <html lang="en">
@@ -138,9 +160,6 @@ if (isset($_GET['id_eleve'])) {
   </form>
 </body>
 </html> -->
-
-
-
 
 <!DOCTYPE html>
 <html lang="en">
