@@ -4,16 +4,22 @@ if (empty($_SESSION['user'])) {
   header('location:sign-in.php');
 }
 
-$_SESSION['last_activity'] = time();
-
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 300)) {
-  session_unset();
-  session_destroy();
-  header("location:logout.php");
-  exit;
-}
-
 require '../includes/DatabaseConnexion.php';
+
+//* deconnexion
+$inactivity_limit = 300; // 5 minutes
+if (isset($_SESSION['last_action'])) {
+  $inactivity_duration = time() - $_SESSION['last_action'];
+  if ($inactivity_duration > $inactivity_limit) {
+    session_unset();
+    session_destroy();
+    header("Location: logout.php");
+    exit();
+  }
+}
+$_SESSION['last_action'] = time();
+
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
   // Récupérer et valider les données du formulaire
   $nom_salle = htmlspecialchars(trim($_POST['nom_salle']));
@@ -405,14 +411,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
                 </div>
               </div>
             </div>
-            <!-- <div class="card-header text-center border-0 pt-0 pt-lg-2 pb-4 pb-lg-3">
-              <div class="d-flex justify-content-between">
-                <a href="javascript:;" class="btn btn-sm btn-info mb-0 d-none d-lg-block">Connect</a>
-                <a href="javascript:;" class="btn btn-sm btn-info mb-0 d-block d-lg-none"><i class="ni ni-collection"></i></a>
-                <a href="javascript:;" class="btn btn-sm btn-dark float-right mb-0 d-none d-lg-block">Message</a>
-                <a href="javascript:;" class="btn btn-sm btn-dark float-right mb-0 d-block d-lg-none"><i class="ni ni-email-83"></i></a>
-              </div>
-            </div> -->
             <div class="card-body pt-0 mb-5">
               <div class="row">
                 <div class="col">

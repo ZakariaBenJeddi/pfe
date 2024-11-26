@@ -5,14 +5,19 @@ if (empty($_SESSION['user'])) {
   header('location:sign-up.php');
 }
 
-//*deconexion apres 300s si aucun evenement deroulle
-$_SESSION['last_activity'] = time();
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 300)) {
-  session_unset();
-  session_destroy();
-  header("location:logout.php");
-  exit;
+//* deconnexion
+$inactivity_limit = 300; // 5 minutes
+if (isset($_SESSION['last_action'])) {
+  $inactivity_duration = time() - $_SESSION['last_action'];
+  if ($inactivity_duration > $inactivity_limit) {
+    session_unset();
+    session_destroy();
+    header("Location: logout.php");
+    exit();
+  }
 }
+$_SESSION['last_action'] = time();
+
 
 //* ensaignan ajax
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -423,20 +428,13 @@ try {
       <div class="row">
         <div class="col-12">
           <div class="card mb-4">
-            <!-- <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-              <h6>Ensaignant table</h6>
-              <div class="">
-                <a class="btn btn-primary btn-sm ms-auto" href="#">Ajouter Ensaignant</a>
-                <button type="button" class="btn btn-primary btn-sm ms-auto" onclick="expo()" id='btnexp'>Exporter</button>
-              </div>
-            </div> -->
             <div class="card-header pb-0 d-flex flex-wrap justify-content-between align-items-center text-center text-md-start">
               <div class="mb-2 mb-md-0 flex-grow-1 text-center text-md-start">
                 <h6 class="text-primary">Ensaignant</h6>
               </div>
               <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
                 <input type="text" class="form-control w-100 w-md-auto mb-3" id="daterange" name="daterange" value="" />
-                <a class="btn btn-primary btn-sm" href="#">Ajouter Ensaignant</a>
+                <a class="btn btn-primary btn-sm" href="ajouter_enseignant.php">Ajouter Ensaignant</a>
                 <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
               </div>
             </div>

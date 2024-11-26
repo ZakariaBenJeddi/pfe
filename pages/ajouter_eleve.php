@@ -1,33 +1,29 @@
 <?php
-require '../includes/DatabaseConnexion.php';
 session_start();
-
 if (empty($_SESSION['user'])) {
   header('location:sign-in.php');
 }
 
-// Définir une limite d'inactivité (en secondes)
-$inactivity_limit = 120; // 2 minutes
+require '../includes/DatabaseConnexion.php';
 
-// Vérifier si l'utilisateur est inactif
+//* deconnexion
+$inactivity_limit = 300; // 5 minutes
 if (isset($_SESSION['last_action'])) {
-    $inactivity_duration = time() - $_SESSION['last_action'];
-    if ($inactivity_duration > $inactivity_limit) {
-        session_unset();
-        session_destroy();
-        header("Location: logout.php");
-        exit();
-    }
+  $inactivity_duration = time() - $_SESSION['last_action'];
+  if ($inactivity_duration > $inactivity_limit) {
+    session_unset();
+    session_destroy();
+    header("Location: logout.php");
+    exit();
+  }
 }
-
-// Mettre à jour l'horodatage de la dernière action
 $_SESSION['last_action'] = time();
+
 
 // update
 // Vérifier si le formulaire a été soumis
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
   // Récupérer les données du formulaire
-  $id_eleve = $_POST['id_eleve'];
   $nom = $_POST['nom_eleve'];
   $prenom = $_POST['prenom_eleve'];
   $date_naissance = $_POST['date_naissance_eleve'];
@@ -50,29 +46,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
   $niveau_de_satisfaction = $_POST['niveau_de_satisfaction_eleve'];
 
   // Préparer la requête de mise à jour
-  $sql = "UPDATE eleves 
-            SET nom = :nom,
-                prenom = :prenom,
-                date_naissance = :date_naissance,
-                genre = :genre,
-                nationalite = :nationalite,
-                adresse = :adresse,
-                telephone = :telephone,
-                email = :email,
-                date_inscription = :date_inscription,
-                statut = :statut,
-                historique_scolaire = :historique_scolaire,
-                langues_parlees = :langues_parlees,
-                nom_tuteur = :nom_tuteur,
-                telephone_tuteur = :telephone_tuteur,
-                email_tuteur = :email_tuteur,
-                profession_tuteur = :profession_tuteur,
-                niveau_scolaire = :niveau_scolaire,
-                besoins_speciaux = :besoins_speciaux ,
-                langue_etrangere = :langue_etrangere,
-                niveau_de_satisfaction = :niveau_de_satisfaction,
-                date_derniere_mise_a_jour = NOW()
-            WHERE id_eleve = :id_eleve";
+  $sql = "INSERT INTO eleves (
+              nom,prenom,date_naissance,genre,nationalite,adresse,telephone,email,date_inscription,
+              statut,historique_scolaire,langues_parlees,nom_tuteur,telephone_tuteur,email_tuteur,
+              profession_tuteur,niveau_scolaire,besoins_speciaux,langue_etrangere,
+              niveau_de_satisfaction,date_derniere_mise_a_jour
+          )
+          VALUES (
+              :nom,:prenom,:date_naissance,:genre,:nationalite,:adresse,:telephone,
+              :email,:date_inscription,:statut,:historique_scolaire,:langues_parlees,
+              :nom_tuteur,:telephone_tuteur,:email_tuteur,:profession_tuteur,:niveau_scolaire,
+              :besoins_speciaux,:langue_etrangere,:niveau_de_satisfaction,NOW()
+          )";
+
 
   try {
     $stmt = $dbh->prepare($sql);
@@ -85,7 +71,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
       ':adresse' => $adresse,
       ':telephone' => $telephone,
       ':email' => $email,
-      ':id_eleve' => $id_eleve,
       ':date_inscription' => $date_inscription,
       ':statut' => $statut,
       ':historique_scolaire' => $historique_scolaire,
@@ -101,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
     ]);
 
     echo "<script>
-        alert('Les informations de l\'élève ont été mises à jour avec succès.');
+        alert('élève ajouter avec succès.');
         window.location.href = 'eleves.php';
       </script>";
   } catch (PDOException $e) {
@@ -109,63 +94,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
   }
 }
 
-if (isset($_GET['id_eleve'])) {
-  $id_eleve = $_GET['id_eleve'];
-
-  $sql = "SELECT * FROM eleves WHERE id_eleve = :id_eleve";
-  $stmt = $dbh->prepare($sql);
-
-  try {
-    $stmt->execute([':id_eleve' => $id_eleve]);
-    $eleve = $stmt->fetch(PDO::FETCH_OBJ);
-  } catch (PDOException $e) {
-    echo "Erreur lors de la récupération des données : " . $e->getMessage();
-  }
-} else {
-  echo "ID de l'élève non fourni.";
-}
 ?>
 
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
-  <form method="post">
-      <input type="text" readonly name="id_eleve" value="<?php // $eleve->id_eleve ?>"><br>
-      nom <input type="text" name="nom_eleve" value="<?php // $eleve->nom ?>"><br>
-      prenom <input type="text" name="prenom_eleve" value="<?php // $eleve->prenom ?>"><br>
-      date_naissance <input type="date" name="date_naissance_eleve" value="<?php // $eleve->date_naissance ?>"><br>
-      genre <input type="text" name="genre_eleve" value="<?php // $eleve->genre ?>"><br>
-      nationalite <input type="text" name="nationalite_eleve" value="<?php // $eleve->nationalite ?>"><br>
-      adresse <input type="text" name="adresse_eleve" value="<?php // $eleve->adresse ?>"><br>
-      telephone <input type="text" name="telephone_eleve" value="<?php // $eleve->telephone ?>"><br>
-      email <input type="email" name="email_eleve" value="<?php // $eleve->email ?>"><br>
-      date_inscription <input type="date" name="date_inscription_eleve" value="<?php // $eleve->date_inscription ?>"><br>
-      statut <input type="text" name="statut_eleve" value="<?php // $eleve->statut ?>"><br>
-      historique_scolaire <input type="text" name="historique_scolaire_eleve" value="<?php // $eleve->historique_scolaire ?>"><br>
-      langues_parlees <input type="text" name="langues_parlees_eleve" value="<?php // $eleve->langues_parlees ?>"><br>
-      nom_tuteur <input type="text" name="nom_tuteur_eleve" value="<?php // $eleve->nom_tuteur ?>"><br>
-      telephone_tuteur <input type="text" name="telephone_tuteur_eleve" value="<?php // $eleve->telephone_tuteur ?>"><br>
-      email_tuteur <input type="email" name="email_tuteur_eleve" value="<?php // $eleve->email_tuteur ?>"><br>
-      profession_tuteur <input type="text" name="profession_tuteur_eleve" value="<?php // $eleve->profession_tuteur ?>"><br>
-      niveau_scolaire <input type="text" name="niveau_scolaire_eleve" value="<?php // $eleve->niveau_scolaire ?>"><br>
-      besoins_speciaux <input type="text" name="besoins_speciaux_eleve" value="<?php // $eleve->besoins_speciaux ?>"><br>
-      langue_etrangere <input type="text" name="langue_etrangere_eleve" value="<?php // $eleve->langue_etrangere ?>"><br>
-      niveau_de_satisfaction <input type="text" name="niveau_de_satisfaction_eleve" value="<?php // $eleve->niveau_de_satisfaction ?>"><br>
-      <input type="submit" value="edit" name="edit">
-  </form>
-</body>
-</html> -->
+
+
 
 <!DOCTYPE html>
 <html lang="en">
 
 <!-- HEAD -->
 <?php include '../includes/head.php' ?>
+
+
 
 <body class="g-sidenav-show bg-gray-100">
   <div class="position-absolute w-100 min-height-300 top-0" style="background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/profile-layout-header.jpg'); background-position-y: 50%;">
@@ -177,8 +117,9 @@ if (isset($_GET['id_eleve'])) {
       <a class="navbar-brand m-0" href=" https://demos.creative-tim.com/argon-dashboard/pages/dashboard.html " target="_blank">
         <img src="https://elaraki.ac.ma/images/logo2.png" class="navbar-brand-img h-100" alt="main_logo">
         <span class="ms-1 font-weight-bold">
-          <?= strtoupper($_SESSION['nom_admin'] . " " . $_SESSION['prenom_admin'])?>
+          <?= strtoupper($_SESSION['nom_admin'] . " " . $_SESSION['prenom_admin'])  ?>
         </span>
+
       </a>
     </div>
     <hr class="horizontal dark mt-0">
@@ -279,6 +220,7 @@ if (isset($_GET['id_eleve'])) {
     </div>
     <div class="sidenav-footer mx-3 ">
       <div class="card card-plain shadow-none" id="sidenavCard">
+        <!-- <img class="w-50 mx-auto" src="../assets/img/illustrations/icon-documentation.svg" alt="sidebar_illustration"> -->
         <img class="w-50 mx-auto mt-5" src="https://elaraki.ac.ma/images/logo2.png" alt="sidebar_illustration">
         <div class="card-body text-center p-3 w-100 pt-0">
           <div class="docs-info">
@@ -287,6 +229,8 @@ if (isset($_GET['id_eleve'])) {
           </div>
         </div>
       </div>
+      <!-- <a href="https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard" target="_blank" class="btn btn-dark btn-sm w-100 mb-3">Documentation</a>
+      <a class="btn btn-primary btn-sm mb-0 w-100" href="https://www.creative-tim.com/product/argon-dashboard-pro?ref=sidebarfree" type="button">Upgrade to pro</a> -->
     </div>
   </aside>
   <div class="main-content position-relative max-height-vh-100 h-100">
@@ -417,7 +361,7 @@ if (isset($_GET['id_eleve'])) {
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
-                <p class="mb-0">Modifier Eleve</p>
+                <p class="mb-0">Ajouter Eleves</p>
               </div>
             </div>
             <hr class="horizontal dark">
@@ -427,155 +371,148 @@ if (isset($_GET['id_eleve'])) {
                 <div class="row">
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="id_eleve" class="form-control-label">ID Élève</label>
-                      <input class="form-control" type="text" readonly name="id_eleve" id="id_eleve" value="<?= $eleve->id_eleve ?>" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
                       <label for="nom_eleve" class="form-control-label">Nom Élève</label>
-                      <input class="form-control" type="text" name="nom_eleve" id="nom_eleve" value="<?= $eleve->nom ?>" required>
+                      <input class="form-control" type="text" name="nom_eleve" id="nom_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="prenom_eleve" class="form-control-label">Prénom Élève</label>
-                      <input class="form-control" type="text" name="prenom_eleve" id="prenom_eleve" value="<?= $eleve->prenom ?>" required>
+                      <input class="form-control" type="text" name="prenom_eleve" id="prenom_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="date_naissance_eleve" class="form-control-label">Date de Naissance</label>
-                      <input class="form-control" type="date" name="date_naissance_eleve" id="date_naissance_eleve" value="<?= $eleve->date_naissance ?>" required>
+                      <input class="form-control" type="date" name="date_naissance_eleve" id="date_naissance_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="genre_eleve" class="form-control-label">Genre</label>
-                      <input class="form-control" type="text" name="genre_eleve" id="genre_eleve" value="<?= $eleve->genre ?>" required>
+                      <input class="form-control" type="text" name="genre_eleve" id="genre_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="nationalite_eleve" class="form-control-label">Nationalité</label>
-                      <input class="form-control" type="text" name="nationalite_eleve" id="nationalite_eleve" value="<?= $eleve->nationalite ?>" required>
+                      <input class="form-control" type="text" name="nationalite_eleve" id="nationalite_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="adresse_eleve" class="form-control-label">Adresse</label>
-                      <input class="form-control" type="text" name="adresse_eleve" id="adresse_eleve" value="<?= $eleve->adresse ?>" required>
+                      <input class="form-control" type="text" name="adresse_eleve" id="adresse_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="telephone_eleve" class="form-control-label">Téléphone</label>
-                      <input class="form-control" type="text" name="telephone_eleve" id="telephone_eleve" value="<?= $eleve->telephone ?>" required>
+                      <input class="form-control" type="text" name="telephone_eleve" id="telephone_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="email_eleve" class="form-control-label">Email</label>
-                      <input class="form-control" type="email" name="email_eleve" id="email_eleve" value="<?= $eleve->email ?>" required>
+                      <input class="form-control" type="email" name="email_eleve" id="email_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="date_inscription_eleve" class="form-control-label">Date d'Inscription</label>
-                      <input class="form-control" type="date" name="date_inscription_eleve" id="date_inscription_eleve" value="<?= $eleve->date_inscription ?>" required>
+                      <input class="form-control" type="date" name="date_inscription_eleve" id="date_inscription_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="statut_eleve" class="form-control-label">Statut</label>
-                      <input class="form-control" type="text" name="statut_eleve" id="statut_eleve" value="<?= $eleve->statut ?>" required>
+                      <input class="form-control" type="text" name="statut_eleve" id="statut_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="historique_scolaire_eleve" class="form-control-label">Historique Scolaire</label>
-                      <input class="form-control" type="text" name="historique_scolaire_eleve" id="historique_scolaire_eleve" value="<?= $eleve->historique_scolaire ?>" required>
+                      <input class="form-control" type="text" name="historique_scolaire_eleve" id="historique_scolaire_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="langues_parlees_eleve" class="form-control-label">Langues Parlées</label>
-                      <input class="form-control" type="text" name="langues_parlees_eleve" id="langues_parlees_eleve" value="<?= $eleve->langues_parlees ?>" required>
+                      <input class="form-control" type="text" name="langues_parlees_eleve" id="langues_parlees_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="nom_tuteur_eleve" class="form-control-label">Nom Tuteur</label>
-                      <input class="form-control" type="text" name="nom_tuteur_eleve" id="nom_tuteur_eleve" value="<?= $eleve->nom_tuteur ?>" required>
+                      <input class="form-control" type="text" name="nom_tuteur_eleve" id="nom_tuteur_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="telephone_tuteur_eleve" class="form-control-label">Téléphone Tuteur</label>
-                      <input class="form-control" type="text" name="telephone_tuteur_eleve" id="telephone_tuteur_eleve" value="<?= $eleve->telephone_tuteur ?>" required>
+                      <input class="form-control" type="text" name="telephone_tuteur_eleve" id="telephone_tuteur_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="email_tuteur_eleve" class="form-control-label">Email Tuteur</label>
-                      <input class="form-control" type="email" name="email_tuteur_eleve" id="email_tuteur_eleve" value="<?= $eleve->email_tuteur ?>" required>
+                      <input class="form-control" type="email" name="email_tuteur_eleve" id="email_tuteur_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="profession_tuteur_eleve" class="form-control-label">Profession Tuteur</label>
-                      <input class="form-control" type="text" name="profession_tuteur_eleve" id="profession_tuteur_eleve" value="<?= $eleve->profession_tuteur ?>" required>
+                      <input class="form-control" type="text" name="profession_tuteur_eleve" id="profession_tuteur_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="niveau_scolaire_eleve" class="form-control-label">Niveau Scolaire</label>
-                      <input class="form-control" type="text" name="niveau_scolaire_eleve" id="niveau_scolaire_eleve" value="<?= $eleve->niveau_scolaire ?>" required>
+                      <input class="form-control" type="text" name="niveau_scolaire_eleve" id="niveau_scolaire_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="besoins_speciaux_eleve" class="form-control-label">Besoins Spéciaux</label>
-                      <input class="form-control" type="text" name="besoins_speciaux_eleve" id="besoins_speciaux_eleve" value="<?= $eleve->besoins_speciaux ?>" required>
+                      <input class="form-control" type="text" name="besoins_speciaux_eleve" id="besoins_speciaux_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="langue_etrangere_eleve" class="form-control-label">Langue Étrangère</label>
-                      <input class="form-control" type="text" name="langue_etrangere_eleve" id="langue_etrangere_eleve" value="<?= $eleve->langue_etrangere ?>" required>
+                      <input class="form-control" type="text" name="langue_etrangere_eleve" id="langue_etrangere_eleve" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="niveau_de_satisfaction_eleve" class="form-control-label">Niveau de Satisfaction</label>
-                      <input class="form-control" type="text" name="niveau_de_satisfaction_eleve" id="niveau_de_satisfaction_eleve" value="<?= $eleve->niveau_de_satisfaction ?>" required>
+                      <input class="form-control" type="text" name="niveau_de_satisfaction_eleve" id="niveau_de_satisfaction_eleve" required>
                     </div>
                   </div>
 
                 </div>
                 <!-- Ajoutez d'autres champs ici -->
                 <div class="row">
-                  <input class="btn btn-primary" type="submit" value="Modifier" name="edit">
+                  <input class="btn btn-primary" type="submit" value="Ajouter" name="ajouter">
                 </div>
               </div>
             </form>
@@ -654,14 +591,27 @@ if (isset($_GET['id_eleve'])) {
     }
   </script>
   <script>
-    // Met à jour dynamiquement la valeur affichée
-    function updateRangeValue(value) {
-      document.getElementById('rangeValue').textContent = value+" %";
-    }
-  </script>
-  <script>
     const nom_salleChange = () => {
       document.getElementById("nom_salle_value").innerText = document.getElementById("nom_salle").value;
+    }
+    const capaciteChange = () => {
+      document.getElementById("capacite_value").innerText = document.getElementById("capacite").value;
+    }
+    const etageChange = () => {
+      console.log(document.getElementById("etage").value);
+      document.getElementById("etage_value").innerText = document.getElementById("etage").value;
+    };
+    const equipementChange = () => {
+      document.getElementById("equipement_value").innerText = document.getElementById("equipement").value;
+    }
+    const chaiseChange = () => {
+      document.getElementById("chaise_value").innerText = document.getElementById("chaise").value;
+    }
+    const bureauChange = () => {
+      document.getElementById("bureau_value").innerText = document.getElementById("bureau").value;
+    }
+    const tableauChange = () => {
+      document.getElementById("tableau_value").innerText = document.getElementById("tableau").value;
     }
   </script>
   <!-- Github buttons -->
