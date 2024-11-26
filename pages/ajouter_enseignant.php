@@ -345,7 +345,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
-                <p class="mb-0">Ajouter Eleves</p>
+                <p class="mb-0">Ajouter Ensaignant</p>
               </div>
             </div>
             <hr class="horizontal dark">
