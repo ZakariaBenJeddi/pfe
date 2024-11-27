@@ -2,47 +2,22 @@
 require '../includes/DatabaseConnexion.php';
 session_start();
 
+if (empty($_SESSION['user'])) {
+  header('location:sign-in.php');
+}
 
-//! 3. Planning des cours dans cette salle
-
-//! Afficher un planning des cours ou des événements qui se tiennent dans la salle.
-//! Exemple :
-//! Lundi 10:00-12:00 : Mathématiques.
-//! Mercredi 14:00-16:00 : Physique.
-
-
-//! 4. Historique d’utilisation (optionnel)
-
-//!     Nombre de fois où la salle a été utilisée dans le passé.
-//!     Si disponible, un tableau avec les événements passés.
-//!     Exemple :
-//!         2024-10-01 : Réunion administrative.
-//!         2024-10-02 : Séance de formation.
-
-
-//! 5. Actions possibles
-
-//!     Modifier les informations : Bouton pour rediriger vers une page de modification (ex. modifier_salle.php?id=ID_SALLE).
-//!     Supprimer la salle : Bouton ou lien pour supprimer la salle après confirmation.
-//!     Ajouter un cours : Bouton pour associer de nouveaux cours à cette salle.
-
-//! 1. Photos de la salle
-
-//!     Ajoutez une ou plusieurs photos de la salle pour une meilleure visualisation.
-//!     Utilisez un slider ou une galerie si plusieurs photos sont disponibles
-
-//! 2. Disponibilité de la salle
-
-//!     Indiquez si la salle est actuellement occupée ou disponible.
-//!     Exemple : "Disponible pour réservation" ou "Occupée jusqu'à 15:00".
-
-//! 7. Alertes (si nécessaire)
-
-//!     Si la salle a des restrictions ou des problèmes, affichez-les clairement.
-//!     Exemple :
-//!         Alertes :
-//!             "Problème technique : Vidéoprojecteur non fonctionnel."
-//!             "Climatisation indisponible jusqu'au 2024-12-01."
+//* deconnexion
+$inactivity_limit = 300; // 5 minutes
+if (isset($_SESSION['last_action'])) {
+  $inactivity_duration = time() - $_SESSION['last_action'];
+  if ($inactivity_duration > $inactivity_limit) {
+    session_unset();
+    session_destroy();
+    header("Location: logout.php");
+    exit();
+  }
+}
+$_SESSION['last_action'] = time();
 
 if (isset($_GET['id'])) {
   $id_salle = isset($_GET['id']) ? $_GET['id'] : null;

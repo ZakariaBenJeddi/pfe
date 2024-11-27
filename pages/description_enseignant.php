@@ -22,24 +22,21 @@ $_SESSION['last_action'] = time();
 
 
 if (isset($_GET['id'])) {
-  $id_eleve = isset($_GET['id']) ? $_GET['id'] : null;
-  if ($id_eleve && filter_var($id_eleve, FILTER_VALIDATE_INT)) {
-    $sql = "SELECT * FROM eleves WHERE id_eleve = :id_eleve";
+  $id_enseignant = isset($_GET['id']) ? $_GET['id'] : null;
+  if ($id_enseignant && filter_var($id_enseignant, FILTER_VALIDATE_INT)) {
+    $sql = "SELECT * FROM enseignant WHERE id_enseignant = :id_enseignant";
     $query = $dbh->prepare($sql);
-    $query->bindParam(':id_eleve', $id_eleve, PDO::PARAM_INT);
+    $query->bindParam(':id_enseignant', $id_enseignant, PDO::PARAM_INT);
     $query->execute();
     $results = $query->fetchAll(PDO::FETCH_OBJ);
   } else {
     // Gérer l'erreur si l'ID est invalide
-    header('location:eleves.php');
+    header('location:enseignant.php');
   }
 } else {
-  header('location:eleves.php');
+  header('location:enseignant.php');
 }
-
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -165,7 +162,6 @@ if (isset($_GET['id'])) {
     </div>
     <div class="sidenav-footer mx-3 ">
       <div class="card card-plain shadow-none" id="sidenavCard">
-        <!-- <img class="w-50 mx-auto" src="../assets/img/illustrations/icon-documentation.svg" alt="sidebar_illustration"> -->
         <img class="w-50 mx-auto mt-5" src="https://elaraki.ac.ma/images/logo2.png" alt="sidebar_illustration">
         <div class="card-body text-center p-3 w-100 pt-0">
           <div class="docs-info">
@@ -174,8 +170,6 @@ if (isset($_GET['id'])) {
           </div>
         </div>
       </div>
-      <!-- <a href="https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard" target="_blank" class="btn btn-dark btn-sm w-100 mb-3">Documentation</a>
-      <a class="btn btn-primary btn-sm mb-0 w-100" href="https://www.creative-tim.com/product/argon-dashboard-pro?ref=sidebarfree" type="button">Upgrade to pro</a> -->
     </div>
   </aside>
   <main class="main-content position-relative border-radius-lg ">
@@ -301,42 +295,22 @@ if (isset($_GET['id'])) {
           <div class="row">
             <div class="col-xl-4 mb-xl-0 mb-4">
               <div class="card bg-transparent shadow-xl">
-                <!-- <div class="overflow-hidden position-relative border-radius-xl" style="background-image: url('../assets/img/school/eleve/eleve1.jpg');">
-                  <span class="mask bg-gradient-dark"></span>
-                  <div class="card-body position-relative z-index-1 p-3">
-                    <i class="fas fa-user text-white p-2">&nbsp;&nbsp;<?= $results[0]->nom . " " . $results[0]->prenom ?></i>
-                    <h5 class="text-white mt-4 mb-5 pb-2">
-                    </h5>
-                    <div class="d-flex">
-                      <div class="d-flex">
-                        <div class="me-4">
-                          <p class="text-white mb-0">Class</p>
-                          <h6 class="text-white mb-0">Filiere</h6>
-                        </div>
-                        <div>
-                          <p class="text-white mb-0">Classe201 &nbsp;&nbsp;&nbsp;<i class="fas fa-map"></i></p>
-                          <h6 class="text-white mb-0">Filiere1 &nbsp;<i class="fas fa-users"></i></h6>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div> -->
-                <div class="overflow-hidden position-relative border-radius-xl" style="background-image: url('../assets/img/school/eleve/eleve1.jpg'); 
+                <div class="overflow-hidden position-relative border-radius-xl" style="background-image: url('../assets/img/team-3.jpg'); 
                   background-repeat: no-repeat; 
                   background-size: cover;
                   background-position: center;">
                   <span class="mask bg-gradient-dark"></span>
                   <div class="card-body position-relative z-index-1 p-3">
-                    <i class="fas fa-user text-white p-2">&nbsp;&nbsp;<?= $results[0]->nom . " " . $results[0]->prenom ?></i>
+                    <i class="fas fa-user text-white p-2">&nbsp;&nbsp;<?= $results[0]->nom_enseignant . " " . $results[0]->prenom_enseignant ?></i>
                     <h5 class="text-white mt-4 mb-5 pb-2"></h5>
                     <div class="d-flex">
                       <div class="d-flex">
                         <div class="me-4">
-                          <p class="text-white mb-0">Class</p>
+                          <p class="text-white mb-0">Specialite</p>
                           <h6 class="text-white mb-0">Filiere</h6>
                         </div>
                         <div>
-                          <p class="text-white mb-0">Classe201 &nbsp;&nbsp;&nbsp;<i class="fas fa-map"></i></p>
+                          <p class="text-white mb-0"><?= $results[0]->specialite ?>&nbsp;&nbsp;&nbsp;<i class="fas fa-map"></i></p>
                           <h6 class="text-white mb-0">Filiere1 &nbsp;<i class="fas fa-users"></i></h6>
                         </div>
                       </div>
@@ -356,10 +330,10 @@ if (isset($_GET['id'])) {
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
-                      <h6 class="text-center mb-0">Niveau</h6>
-                      <span class="text-xs">Niveau Scolaire</span>
+                      <h6 class="text-center mb-0">Salaire</h6>
+                      <span class="text-xs">Salaire par mois</span>
                       <hr class="horizontal dark my-3">
-                      <h5 class="mb-0"><?= $results[0]->niveau_scolaire  ?> </h5>
+                      <h5 class="mb-0"><?= intval($results[0]->salaire) ?> DH</h5>
                     </div>
                   </div>
                 </div>
@@ -371,10 +345,10 @@ if (isset($_GET['id'])) {
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
-                      <h6 class="text-center mb-0">Satisfaction</h6>
-                      <span class="text-xs">Happy</span>
+                      <h6 class="text-center mb-0">Telephone</h6>
+                      <span class="text-xs">Num Telephone</span>
                       <hr class="horizontal dark my-3">
-                      <h5 class="mb-0"><?= $results[0]->niveau_de_satisfaction ?>% </h5>
+                      <h5 class="mb-0"><?= $results[0]->telephone_enseignant ?></h5>
                     </div>
                   </div>
                 </div>
@@ -386,10 +360,10 @@ if (isset($_GET['id'])) {
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
-                      <h6 class="text-center mb-0">Nationalite </h6>
-                      <span class="text-xs">Nationalite Origin</span>
+                      <h6 class="text-center mb-0">Masse Horaire </h6>
+                      <span class="text-xs">Par Semaine</span>
                       <hr class="horizontal dark my-3">
-                      <h5 class="mb-0"><?= $results[0]->nationalite ?> </h5>
+                      <h5 class="mb-0"><?= $results[0]->masse_horaire ?></h5>
                     </div>
                   </div>
                 </div>
@@ -686,10 +660,7 @@ if (isset($_GET['id'])) {
       Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
   </script>
-  <!-- Github buttons -->
   <script async defer src="https://buttons.github.io/buttons.js"></script>
-  <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
 </body>
-
 </html>
