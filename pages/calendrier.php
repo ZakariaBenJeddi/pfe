@@ -1,4 +1,6 @@
 <?php
+// changer les dates des seances si l'admin fait une drag and drop
+// 
 session_start();
 // $username = $_SESSION['lastname'];
 
