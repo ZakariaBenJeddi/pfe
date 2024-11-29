@@ -41,9 +41,9 @@
 //           document.querySelector('#event-details-modal #start').textContent = event.start.toLocaleString();
 //           document.querySelector('#event-details-modal #end').textContent = event.end ? event.end.toLocaleString() : 'Non spécifiée';
 
-//           // Définissez les ID des boutons Edit et Delete
-//           document.querySelector('#event-details-modal #edit').setAttribute('data-id', event.id);
-//           document.querySelector('#event-details-modal #delete').setAttribute('data-id', event.id);
+          // Définissez les ID des boutons Edit et Delete
+        //   document.querySelector('#event-details-modal #edit').setAttribute('data-id', event.id);
+        //   document.querySelector('#event-details-modal #delete').setAttribute('data-id', event.id);
 
 //           // Affiche la modale
 //           let modal = new bootstrap.Modal(document.getElementById('event-details-modal'));
@@ -153,24 +153,24 @@
 //             document.querySelector('#event-details-modal #start').textContent = event.start.toLocaleString();
 //             document.querySelector('#event-details-modal #end').textContent = event.end ? event.end.toLocaleString() : 'Non spécifiée';
 
-//             // Définissez les ID des boutons Edit et Delete
-//             let editButton = document.querySelector('#event-details-modal #edit');
-//             editButton.setAttribute('data-id', event.id);
+            // // Définissez les ID des boutons Edit et Delete
+            // let editButton = document.querySelector('#event-details-modal #edit');
+            // editButton.setAttribute('data-id', event.id);
 
-//             // Gère le clic sur le bouton Edit
-//             editButton.onclick = function () {
-//                 // Remplit les champs du formulaire avec les données de l'événement
-//                 document.querySelector('#schedule-form input[name="id"]').value = event.id;
-//                 document.querySelector('#schedule-form input[name="title"]').value = event.title || '';
-//                 document.querySelector('#schedule-form textarea[name="description"]').value = event.extendedProps.description || '';
-//                 document.querySelector('#schedule-form select[name="professeur"]').value = event.extendedProps.professeur || '';
-//                 document.querySelector('#schedule-form input[name="salle"]').value = event.extendedProps.salle || '';
-//                 document.querySelector('#schedule-form input[name="start_datetime"]').value = event.start.toISOString().slice(0, 16); // Format YYYY-MM-DDTHH:mm
-//                 document.querySelector('#schedule-form input[name="end_datetime"]').value = event.end ? event.end.toISOString().slice(0, 16) : '';
+            // // Gère le clic sur le bouton Edit
+            // editButton.onclick = function () {
+            //     // Remplit les champs du formulaire avec les données de l'événement
+            //     document.querySelector('#schedule-form input[name="id"]').value = event.id;
+            //     document.querySelector('#schedule-form input[name="title"]').value = event.title || '';
+            //     document.querySelector('#schedule-form textarea[name="description"]').value = event.extendedProps.description || '';
+            //     document.querySelector('#schedule-form select[name="professeur"]').value = event.extendedProps.professeur || '';
+            //     document.querySelector('#schedule-form input[name="salle"]').value = event.extendedProps.salle || '';
+            //     document.querySelector('#schedule-form input[name="start_datetime"]').value = event.start.toISOString().slice(0, 16); // Format YYYY-MM-DDTHH:mm
+            //     document.querySelector('#schedule-form input[name="end_datetime"]').value = event.end ? event.end.toISOString().slice(0, 16) : '';
 
-//                 // Scroll ou focus sur le formulaire (optionnel)
-//                 document.querySelector('#schedule-form').scrollIntoView({ behavior: 'smooth' });
-//             };
+            //     // Scroll ou focus sur le formulaire (optionnel)
+            //     document.querySelector('#schedule-form').scrollIntoView({ behavior: 'smooth' });
+            // };
 
 //             // Gère le clic sur le bouton Delete
 //             let deleteButton = document.querySelector('#event-details-modal #delete');
