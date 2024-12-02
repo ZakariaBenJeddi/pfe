@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
   $degree = $_POST['degree'];
 
   // Préparer la requête d'insertion
-    $sql = "INSERT INTO enseignant (
+  $sql = "INSERT INTO enseignant (
       nom_enseignant,prenom_enseignant,email_enseignant,telephone_enseignant,date_naissance,
       specialite,masse_horaire,date_embauche,adresse,genre,niveau_education,salaire,
       est_connecte,degree
@@ -51,30 +51,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
 
 
   try {
-      $stmt = $dbh->prepare($sql);
-      $stmt->execute([
-          ':nom_enseignant' => $nom_enseignant,
-          ':prenom_enseignant' => $prenom_enseignant,
-          ':email_enseignant' => $email_enseignant,
-          ':telephone_enseignant' => $telephone_enseignant,
-          ':date_naissance' => $date_naissance,
-          ':specialite' => $specialite,
-          ':masse_horaire' => $masse_horaire,
-          ':date_embauche' => $date_embauche,
-          ':adresse' => $adresse,
-          ':genre' => $genre,
-          ':niveau_education' => $niveau_education,
-          ':salaire' => $salaire,
-          ':est_connecte' => $est_connecte,
-          ':degree' => $degree,
-      ]);
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute([
+      ':nom_enseignant' => $nom_enseignant,
+      ':prenom_enseignant' => $prenom_enseignant,
+      ':email_enseignant' => $email_enseignant,
+      ':telephone_enseignant' => $telephone_enseignant,
+      ':date_naissance' => $date_naissance,
+      ':specialite' => $specialite,
+      ':masse_horaire' => $masse_horaire,
+      ':date_embauche' => $date_embauche,
+      ':adresse' => $adresse,
+      ':genre' => $genre,
+      ':niveau_education' => $niveau_education,
+      ':salaire' => $salaire,
+      ':est_connecte' => $est_connecte,
+      ':degree' => $degree,
+    ]);
 
-      echo "<script>
+    echo "<script>
               alert('Enseignant ajouter avec succès.');
               window.location.href = 'enseignant.php';
           </script>";
   } catch (PDOException $e) {
-      echo "Erreur lors de la mise à jour : " . $e->getMessage();
+    echo "Erreur lors de la mise à jour : " . $e->getMessage();
   }
 }
 
@@ -109,6 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
     <hr class="horizontal dark mt-0">
     <div class="collapse navbar-collapse  w-auto" id="sidenav-collapse-main">
       <ul class="navbar-nav">
+        <!-- Section Dashboard -->
         <li class="nav-item">
           <a class="nav-link active" href="../pages/dashboard.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -117,87 +118,154 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
             <span class="nav-link-text ms-1">Dashboard</span>
           </a>
         </li>
+
+        <!-- Section Gestion des utilisateurs -->
         <li class="nav-item">
-          <a class="nav-link " href="../pages/tables.php">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion des Utilisateurs</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/eleves.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
+              <i class="ni ni-hat-3 text-success text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Tables</span>
+            <span class="nav-link-text ms-1">Élèves</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/salle.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-building text-primary text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Salles</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/enseignant.php">
+          <a class="nav-link" href="../pages/enseignant.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-single-02 text-primary text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Enseignant</span>
+            <span class="nav-link-text ms-1">Enseignants</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/billing.php">
+          <a class="nav-link" href="../pages/administration.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
+              <i class="ni ni-badge text-info text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Billing</span>
+            <span class="nav-link-text ms-1">Administration</span>
+          </a>
+        </li>
+
+        <!-- Section Gestion pédagogique -->
+        <li class="nav-item">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion Pédagogique</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/classes.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-building text-warning text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Classes</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/calendrier.php">
+          <a class="nav-link" href="../pages/matieres.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-book-bookmark text-danger text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Matières</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/calendrier.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
             </div>
             <span class="nav-link-text ms-1">Emplois du Temps</span>
           </a>
         </li>
+
+        <!-- Section Suivi -->
         <li class="nav-item">
-          <a class="nav-link " href="../pages/virtual-reality.php">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Suivi</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/absences.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-app text-info text-sm opacity-10"></i>
+              <i class="ni ni-user-run text-danger text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Virtual Reality</span>
+            <span class="nav-link-text ms-1">Absences</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/rtl.php">
+          <a class="nav-link" href="../pages/evaluations.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-world-2 text-danger text-sm opacity-10"></i>
+              <i class="ni ni-chart-bar-32 text-success text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">RTL</span>
+            <span class="nav-link-text ms-1">Évaluations</span>
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/bulletins.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-folder-17 text-primary text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Bulletins</span>
+          </a>
+        </li>
+
+        <!-- Section Gestion des ressources -->
+        <li class="nav-item">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion des Ressources</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/salle.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-building text-info text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Salles</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/equipements.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-laptop text-primary text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Équipements</span>
+          </a>
+        </li>
+
+        <!-- Section Comptabilité -->
+        <li class="nav-item">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Comptabilité</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/payements.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Paiements</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/frais-scolarite.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-money-coins text-warning text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Frais de scolarité</span>
+          </a>
+        </li>
+
+        <!-- Section Compte -->
         <li class="nav-item mt-3">
-          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Mon Compte</h6>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/profile.php">
+          <a class="nav-link" href="../pages/profile.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Profile</span>
+            <span class="nav-link-text ms-1">Profil</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/sign-in.php">
+          <a class="nav-link" href="../pages/logout.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-single-copy-04 text-warning text-sm opacity-10"></i>
+              <i class="ni ni-button-power text-danger text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Sign In</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/sign-up.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-collection text-info text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Sign Up</span>
+            <span class="nav-link-text ms-1">Déconnexion</span>
           </a>
         </li>
       </ul>
@@ -356,105 +424,105 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="nom_enseignant" class="form-control-label">Nom</label>
-                      <input class="form-control" type="text" name="nom_enseignant" id="nom_enseignant"  >
+                      <input class="form-control" type="text" name="nom_enseignant" id="nom_enseignant">
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="prenom_enseignant" class="form-control-label">Prénom</label>
-                      <input class="form-control" type="text" name="prenom_enseignant" id="prenom_enseignant"  >
+                      <input class="form-control" type="text" name="prenom_enseignant" id="prenom_enseignant">
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="date_naissance" class="form-control-label">Date de naissance</label>
-                      <input class="form-control" type="date" name="date_naissance" id="date_naissance"  >
+                      <input class="form-control" type="date" name="date_naissance" id="date_naissance">
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="genre" class="form-control-label">Genre</label>
-                      <input class="form-control" type="text" name="genre" id="genre"  >
+                      <input class="form-control" type="text" name="genre" id="genre">
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="masse_horaire" class="form-control-label">Masse Horaire</label>
-                      <input class="form-control" type="number" name="masse_horaire" id="masse_horaire"  >
+                      <input class="form-control" type="number" name="masse_horaire" id="masse_horaire">
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="adresse" class="form-control-label">Adresse</label>
-                      <input class="form-control" type="text" name="adresse" id="adresse"  >
+                      <input class="form-control" type="text" name="adresse" id="adresse">
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="telephone_enseignant" class="form-control-label">Téléphone</label>
-                      <input class="form-control" type="text" name="telephone_enseignant" id="telephone_enseignant"  >
+                      <input class="form-control" type="text" name="telephone_enseignant" id="telephone_enseignant">
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="email_enseignant" class="form-control-label">Email</label>
-                      <input class="form-control" type="email" name="email_enseignant" id="email_enseignant"  >
+                      <input class="form-control" type="email" name="email_enseignant" id="email_enseignant">
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="date_embauche" class="form-control-label">Date d'embauche</label>
-                      <input class="form-control" type="date" name="date_embauche" id="date_embauche"  >
+                      <input class="form-control" type="date" name="date_embauche" id="date_embauche">
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="est_connecte" class="form-control-label">Est Connecté</label>
-                      <input class="form-control" type="text" name="est_connecte" id="est_connecte"  >
+                      <input class="form-control" type="text" name="est_connecte" id="est_connecte">
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="specialite" class="form-control-label">Spécialité</label>
-                      <input class="form-control" type="text" name="specialite" id="specialite"  >
+                      <input class="form-control" type="text" name="specialite" id="specialite">
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="salaire" class="form-control-label">Salaire</label>
-                      <input class="form-control" type="text" name="salaire" id="salaire"  >
+                      <input class="form-control" type="text" name="salaire" id="salaire">
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="niveau_education" class="form-control-label">Niveau d'Éducation</label>
-                      <input class="form-control" type="text" name="niveau_education" id="niveau_education"  >
+                      <input class="form-control" type="text" name="niveau_education" id="niveau_education">
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="date_creation" class="form-control-label">Date de Création</label>
-                      <input class="form-control" type="date" name="date_creation" id="date_creation" >
+                      <input class="form-control" type="date" name="date_creation" id="date_creation">
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="degree" class="form-control-label">Degree</label>
-                      <input class="form-control" type="number" name="degree" id="degree"  >
+                      <input class="form-control" type="number" name="degree" id="degree">
                     </div>
                   </div>
                 </div>

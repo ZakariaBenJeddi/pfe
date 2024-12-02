@@ -11,13 +11,13 @@ $inactivity_limit = 120; // 2 minutes
 
 // Vérifier si l'utilisateur est inactif
 if (isset($_SESSION['last_action'])) {
-    $inactivity_duration = time() - $_SESSION['last_action'];
-    if ($inactivity_duration > $inactivity_limit) {
-        session_unset();
-        session_destroy();
-        header("Location: logout.php");
-        exit();
-    }
+  $inactivity_duration = time() - $_SESSION['last_action'];
+  if ($inactivity_duration > $inactivity_limit) {
+    session_unset();
+    session_destroy();
+    header("Location: logout.php");
+    exit();
+  }
 }
 
 // Mettre à jour l'horodatage de la dernière action
@@ -135,27 +135,48 @@ if (isset($_GET['id_eleve'])) {
 </head>
 <body>
   <form method="post">
-      <input type="text" readonly name="id_eleve" value="<?php // $eleve->id_eleve ?>"><br>
-      nom <input type="text" name="nom_eleve" value="<?php // $eleve->nom ?>"><br>
-      prenom <input type="text" name="prenom_eleve" value="<?php // $eleve->prenom ?>"><br>
-      date_naissance <input type="date" name="date_naissance_eleve" value="<?php // $eleve->date_naissance ?>"><br>
-      genre <input type="text" name="genre_eleve" value="<?php // $eleve->genre ?>"><br>
-      nationalite <input type="text" name="nationalite_eleve" value="<?php // $eleve->nationalite ?>"><br>
-      adresse <input type="text" name="adresse_eleve" value="<?php // $eleve->adresse ?>"><br>
-      telephone <input type="text" name="telephone_eleve" value="<?php // $eleve->telephone ?>"><br>
-      email <input type="email" name="email_eleve" value="<?php // $eleve->email ?>"><br>
-      date_inscription <input type="date" name="date_inscription_eleve" value="<?php // $eleve->date_inscription ?>"><br>
-      statut <input type="text" name="statut_eleve" value="<?php // $eleve->statut ?>"><br>
-      historique_scolaire <input type="text" name="historique_scolaire_eleve" value="<?php // $eleve->historique_scolaire ?>"><br>
-      langues_parlees <input type="text" name="langues_parlees_eleve" value="<?php // $eleve->langues_parlees ?>"><br>
-      nom_tuteur <input type="text" name="nom_tuteur_eleve" value="<?php // $eleve->nom_tuteur ?>"><br>
-      telephone_tuteur <input type="text" name="telephone_tuteur_eleve" value="<?php // $eleve->telephone_tuteur ?>"><br>
-      email_tuteur <input type="email" name="email_tuteur_eleve" value="<?php // $eleve->email_tuteur ?>"><br>
-      profession_tuteur <input type="text" name="profession_tuteur_eleve" value="<?php // $eleve->profession_tuteur ?>"><br>
-      niveau_scolaire <input type="text" name="niveau_scolaire_eleve" value="<?php // $eleve->niveau_scolaire ?>"><br>
-      besoins_speciaux <input type="text" name="besoins_speciaux_eleve" value="<?php // $eleve->besoins_speciaux ?>"><br>
-      langue_etrangere <input type="text" name="langue_etrangere_eleve" value="<?php // $eleve->langue_etrangere ?>"><br>
-      niveau_de_satisfaction <input type="text" name="niveau_de_satisfaction_eleve" value="<?php // $eleve->niveau_de_satisfaction ?>"><br>
+      <input type="text" readonly name="id_eleve" value="<?php // $eleve->id_eleve 
+                                                          ?>"><br>
+      nom <input type="text" name="nom_eleve" value="<?php // $eleve->nom 
+                                                      ?>"><br>
+      prenom <input type="text" name="prenom_eleve" value="<?php // $eleve->prenom 
+                                                            ?>"><br>
+      date_naissance <input type="date" name="date_naissance_eleve" value="<?php // $eleve->date_naissance 
+                                                                            ?>"><br>
+      genre <input type="text" name="genre_eleve" value="<?php // $eleve->genre 
+                                                          ?>"><br>
+      nationalite <input type="text" name="nationalite_eleve" value="<?php // $eleve->nationalite 
+                                                                      ?>"><br>
+      adresse <input type="text" name="adresse_eleve" value="<?php // $eleve->adresse 
+                                                              ?>"><br>
+      telephone <input type="text" name="telephone_eleve" value="<?php // $eleve->telephone 
+                                                                  ?>"><br>
+      email <input type="email" name="email_eleve" value="<?php // $eleve->email 
+                                                          ?>"><br>
+      date_inscription <input type="date" name="date_inscription_eleve" value="<?php // $eleve->date_inscription 
+                                                                                ?>"><br>
+      statut <input type="text" name="statut_eleve" value="<?php // $eleve->statut 
+                                                            ?>"><br>
+      historique_scolaire <input type="text" name="historique_scolaire_eleve" value="<?php // $eleve->historique_scolaire 
+                                                                                      ?>"><br>
+      langues_parlees <input type="text" name="langues_parlees_eleve" value="<?php // $eleve->langues_parlees 
+                                                                              ?>"><br>
+      nom_tuteur <input type="text" name="nom_tuteur_eleve" value="<?php // $eleve->nom_tuteur 
+                                                                    ?>"><br>
+      telephone_tuteur <input type="text" name="telephone_tuteur_eleve" value="<?php // $eleve->telephone_tuteur 
+                                                                                ?>"><br>
+      email_tuteur <input type="email" name="email_tuteur_eleve" value="<?php // $eleve->email_tuteur 
+                                                                        ?>"><br>
+      profession_tuteur <input type="text" name="profession_tuteur_eleve" value="<?php // $eleve->profession_tuteur 
+                                                                                  ?>"><br>
+      niveau_scolaire <input type="text" name="niveau_scolaire_eleve" value="<?php // $eleve->niveau_scolaire 
+                                                                              ?>"><br>
+      besoins_speciaux <input type="text" name="besoins_speciaux_eleve" value="<?php // $eleve->besoins_speciaux 
+                                                                                ?>"><br>
+      langue_etrangere <input type="text" name="langue_etrangere_eleve" value="<?php // $eleve->langue_etrangere 
+                                                                                ?>"><br>
+      niveau_de_satisfaction <input type="text" name="niveau_de_satisfaction_eleve" value="<?php // $eleve->niveau_de_satisfaction 
+                                                                                            ?>"><br>
       <input type="submit" value="edit" name="edit">
   </form>
 </body>
@@ -177,13 +198,14 @@ if (isset($_GET['id_eleve'])) {
       <a class="navbar-brand m-0" href=" https://demos.creative-tim.com/argon-dashboard/pages/dashboard.html " target="_blank">
         <img src="https://elaraki.ac.ma/images/logo2.png" class="navbar-brand-img h-100" alt="main_logo">
         <span class="ms-1 font-weight-bold">
-          <?= strtoupper($_SESSION['nom_admin'] . " " . $_SESSION['prenom_admin'])?>
+          <?= strtoupper($_SESSION['nom_admin'] . " " . $_SESSION['prenom_admin']) ?>
         </span>
       </a>
     </div>
     <hr class="horizontal dark mt-0">
     <div class="collapse navbar-collapse  w-auto" id="sidenav-collapse-main">
       <ul class="navbar-nav">
+        <!-- Section Dashboard -->
         <li class="nav-item">
           <a class="nav-link active" href="../pages/dashboard.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -192,87 +214,154 @@ if (isset($_GET['id_eleve'])) {
             <span class="nav-link-text ms-1">Dashboard</span>
           </a>
         </li>
+
+        <!-- Section Gestion des utilisateurs -->
         <li class="nav-item">
-          <a class="nav-link " href="../pages/tables.php">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion des Utilisateurs</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/eleves.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
+              <i class="ni ni-hat-3 text-success text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Tables</span>
+            <span class="nav-link-text ms-1">Élèves</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/salle.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-building text-primary text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Salles</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/enseignant.php">
+          <a class="nav-link" href="../pages/enseignant.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-single-02 text-primary text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Enseignant</span>
+            <span class="nav-link-text ms-1">Enseignants</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/billing.php">
+          <a class="nav-link" href="../pages/administration.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
+              <i class="ni ni-badge text-info text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Billing</span>
+            <span class="nav-link-text ms-1">Administration</span>
+          </a>
+        </li>
+
+        <!-- Section Gestion pédagogique -->
+        <li class="nav-item">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion Pédagogique</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/classes.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-building text-warning text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Classes</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/calendrier.php">
+          <a class="nav-link" href="../pages/matieres.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-book-bookmark text-danger text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Matières</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/calendrier.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
             </div>
             <span class="nav-link-text ms-1">Emplois du Temps</span>
           </a>
         </li>
+
+        <!-- Section Suivi -->
         <li class="nav-item">
-          <a class="nav-link " href="../pages/virtual-reality.php">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Suivi</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/absences.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-app text-info text-sm opacity-10"></i>
+              <i class="ni ni-user-run text-danger text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Virtual Reality</span>
+            <span class="nav-link-text ms-1">Absences</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/rtl.php">
+          <a class="nav-link" href="../pages/evaluations.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-world-2 text-danger text-sm opacity-10"></i>
+              <i class="ni ni-chart-bar-32 text-success text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">RTL</span>
+            <span class="nav-link-text ms-1">Évaluations</span>
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/bulletins.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-folder-17 text-primary text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Bulletins</span>
+          </a>
+        </li>
+
+        <!-- Section Gestion des ressources -->
+        <li class="nav-item">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion des Ressources</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/salle.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-building text-info text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Salles</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/equipements.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-laptop text-primary text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Équipements</span>
+          </a>
+        </li>
+
+        <!-- Section Comptabilité -->
+        <li class="nav-item">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Comptabilité</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/payements.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Paiements</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/frais-scolarite.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-money-coins text-warning text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Frais de scolarité</span>
+          </a>
+        </li>
+
+        <!-- Section Compte -->
         <li class="nav-item mt-3">
-          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Mon Compte</h6>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/profile.php">
+          <a class="nav-link" href="../pages/profile.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Profile</span>
+            <span class="nav-link-text ms-1">Profil</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/sign-in.php">
+          <a class="nav-link" href="../pages/logout.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-single-copy-04 text-warning text-sm opacity-10"></i>
+              <i class="ni ni-button-power text-danger text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Sign In</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/sign-up.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-collection text-info text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Sign Up</span>
+            <span class="nav-link-text ms-1">Déconnexion</span>
           </a>
         </li>
       </ul>
@@ -656,7 +745,7 @@ if (isset($_GET['id_eleve'])) {
   <script>
     // Met à jour dynamiquement la valeur affichée
     function updateRangeValue(value) {
-      document.getElementById('rangeValue').textContent = value+" %";
+      document.getElementById('rangeValue').textContent = value + " %";
     }
   </script>
   <script>

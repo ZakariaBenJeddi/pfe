@@ -22,41 +22,41 @@ $_SESSION['last_action'] = time();
 
 // get enseignant
 if (isset($_GET['id'])) {
-    $id = $_GET['id'];
-    $sql = "SELECT * FROM enseignant WHERE id_enseignant = :id";
-    $stmt = $dbh->prepare($sql);
-    try {
-        $stmt->execute([':id' => $id]);
-        $enseignant = $stmt->fetch(PDO::FETCH_OBJ);
-    } catch (PDOException $e) {
-        echo "Erreur lors de la récupération des données : " . $e->getMessage();
-    }
+  $id = $_GET['id'];
+  $sql = "SELECT * FROM enseignant WHERE id_enseignant = :id";
+  $stmt = $dbh->prepare($sql);
+  try {
+    $stmt->execute([':id' => $id]);
+    $enseignant = $stmt->fetch(PDO::FETCH_OBJ);
+  } catch (PDOException $e) {
+    echo "Erreur lors de la récupération des données : " . $e->getMessage();
+  }
 } else {
-    echo "ID de l'enseignant non fourni.";
-    exit();
+  echo "ID de l'enseignant non fourni.";
+  exit();
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
-    // Récupérer les données du formulaire
-    $id_enseignant = $_POST['id_enseignant'];
-    $nom_enseignant = $_POST['nom_enseignant'];
-    $prenom_enseignant = $_POST['prenom_enseignant'];
-    $email_enseignant = $_POST['email_enseignant'];
-    $telephone_enseignant = $_POST['telephone_enseignant'];
-    $date_naissance = $_POST['date_naissance'];
-    $specialite = $_POST['specialite'];
-    $masse_horaire = $_POST['masse_horaire'];
-    $date_embauche = $_POST['date_embauche'];
-    $adresse = $_POST['adresse'];
-    $genre = $_POST['genre'];
-    $niveau_education = $_POST['niveau_education'];
-    $salaire = $_POST['salaire'];
-    $date_creation = $_POST['date_creation'];
-    $est_connecte = $_POST['est_connecte'];
-    $degree = $_POST['degree'];
+  // Récupérer les données du formulaire
+  $id_enseignant = $_POST['id_enseignant'];
+  $nom_enseignant = $_POST['nom_enseignant'];
+  $prenom_enseignant = $_POST['prenom_enseignant'];
+  $email_enseignant = $_POST['email_enseignant'];
+  $telephone_enseignant = $_POST['telephone_enseignant'];
+  $date_naissance = $_POST['date_naissance'];
+  $specialite = $_POST['specialite'];
+  $masse_horaire = $_POST['masse_horaire'];
+  $date_embauche = $_POST['date_embauche'];
+  $adresse = $_POST['adresse'];
+  $genre = $_POST['genre'];
+  $niveau_education = $_POST['niveau_education'];
+  $salaire = $_POST['salaire'];
+  $date_creation = $_POST['date_creation'];
+  $est_connecte = $_POST['est_connecte'];
+  $degree = $_POST['degree'];
 
-    // Préparer la requête de mise à jour
-    $sql = "UPDATE enseignant 
+  // Préparer la requête de mise à jour
+  $sql = "UPDATE enseignant 
             SET nom_enseignant = :nom_enseignant,
                 prenom_enseignant = :prenom_enseignant,
                 email_enseignant = :email_enseignant,
@@ -75,34 +75,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
                 date_modification = NOW()
             WHERE id_enseignant = :id_enseignant";
 
-    try {
-        $stmt = $dbh->prepare($sql);
-        $stmt->execute([
-            ':id_enseignant' => $id_enseignant,
-            ':nom_enseignant' => $nom_enseignant,
-            ':prenom_enseignant' => $prenom_enseignant,
-            ':email_enseignant' => $email_enseignant,
-            ':telephone_enseignant' => $telephone_enseignant,
-            ':date_naissance' => $date_naissance,
-            ':specialite' => $specialite,
-            ':masse_horaire' => $masse_horaire,
-            ':date_embauche' => $date_embauche,
-            ':adresse' => $adresse,
-            ':genre' => $genre,
-            ':niveau_education' => $niveau_education,
-            ':salaire' => $salaire,
-            ':date_creation' => $date_creation,
-            ':est_connecte' => $est_connecte,
-            ':degree' => $degree,
-        ]);
+  try {
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute([
+      ':id_enseignant' => $id_enseignant,
+      ':nom_enseignant' => $nom_enseignant,
+      ':prenom_enseignant' => $prenom_enseignant,
+      ':email_enseignant' => $email_enseignant,
+      ':telephone_enseignant' => $telephone_enseignant,
+      ':date_naissance' => $date_naissance,
+      ':specialite' => $specialite,
+      ':masse_horaire' => $masse_horaire,
+      ':date_embauche' => $date_embauche,
+      ':adresse' => $adresse,
+      ':genre' => $genre,
+      ':niveau_education' => $niveau_education,
+      ':salaire' => $salaire,
+      ':date_creation' => $date_creation,
+      ':est_connecte' => $est_connecte,
+      ':degree' => $degree,
+    ]);
 
-        echo "<script>
+    echo "<script>
                 alert('Les informations de l\'enseignant ont été mises à jour avec succès.');
                 window.location.href = 'enseignant.php';
             </script>";
-    } catch (PDOException $e) {
-        echo "Erreur lors de la mise à jour : " . $e->getMessage();
-    }
+  } catch (PDOException $e) {
+    echo "Erreur lors de la mise à jour : " . $e->getMessage();
+  }
 }
 ?>
 
@@ -122,13 +122,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
       <a class="navbar-brand m-0" href=" https://demos.creative-tim.com/argon-dashboard/pages/dashboard.html " target="_blank">
         <img src="https://elaraki.ac.ma/images/logo2.png" class="navbar-brand-img h-100" alt="main_logo">
         <span class="ms-1 font-weight-bold">
-          <?= strtoupper($_SESSION['nom_admin'] . " " . $_SESSION['prenom_admin'])?>
+          <?= strtoupper($_SESSION['nom_admin'] . " " . $_SESSION['prenom_admin']) ?>
         </span>
       </a>
     </div>
     <hr class="horizontal dark mt-0">
     <div class="collapse navbar-collapse  w-auto" id="sidenav-collapse-main">
       <ul class="navbar-nav">
+        <!-- Section Dashboard -->
         <li class="nav-item">
           <a class="nav-link active" href="../pages/dashboard.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -137,87 +138,154 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
             <span class="nav-link-text ms-1">Dashboard</span>
           </a>
         </li>
+
+        <!-- Section Gestion des utilisateurs -->
         <li class="nav-item">
-          <a class="nav-link " href="../pages/tables.php">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion des Utilisateurs</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/eleves.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
+              <i class="ni ni-hat-3 text-success text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Tables</span>
+            <span class="nav-link-text ms-1">Élèves</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/salle.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-building text-primary text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Salles</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/enseignant.php">
+          <a class="nav-link" href="../pages/enseignant.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-single-02 text-primary text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Enseignant</span>
+            <span class="nav-link-text ms-1">Enseignants</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/billing.php">
+          <a class="nav-link" href="../pages/administration.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
+              <i class="ni ni-badge text-info text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Billing</span>
+            <span class="nav-link-text ms-1">Administration</span>
+          </a>
+        </li>
+
+        <!-- Section Gestion pédagogique -->
+        <li class="nav-item">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion Pédagogique</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/classes.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-building text-warning text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Classes</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/calendrier.php">
+          <a class="nav-link" href="../pages/matieres.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-book-bookmark text-danger text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Matières</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/calendrier.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
             </div>
             <span class="nav-link-text ms-1">Emplois du Temps</span>
           </a>
         </li>
+
+        <!-- Section Suivi -->
         <li class="nav-item">
-          <a class="nav-link " href="../pages/virtual-reality.php">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Suivi</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/absences.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-app text-info text-sm opacity-10"></i>
+              <i class="ni ni-user-run text-danger text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Virtual Reality</span>
+            <span class="nav-link-text ms-1">Absences</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/rtl.php">
+          <a class="nav-link" href="../pages/evaluations.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-world-2 text-danger text-sm opacity-10"></i>
+              <i class="ni ni-chart-bar-32 text-success text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">RTL</span>
+            <span class="nav-link-text ms-1">Évaluations</span>
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/bulletins.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-folder-17 text-primary text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Bulletins</span>
+          </a>
+        </li>
+
+        <!-- Section Gestion des ressources -->
+        <li class="nav-item">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion des Ressources</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/salle.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-building text-info text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Salles</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/equipements.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-laptop text-primary text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Équipements</span>
+          </a>
+        </li>
+
+        <!-- Section Comptabilité -->
+        <li class="nav-item">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Comptabilité</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/payements.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Paiements</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/frais-scolarite.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-money-coins text-warning text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Frais de scolarité</span>
+          </a>
+        </li>
+
+        <!-- Section Compte -->
         <li class="nav-item mt-3">
-          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Mon Compte</h6>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/profile.php">
+          <a class="nav-link" href="../pages/profile.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Profile</span>
+            <span class="nav-link-text ms-1">Profil</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="../pages/sign-in.php">
+          <a class="nav-link" href="../pages/logout.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-single-copy-04 text-warning text-sm opacity-10"></i>
+              <i class="ni ni-button-power text-danger text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Sign In</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link " href="../pages/sign-up.php">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-collection text-info text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Sign Up</span>
+            <span class="nav-link-text ms-1">Déconnexion</span>
           </a>
         </li>
       </ul>
@@ -471,7 +539,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="date_creation" class="form-control-label">Date de Création</label>
-                      <input class="form-control" type="date" name="date_creation" id="date_creation" value="<?=  date('Y-m-d', strtotime($enseignant->date_creation))  ?>" required>
+                      <input class="form-control" type="date" name="date_creation" id="date_creation" value="<?= date('Y-m-d', strtotime($enseignant->date_creation))  ?>" required>
                     </div>
                   </div>
 
@@ -565,7 +633,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
   <script>
     // Met à jour dynamiquement la valeur affichée
     function updateRangeValue(value) {
-      document.getElementById('rangeValue').textContent = value+" %";
+      document.getElementById('rangeValue').textContent = value + " %";
     }
   </script>
   <script>
