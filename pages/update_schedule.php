@@ -37,7 +37,7 @@
     $new_end = date('Y-m-d', strtotime($end));
     
     $overlap_check->execute([
-      $id, 
+      $id,
       $salle, 
       $new_start . ' ' . $current_session['existing_start_time'], 
       $new_end . ' ' . $current_session['existing_end_time'],
