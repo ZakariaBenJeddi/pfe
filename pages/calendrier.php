@@ -1,12 +1,35 @@
 <?php
-// changer les dates des seances si l'admin fait une drag and drop
-// 
 session_start();
 // $username = $_SESSION['lastname'];
 
 use function PHPSTORM_META\type;
 
 require_once('db-connect.php');
+
+// Connexion à la base de données
+$pdo_matiere_prof = new PDO('mysql:host=localhost;dbname=emploi_du_temps_2acc;charset=utf8', 'root', '');
+
+// Vérifier si l'ID de la matière est transmis
+if (isset($_GET['matiere_id'])) {
+    $matiereId = $_GET['matiere_id'];
+
+    // Requête pour récupérer les enseignants
+    $query = "
+        SELECT DISTINCT p.id, p.nom
+        FROM professeurs2 p
+        JOIN professeurs_classes_matieres2 pcm ON pcm.professeur_id = p.id
+        WHERE pcm.matiere_id = :matiere_id
+    ";
+
+    $stmt = $pdo_matiere_prof->prepare($query);
+    $stmt->execute(['matiere_id' => $matiereId]);
+
+    $professeurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Retourner les données en JSON
+    echo json_encode($professeurs);
+    exit();
+}
 
 
 
@@ -52,7 +75,7 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
     <!-- CSS Files -->
     <link id="pagestyle" href="../assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
 
-    
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
@@ -409,8 +432,26 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
                             </div>
                             <div class="card-body">
                                 <div class="container-fluid">
+                                    <form action="" method="get" id="matiere-form">
+                                        <div class="form-group mb-2">
+                                            <label for="matiere-select" class="control-label">Matière</label>
+                                            <select class="text-sm" name="matiere_id" id="matiere-select">
+                                                <option value="">Sélectionnez une matière</option>
+                                                <?php foreach ($matieres as $matiere) : ?>
+                                                    <option value="<?= $matiere['id'] ?>"><?= $matiere['nom'] ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label for="matiere-select" class="control-label">Enseignant</label>
+                                            <select class="text-sm" name="professeur-select" id="professeur-select">
+                                                <option value="">Choisissez un enseignant</option>
+                                            </select>
+                                        </div>
+                                    </form>
                                     <form action="save_schedule.php" method="post" id="schedule-form">
                                         <input type="hidden" name="id" value="">
+                                        <input type="hidden" name="professeur" id="professeur-value">
                                         <div class="form-group mb-2">
                                             <label for="title" class="control-label">Title</label>
                                             <input type="text" class="form-control form-control-sm rounded-0" name="title" id="title" value='a' required>
@@ -418,16 +459,6 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
                                         <div class="form-group mb-2">
                                             <label for="description" class="control-label">Description</label>
                                             <textarea rows="3" class="form-control form-control-sm rounded-0" name="description" id="description" required>a</textarea>
-                                        </div>
-                                        <div class="form-group mb-2">
-                                            <label for="title" class="control-label">Prof</label>
-                                            <select name="professeur" id="professeur">
-                                                <?php if ($prof->num_rows > 0) {
-                                                    while ($row = $prof->fetch_assoc()) { ?>
-                                                        <option name="professeur" id="professeur" value="<?= $row['nom_enseignant'] ?>"><?= $row['nom_enseignant'] ?> - <?= $row['specialite'] ?></option>
-                                                <?php }
-                                                } ?>
-                                            </select>
                                         </div>
                                         <div class="form-group mb-2">
                                             <label for="title" class="control-label">salle</label>
@@ -440,18 +471,6 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
                                         <div class="form-group mb-2">
                                             <label for="end_datetime" class="control-label">End</label>
                                             <input type="datetime-local" value="2024-11-13T17:00" class="form-control form-control-sm rounded-0" name="end_datetime" id="end_datetime" required>
-                                        </div>
-                                        <div class="mt-3">
-                                            <form method="POST">
-                                                <select name="professeur2" id="professeur2">
-                                                    <option value="">-- Tous les professeurs --</option>
-                                                    <?php if ($prof3->num_rows > 0) {
-                                                        while ($row = $prof3->fetch_assoc()) { ?>
-                                                            <option value="<?= $row['professeur'] ?>"><?= $row['professeur'] ?></option>
-                                                    <?php }
-                                                    } ?>
-                                                </select>
-                                            </form>
                                         </div>
                                     </form>
                                 </div>
@@ -518,28 +537,62 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
     <?php
     if (isset($conn)) $conn->close();
     ?>
-<script>
-    $(document).ready(function () {
-        console.log('FullCalendar initialized');
-        $('#professeur2').on('change', function () {
-            const professeur = $(this).val();
-            console.log('Professeur sélectionné :', professeur);
 
-            $('#calendar').fullCalendar('removeEvents');
-            $('#calendar').fullCalendar('addEventSource', {
-                url: 'fetch_events.php',
-                type: 'POST',
-                data: { professeur: professeur },
-                success: function (data) {
-                    console.log('Données reçues :', data);
-                },
-                error: function () {
-                    alert('Erreur lors du chargement des événements.');
-                }
+    <!-- AJAX GET PROF DEPUIS MATIERE  -->
+    <script>
+        // Lorsque la matière est sélectionnée, soumettre le formulaire et obtenir les enseignants
+        document.getElementById('matiere-select').addEventListener('change', function() {
+            const matiereId = this.value;
+
+            if (matiereId) {
+                fetch("<?php echo $_SERVER['PHP_SELF']; ?>?matiere_id=" + matiereId)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        const professeurSelect = document.getElementById("professeur-select");
+                        const professeurValue = document.getElementById("professeur-value");
+                        professeurSelect.innerHTML = '';
+
+                        // Ajouter les options des enseignants
+                        data.forEach((professeur) => {
+                            const option = document.createElement("option");
+                            option.value = professeur.id;
+                            option.textContent = professeur.nom;
+                            professeurSelect.appendChild(option);
+                            professeurValue.value = professeur.nom
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Erreur lors de la récupération des enseignants:", error);
+                    });
+            }
+        });
+    </script>
+
+
+    <script>
+        $(document).ready(function() {
+            console.log('FullCalendar initialized');
+            $('#professeur2').on('change', function() {
+                const professeur = $(this).val();
+                console.log('Professeur sélectionné :', professeur);
+
+                $('#calendar').fullCalendar('removeEvents');
+                $('#calendar').fullCalendar('addEventSource', {
+                    url: 'fetch_events.php',
+                    type: 'POST',
+                    data: {
+                        professeur: professeur
+                    },
+                    success: function(data) {
+                        console.log('Données reçues :', data);
+                    },
+                    error: function() {
+                        alert('Erreur lors du chargement des événements.');
+                    }
+                });
             });
         });
-    });
-</script>
+    </script>
 </body>
 <script>
     var scheds = $.parseJSON('<?= json_encode($sched_res) ?>')
