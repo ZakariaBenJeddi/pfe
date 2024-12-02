@@ -7,7 +7,7 @@ use function PHPSTORM_META\type;
 require_once('db-connect.php');
 
 // Connexion à la base de données
-$pdo_matiere_prof = new PDO('mysql:host=localhost;dbname=emploi_du_temps_2acc;charset=utf8', 'root', '');
+$pdo_matiere_prof_classe = new PDO('mysql:host=localhost;dbname=emploi_du_temps_2acc;charset=utf8', 'root', '');
 
 // Vérifier si l'ID de la matière est transmis
 if (isset($_GET['matiere_id'])) {
@@ -21,7 +21,7 @@ if (isset($_GET['matiere_id'])) {
         WHERE pcm.matiere_id = :matiere_id
     ";
 
-    $stmt = $pdo_matiere_prof->prepare($query);
+    $stmt = $pdo_matiere_prof_classe->prepare($query);
     $stmt->execute(['matiere_id' => $matiereId]);
 
     $professeurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -31,6 +31,27 @@ if (isset($_GET['matiere_id'])) {
     exit();
 }
 
+if (isset($_GET['professeur_id'])) {
+    $professerId = $_GET['professeur_id'];
+
+    // Requête pour récupérer les classes
+    $query = "
+        SELECT DISTINCT c.id, c.nom
+        FROM classes2 c
+        JOIN professeurs_classes_matieres2 pcm ON pcm.classe_id = c.id
+        WHERE pcm.professeur_id = :professeur_id
+    ";
+
+    $stmt = $pdo_matiere_prof_classe->prepare($query);
+    $stmt->execute(['professeur_id' => $professerId]);
+
+    $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Retourner les données en JSON
+    header('Content-Type: application/json');
+    echo json_encode($classes);
+    exit();
+}
 
 
 $conn3 = new mysqli('localhost', 'root', '', 'dummy_db');
@@ -443,9 +464,15 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
                                             </select>
                                         </div>
                                         <div class="form-group mb-2">
-                                            <label for="matiere-select" class="control-label">Enseignant</label>
-                                            <select class="text-sm" name="professeur-select" id="professeur-select">
+                                            <label for="professeur-select" class="control-label">Enseignant</label>
+                                            <select class="text-sm" name="professeur_id" id="professeur-select">
                                                 <option value="">Choisissez un enseignant</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label for="classe-select" class="control-label">Classes</label>
+                                            <select class="text-sm" name="classe-select" id="classe-select">
+                                                <option value="">Choisissez une Classes</option>
                                             </select>
                                         </div>
                                     </form>
@@ -564,6 +591,33 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
                     .catch(error => {
                         console.error("Erreur lors de la récupération des enseignants:", error);
                     });
+            }
+        });
+        document.getElementById('professeur-select').addEventListener('click', function() {
+            const professeurId = this.value;
+            if (professeurId) {
+                console.log("Fetching classes for professeur ID:", professeurId);
+
+                fetch("<?php echo $_SERVER['PHP_SELF']; ?>?professeur_id=" + professeurId)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        console.log("Classes received:", data);
+
+                        const classeSelect = document.getElementById("classe-select");
+                        classeSelect.innerHTML = '';
+
+                        data.forEach((classe) => {
+                            const option = document.createElement("option");
+                            option.value = classe.id;
+                            option.textContent = classe.nom;
+                            classeSelect.appendChild(option);
+                        });
+                    })
+                    .catch((error) => {
+                        console.error("Erreur lors de la récupération des classes :", error);
+                    });
+            } else {
+                console.log("Aucun professeur sélectionné.");
             }
         });
     </script>
