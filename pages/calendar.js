@@ -280,7 +280,6 @@ document.addEventListener('DOMContentLoaded', function () {
             info.el.style.cursor = '';
         }
     });
-
     calendar.render();
 
     function updateEvent(event) {
@@ -310,4 +309,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('Une erreur est survenue lors de la mise à jour.');
             });
     }
+
 });
+
