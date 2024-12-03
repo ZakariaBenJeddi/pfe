@@ -759,57 +759,9 @@ $nbr_salle = $query_nbr_salle->fetchColumn();
     </div>
   </main>
 
-
   <!-- //! DRIVER JS -->
   <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
-  <script>
-    document.getElementById('startTourButton').addEventListener('click', function() {
-      const driverObj = window.driver.js.driver({
-        showProgress: true,
-        showButtons: ['next', 'previous'],
-        steps: [{
-            element: '#nombre_salle',
-            popover: {
-              title: 'Premier exemple',
-              description: 'Voici la première étape du tour',
-              side: "left",
-              align: 'start'
-            }
-          },
-          {
-            element: '#nombre_eleve',
-            popover: {
-              title: 'Premier exemple',
-              description: 'Voici la première étape du tour',
-              side: "right",
-              align: 'start'
-            }
-          },
-          {
-            element: '#ensaignant',
-            popover: {
-              title: 'Import de la librairie',
-              description: 'Première ligne de code',
-              side: "bottom",
-              align: 'start'
-            }
-          },
-          {
-            element: '#abscence',
-            popover: {
-              title: 'Import de la librairie',
-              description: 'Première ligne de code',
-              side: "left",
-              align: 'start',
-            }
-          },
-          // ... autres étapes ...
-        ]
-      });
-
-      driverObj.drive();
-    });
-  </script>
+  <script src="driver.js"></script>
 
   <!-- FIXED PLUGIN  -->
   <?php include '../includes/fixedplugin.php' ?>
@@ -985,7 +937,7 @@ $nbr_salle = $query_nbr_salle->fetchColumn();
     new Chart(ctx, config);
   </script>
 
-  <!-- //! LINE CHART BLEU YELLOW -->
+  <!-- //! LINE CHART BLEU ROSE -->
   <script>
     const options = {
       colors: ["#0d6efd", "#ffc107"],
@@ -1136,7 +1088,6 @@ $nbr_salle = $query_nbr_salle->fetchColumn();
       chart.render();
     }
   </script>
-
 
   <script>
     var win = navigator.platform.indexOf('Win') > -1;

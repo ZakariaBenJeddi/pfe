@@ -24,7 +24,6 @@ if (isset($_SESSION['last_action'])) {
 $_SESSION['last_action'] = time();
 
 // update
-// Vérifier si le formulaire a été soumis
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
   // Récupérer les données du formulaire
   $id_eleve = $_POST['id_eleve'];
@@ -48,6 +47,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
   $besoins_speciaux = $_POST['besoins_speciaux_eleve'];
   $langue_etrangere = $_POST['langue_etrangere_eleve'];
   $niveau_de_satisfaction = $_POST['niveau_de_satisfaction_eleve'];
+  // Gestion de l'upload de l'image
+  $photo = null; // Par défaut, pas d'image uploadée
+  if (!empty($_FILES['image_eleve']['name'])) {
+    $targetDir = "../assets/img/school/eleve/";
+    $fileName = uniqid('eleve_', true) . '.' . pathinfo($_FILES['image_eleve']['name'], PATHINFO_EXTENSION);
+    $targetFilePath = $targetDir . $fileName;
+
+    // Type MIME pour validation
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $fileMime = finfo_file($finfo, $_FILES['image_eleve']['tmp_name']);
+    finfo_close($finfo);
+
+    $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+
+    if (in_array($fileMime, $allowedMimeTypes)) {
+      if (move_uploaded_file($_FILES['image_eleve']['tmp_name'], $targetFilePath)) {
+        $photo = $fileName; // Enregistrer le nom unique du fichier
+      } else {
+        $error = $_FILES['image_eleve']['error'];
+        echo "<script>alert('Erreur lors du téléchargement de l\'image. Code : $error');</script>";
+      }
+    } else {
+      echo "<script>alert('Type de fichier non autorisé.');</script>";
+    }
+  }
+
+
 
   // Préparer la requête de mise à jour
   $sql = "UPDATE eleves 
@@ -71,6 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
                 besoins_speciaux = :besoins_speciaux ,
                 langue_etrangere = :langue_etrangere,
                 niveau_de_satisfaction = :niveau_de_satisfaction,
+                photo = COALESCE(:photo, photo), -- Met à jour la photo uniquement si une nouvelle image est téléchargée
                 date_derniere_mise_a_jour = NOW()
             WHERE id_eleve = :id_eleve";
 
@@ -98,6 +125,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
       ':besoins_speciaux' => $besoins_speciaux,
       ':langue_etrangere' => $langue_etrangere,
       ':niveau_de_satisfaction' => $niveau_de_satisfaction,
+      ':photo' => $photo, // Le nom de l'image ou NULL
     ]);
 
     echo "<script>
@@ -125,65 +153,6 @@ if (isset($_GET['id_eleve'])) {
   echo "ID de l'élève non fourni.";
 }
 ?>
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
-  <form method="post">
-      <input type="text" readonly name="id_eleve" value="<?php // $eleve->id_eleve 
-                                                          ?>"><br>
-      nom <input type="text" name="nom_eleve" value="<?php // $eleve->nom 
-                                                      ?>"><br>
-      prenom <input type="text" name="prenom_eleve" value="<?php // $eleve->prenom 
-                                                            ?>"><br>
-      date_naissance <input type="date" name="date_naissance_eleve" value="<?php // $eleve->date_naissance 
-                                                                            ?>"><br>
-      genre <input type="text" name="genre_eleve" value="<?php // $eleve->genre 
-                                                          ?>"><br>
-      nationalite <input type="text" name="nationalite_eleve" value="<?php // $eleve->nationalite 
-                                                                      ?>"><br>
-      adresse <input type="text" name="adresse_eleve" value="<?php // $eleve->adresse 
-                                                              ?>"><br>
-      telephone <input type="text" name="telephone_eleve" value="<?php // $eleve->telephone 
-                                                                  ?>"><br>
-      email <input type="email" name="email_eleve" value="<?php // $eleve->email 
-                                                          ?>"><br>
-      date_inscription <input type="date" name="date_inscription_eleve" value="<?php // $eleve->date_inscription 
-                                                                                ?>"><br>
-      statut <input type="text" name="statut_eleve" value="<?php // $eleve->statut 
-                                                            ?>"><br>
-      historique_scolaire <input type="text" name="historique_scolaire_eleve" value="<?php // $eleve->historique_scolaire 
-                                                                                      ?>"><br>
-      langues_parlees <input type="text" name="langues_parlees_eleve" value="<?php // $eleve->langues_parlees 
-                                                                              ?>"><br>
-      nom_tuteur <input type="text" name="nom_tuteur_eleve" value="<?php // $eleve->nom_tuteur 
-                                                                    ?>"><br>
-      telephone_tuteur <input type="text" name="telephone_tuteur_eleve" value="<?php // $eleve->telephone_tuteur 
-                                                                                ?>"><br>
-      email_tuteur <input type="email" name="email_tuteur_eleve" value="<?php // $eleve->email_tuteur 
-                                                                        ?>"><br>
-      profession_tuteur <input type="text" name="profession_tuteur_eleve" value="<?php // $eleve->profession_tuteur 
-                                                                                  ?>"><br>
-      niveau_scolaire <input type="text" name="niveau_scolaire_eleve" value="<?php // $eleve->niveau_scolaire 
-                                                                              ?>"><br>
-      besoins_speciaux <input type="text" name="besoins_speciaux_eleve" value="<?php // $eleve->besoins_speciaux 
-                                                                                ?>"><br>
-      langue_etrangere <input type="text" name="langue_etrangere_eleve" value="<?php // $eleve->langue_etrangere 
-                                                                                ?>"><br>
-      niveau_de_satisfaction <input type="text" name="niveau_de_satisfaction_eleve" value="<?php // $eleve->niveau_de_satisfaction 
-                                                                                            ?>"><br>
-      <input type="submit" value="edit" name="edit">
-  </form>
-</body>
-</html> -->
-
-<!DOCTYPE html>
-<html lang="en">
 
 <!-- HEAD -->
 <?php include '../includes/head.php' ?>
@@ -646,18 +615,22 @@ if (isset($_GET['id_eleve'])) {
                       <input class="form-control" type="text" name="besoins_speciaux_eleve" id="besoins_speciaux_eleve" value="<?= $eleve->besoins_speciaux ?>" required>
                     </div>
                   </div>
-
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="langue_etrangere_eleve" class="form-control-label">Langue Étrangère</label>
                       <input class="form-control" type="text" name="langue_etrangere_eleve" id="langue_etrangere_eleve" value="<?= $eleve->langue_etrangere ?>" required>
                     </div>
                   </div>
-
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="niveau_de_satisfaction_eleve" class="form-control-label">Niveau de Satisfaction</label>
                       <input class="form-control" type="text" name="niveau_de_satisfaction_eleve" id="niveau_de_satisfaction_eleve" value="<?= $eleve->niveau_de_satisfaction ?>" required>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="image_eleve" class="form-control-label">Image</label>
+                      <input class="form-control" type="file" name="image_eleve" id="image_eleve" value="<?= $eleve->photo ?>" required>
                     </div>
                   </div>
 

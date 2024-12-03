@@ -446,7 +446,7 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
                     <div class="col-md-9">
                         <div id="calendar"></div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3 mt-lg-0 mt-5">
                         <div class="cardt rounded-0 shadow">
                             <div class="card-header bg-gradient bg-primary text-light">
                                 <h5 class="card-title text-center">Schedule Form</h5>
@@ -470,7 +470,7 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
                                             </select>
                                         </div>
                                         <div class="form-group mb-2">
-                                            <label for="classe-select" class="control-label">Classes</label>
+                                            <label for="classe-select" class="control-label">Classes</label><br>
                                             <select class="text-sm" name="classe-select" id="classe-select">
                                                 <option value="">Choisissez une Classes</option>
                                             </select>
