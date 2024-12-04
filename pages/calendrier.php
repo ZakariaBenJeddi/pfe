@@ -2,6 +2,23 @@
 session_start();
 // $username = $_SESSION['lastname'];
 
+if (empty($_SESSION['user'])) {
+    header('location:sign-in.php');
+}
+
+//* deconnexion
+$inactivity_limit = 300; // 5 minutes
+if (isset($_SESSION['last_action'])) {
+    $inactivity_duration = time() - $_SESSION['last_action'];
+    if ($inactivity_duration > $inactivity_limit) {
+        session_unset();
+        session_destroy();
+        header("Location: logout.php");
+        exit();
+    }
+}
+$_SESSION['last_action'] = time();
+
 use function PHPSTORM_META\type;
 
 require_once('db-connect.php');
@@ -130,6 +147,41 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
             border-color: #ededed !important;
             border-style: solid;
             border-width: 1px !important;
+        }
+
+        /* Styles pour le conteneur de chargement */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Fond semi-transparent */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        /* Styles pour l'animation (spinner) */
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
@@ -444,6 +496,9 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
             <div class="container py-5 " style="margin-top: 13rem !important;" id="page-container">
                 <div class="row">
                     <div class="col-md-9">
+                        <div id="loading-screen" style="display: none;">
+                            <div class="spinner"></div>
+                        </div>
                         <div id="calendar"></div>
                     </div>
                     <div class="col-md-3 mt-lg-0 mt-5">
@@ -697,6 +752,31 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
 
             reader.readAsBinaryString(file);
         }
+    </script>
+
+    <!-- reload page pour 5s premiere chargement de page -->
+    <script>
+        window.onload = function() {
+            const loadingScreen = document.getElementById('loading-screen');
+
+            // Affiche l'animation de chargement
+            loadingScreen.style.display = 'flex';
+
+            if (!sessionStorage.getItem('pageReloaded')) {
+                // Si la page n'a pas encore été rechargée
+                setTimeout(function() {
+                    location.reload(); // Recharge la page
+                }, 2500); // Temps en millisecondes (2.55 secondes)
+
+                // Marque la page comme "déjà rechargée"
+                sessionStorage.setItem('pageReloaded', true);
+            } else {
+                // Cache l'animation après le chargement
+                setTimeout(function() {
+                    loadingScreen.style.display = 'none';
+                }, 1000); // Cache l'animation après 1 seconde
+            }
+        };
     </script>
 
     <script>
