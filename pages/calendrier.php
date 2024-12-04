@@ -766,7 +766,7 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
                 // Si la page n'a pas encore été rechargée
                 setTimeout(function() {
                     location.reload(); // Recharge la page
-                }, 2500); // Temps en millisecondes (2.55 secondes)
+                }, 5000); // Temps en millisecondes (2.55 secondes)
 
                 // Marque la page comme "déjà rechargée"
                 sessionStorage.setItem('pageReloaded', true);

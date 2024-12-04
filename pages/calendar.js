@@ -235,6 +235,38 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
             return { html: customHtml };
         },
+        eventDidMount: function(info) {
+            let title = info.event.title;
+            let titleParts = title.split('-');
+            let eventType = titleParts[1].trim();
+            
+            // Définir les styles en fonction du type d'événement
+            let backgroundColor, borderColor;
+            switch (eventType) {
+                case 'PC':
+                backgroundColor = '#ffa07a';
+                borderColor = '#87ceeb';
+                break;
+                case 'Français':
+                backgroundColor = '#87ceeb';
+                borderColor = '#90ee90';
+                break;
+                case 'Maths':
+                backgroundColor = '#90ee90';
+                borderColor = '#ffa07a';
+                break;
+                // Ajoutez d'autres cas pour les autres types d'événements
+                default:
+                backgroundColor = '#ccc';
+                borderColor = '#333';
+            }
+            
+            // Appliquer les styles à l'événement
+            info.el.style.backgroundColor = backgroundColor;
+            info.el.style.borderColor = borderColor;
+            info.el.style.border = '1px solid';
+            info.el.style.margin = '1px';
+            },
         editable: true, // Permet le drag and drop et le redimensionnement
         eventDrop: function (info) {
             // Appelé lorsqu'un événement est déplacé
