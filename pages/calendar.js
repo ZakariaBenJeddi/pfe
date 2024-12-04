@@ -222,6 +222,19 @@ document.addEventListener('DOMContentLoaded', function () {
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
         events: 'fetch_events.php', // URL pour récupérer les événements
+        eventContent: function (arg) {
+            let timeText = arg.timeText;
+            let title = arg.event.title;
+            let titleParts = title.split('-')
+            let customHtml = `
+                <div>
+                    <div>${timeText}</div>
+                    <div>${titleParts[0]}</div>
+                    <div>${titleParts[1]}</div>
+                </div>
+            `;
+            return { html: customHtml };
+        },
         editable: true, // Permet le drag and drop et le redimensionnement
         eventDrop: function (info) {
             // Appelé lorsqu'un événement est déplacé
