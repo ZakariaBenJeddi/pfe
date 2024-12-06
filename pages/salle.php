@@ -181,6 +181,14 @@ try {
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" href="../pages/filiere.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-books text-info text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Filière</span>
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" href="../pages/matieres.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-book-bookmark text-danger text-sm opacity-10"></i>
@@ -444,7 +452,8 @@ try {
                     </button>
                   </div>
                   <div class="modal-body" id="info_update">
-                    <?php // include("edit_salle.php"); ?>
+                    <?php // include("edit_salle.php"); 
+                    ?>
                   </div>
                   <div class="modal-footer ">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>

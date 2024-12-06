@@ -95,7 +95,7 @@ try {
 
     //* Exécution de la requête et gestion des erreurs
     if ($query->execute()) {
-      echo "<script>alert('Salle Bien Supprimée');</script>";
+      echo "<script>alert('Eleve Bien Supprimée');</script>";
 
       //* Utilisez une redirection sécurisée
       header("Location: eleves.php");
@@ -184,6 +184,14 @@ try {
               <i class="ni ni-building text-warning text-sm opacity-10"></i>
             </div>
             <span class="nav-link-text ms-1">Classes</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../pages/filiere.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-books text-info text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Filière</span>
           </a>
         </li>
         <li class="nav-item">
@@ -697,7 +705,7 @@ try {
               // Aucun résultat
               tableBody.append(`
                             <tr>
-                                <td colspan="8" class="text-center">Aucune salle trouvée pour cette période</td>
+                                <td colspan="8" class="text-center">Aucune Eleve trouvée pour cette période</td>
                             </tr>
                         `);
             }

@@ -585,6 +585,9 @@ function darkMode(el) {
   const cardNavLinksIcons = document.querySelectorAll('.card .nav .nav-link i');
   const cardNavSpan = document.querySelectorAll('.card .nav .nav-link span');
 
+  const tables = document.querySelectorAll('table');
+  const tableHeaders = document.querySelectorAll('table th');
+  const tableCells = document.querySelectorAll('table td');
 
   if (!el.getAttribute("checked")) {
     body.classList.add('dark-version');
