@@ -678,7 +678,6 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
         });
     </script>
 
-
     <!-- Importer Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 
@@ -766,7 +765,8 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
                 // Si la page n'a pas encore été rechargée
                 setTimeout(function() {
                     location.reload(); // Recharge la page
-                }, 5000); // Temps en millisecondes (2.55 secondes)
+                }, 9000); // Temps en millisecondes (2.55 secondes)
+                location.reload(); // Recharge la page
 
                 // Marque la page comme "déjà rechargée"
                 sessionStorage.setItem('pageReloaded', true);
