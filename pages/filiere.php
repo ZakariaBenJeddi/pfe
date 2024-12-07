@@ -481,7 +481,7 @@ try {
                             <p class="text-xs font-weight-bold mb-0"><?= $result->date_creation; ?></p>
                           </td>
                           <td class="align-middle text-center d-flex">
-                            <a href="edit_filiere.php?id_filiere=<?= $result->id_filiere ?>" class="dropdown-item">
+                            <a href="edit_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
                               <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                             </a>
                             <a href="description_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
