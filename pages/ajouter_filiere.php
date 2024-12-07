@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
   $description = $_POST['description'];
   $niveau = $_POST['niveau'];
   $nombre_heures_max = $_POST['nombre_heures_max'];
-  $date_creation = $_POST['date_creation'];
+  $date_creation = $_POST['date_creation']. ' ' . date('H:i:s');
 
   if (!in_array($niveau, $enum_values)) {
     die("Valeur non valide pour le champ 'niveau'.");

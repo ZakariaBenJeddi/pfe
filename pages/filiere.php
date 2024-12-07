@@ -478,7 +478,10 @@ try {
                             <p class="text-xs font-weight-bold mb-0"><?= $result->nombre_heures_max; ?></p>
                           </td>
                           <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0"><?= $result->date_creation; ?></p>
+                            <p class="text-xs font-weight-bold mb-0">
+                              <?php $date = new DateTime($result->date_creation) ;
+                              echo $date->format('Y-m-d'); ?>
+                            </p>
                           </td>
                           <td class="align-middle text-center d-flex">
                             <a href="edit_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
