@@ -20,8 +20,8 @@ if (isset($_SESSION['last_action'])) {
 $_SESSION['last_action'] = time();
 
 
-$niveau = "SHOW COLUMNS FROM filiere LIKE 'niveau'";
-$stmt = $dbh->query($niveau);
+$niveau1 = "SHOW COLUMNS FROM filiere LIKE 'niveau'";
+$stmt = $dbh->query($niveau1);
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $enum_values = [];
@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
   $description = $_POST['description'];
   $niveau = $_POST['niveau'];
   $nombre_heures_max = $_POST['nombre_heures_max'];
-  $date_creation = $_POST['date_creation']. ' ' . date('H:i:s');
+  $date_creation = $_POST['date_creation'] . ' ' . date('H:i:s');
 
   if (!in_array($niveau, $enum_values)) {
     die("Valeur non valide pour le champ 'niveau'.");
@@ -101,7 +101,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
     </div>
     <div class="sidenav-footer mx-3 ">
       <div class="card card-plain shadow-none" id="sidenavCard">
-        <!-- <img class="w-50 mx-auto" src="../assets/img/illustrations/icon-documentation.svg" alt="sidebar_illustration"> -->
         <img class="w-50 mx-auto mt-5" src="https://elaraki.ac.ma/images/logo2.png" alt="sidebar_illustration">
         <div class="card-body text-center p-3 w-100 pt-0">
           <div class="docs-info">
@@ -258,18 +257,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
   <script src="../assets/js/core/bootstrap.min.js"></script>
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
-  
-<script>
-  // Récupérer l'élément input
-  const dateInput = document.getElementById('date_aujourdhui');
 
-  // Obtenir la date d'aujourd'hui
-  const today = new Date();
-  const formattedDate = today.toISOString().split('T')[0]; // Format YYYY-MM-DD
-
-  // Définir la date par défaut
-  dateInput.value = formattedDate;
-</script>
+  <script>
+    const dateInput = document.getElementById('date_aujourdhui');
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0]; // Format YYYY-MM-DD
+    dateInput.value = formattedDate;
+  </script>
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
