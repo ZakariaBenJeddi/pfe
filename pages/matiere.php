@@ -40,9 +40,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $end_date = date("Y-m-d", strtotime($end_date));
 
     // Requête SQL avec préparation
-    $sql = "SELECT * FROM filiere 
-              WHERE date_creation BETWEEN :start_date AND :end_date
-              ORDER BY date_creation DESC";
+    $sql = "SELECT * FROM matiere 
+              WHERE annee_creation BETWEEN :start_date AND :end_date
+              ORDER BY annee_creation DESC";
 
     $stmt = $dbh->prepare($sql);
     $stmt->execute([
@@ -69,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
 //* read 
-$sql = "SELECT * FROM filiere";
+$sql = "SELECT * FROM matiere";
 $query = $dbh->query($sql);
 $results = $query->fetchAll(PDO::FETCH_OBJ);
 
@@ -85,14 +85,14 @@ try {
       exit;
     }
 
-    $sql = "DELETE FROM filiere WHERE id_filiere = :id";
+    $sql = "DELETE FROM matiere WHERE id_matiere = :id";
     $query = $dbh->prepare($sql);
     $query->bindParam(':id', $id, PDO::PARAM_INT);
 
     if ($query->execute()) {
-      echo "<script>alert('Filiere Bien Supprimée');</script>";
+      echo "<script>alert('Matiere Bien Supprimée');</script>";
 
-      header("Location: filiere.php");
+      header("Location:matiere.php");
       exit;
     } else {
       //* Affichage d'un message d'erreur générique pour éviter de donner des détails à un attaquant
@@ -189,7 +189,7 @@ try {
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="../pages/matieres.php">
+          <a class="nav-link" href="../pages/matiere.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-book-bookmark text-danger text-sm opacity-10"></i>
             </div>
@@ -446,10 +446,10 @@ try {
                 <table class="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nom Filière</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">code filière</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Niveau</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">nombre heures</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nom Matiere</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">code Matiere</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Description</th>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">date creation</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
                     </tr>
@@ -464,33 +464,35 @@ try {
                                 <img src="../assets/img/small-logos/logo-invision.svg" class="avatar avatar-sm me-3" alt="filiere">
                               </div>
                               <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->nom_filiere ?></h6>
+                                <h6 class="mb-0 text-sm"><?= $result->nom_matiere ?></h6>
                               </div>
                             </div>
                           </td>
                           <td class="align-middle text-center text-sm">
-                            <p class="text-xs font-weight-bold mb-0"><?= $result->code_filiere; ?></p>
+                            <p class="text-xs font-weight-bold mb-0"><?= $result->code_matiere; ?></p>
                           </td>
                           <td>
-                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->niveau; ?></p>
-                          </td>
-                          <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0"><?= $result->nombre_heures_max; ?></p>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->statut; ?></p>
                           </td>
                           <td class="align-middle text-center">
                             <p class="text-xs font-weight-bold mb-0">
-                              <?php $date = new DateTime($result->date_creation) ;
+                              <?= substr($result->description, 0, 20) . (strlen($result->description) > 20 ? '...' : ''); ?>
+                            </p>
+                          </td>
+                          <td class="align-middle text-center">
+                            <p class="text-xs font-weight-bold mb-0">
+                              <?php $date = new DateTime($result->annee_creation);
                               echo $date->format('Y-m-d'); ?>
                             </p>
                           </td>
                           <td class="align-middle text-center d-flex">
-                            <a href="edit_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
+                            <a href="edit_matiere.php?id=<?= $result->id_matiere ?>" class="dropdown-item">
                               <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                             </a>
-                            <a href="description_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
+                            <a href="description_matiere.php?id=<?= $result->id_matiere ?>" class="dropdown-item">
                               <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                             </a>
-                            <a href="filiere.php?id=<?= $result->id_filiere ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                            <a href="matiere.php?id=<?= $result->id_matiere ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
                               <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
                             </a>
                           </td>
@@ -626,30 +628,35 @@ try {
                                 <img src="../assets/img/small-logos/logo-invision.svg" class="avatar avatar-sm me-3" alt="filiere">
                               </div>
                               <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->nom_filiere ?></h6>
+                                <h6 class="mb-0 text-sm"><?= $result->nom_matiere ?></h6>
                               </div>
                             </div>
                           </td>
                           <td class="align-middle text-center text-sm">
-                            <p class="text-xs font-weight-bold mb-0"><?= $result->code_filiere; ?></p>
+                            <p class="text-xs font-weight-bold mb-0"><?= $result->code_matiere; ?></p>
                           </td>
                           <td>
-                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->niveau; ?></p>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->statut; ?></p>
                           </td>
                           <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0"><?= $result->nombre_heures_max; ?></p>
+                            <p class="text-xs font-weight-bold mb-0">
+                            <?= substr($result->description, 0, 20) . (strlen($result->description) > 20 ? '...' : ''); ?>
+                            </p>
                           </td>
                           <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0"><?= $result->date_creation; ?></p>
+                            <p class="text-xs font-weight-bold mb-0">
+                              <?php $date = new DateTime($result->annee_creation);
+                              echo $date->format('Y-m-d'); ?>
+                            </p>
                           </td>
                           <td class="align-middle text-center d-flex">
-                            <a href="edit_filiere.php?id_filiere=<?= $result->id_filiere ?>" class="dropdown-item">
+                            <a href="edit_matiere.php?id=<?= $result->id_matiere ?>" class="dropdown-item">
                               <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                             </a>
-                            <a href="description_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
+                            <a href="description_matiere.php?id=<?= $result->id_matiere ?>" class="dropdown-item">
                               <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                             </a>
-                            <a href="filiere.php?id=<?= $result->id_filiere ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                            <a href="matiere.php?id=<?= $result->id_matiere ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
                               <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
                             </a>
                           </td>

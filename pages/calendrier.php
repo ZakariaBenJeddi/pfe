@@ -353,7 +353,7 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="../pages/sign-out.php">
+                <a class="nav-link" href="../pages/sign-in.php">
                     <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="ni ni-button-power text-danger text-sm opacity-10"></i>
                     </div>
@@ -765,7 +765,7 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
                 // Si la page n'a pas encore été rechargée
                 setTimeout(function() {
                     location.reload(); // Recharge la page
-                }, 9000); // Temps en millisecondes (2.55 secondes)
+                }, 10000); // Temps en millisecondes (2.55 secondes)
                 location.reload(); // Recharge la page
 
                 // Marque la page comme "déjà rechargée"

@@ -235,69 +235,69 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
             return { html: customHtml };
         },
-        // eventDidMount: function(info) {
-        //     let title = info.event.title;
-        //     let titleParts = title.split('-');
-        //     let eventType = titleParts[1].trim();
+        eventDidMount: function(info) {
+            let title = info.event.title;
+            let titleParts = title.split('-');
+            let eventType = titleParts[1].trim();
             
-        //     // Définir les styles en fonction du type d'événement
-        //     let backgroundColor, borderColor;
-        //     switch (eventType) {
-        //         case 'Anglais':
-        //             backgroundColor = '#87CEEB'; // Bleu ciel
-        //             borderColor = '#1E90FF'; // Bleu foncé
-        //             break;
-        //         case 'Arabe':
-        //             backgroundColor = '#FFD700'; // Jaune
-        //             borderColor = '#DAA520'; // Doré
-        //             break;
-        //         case 'Éducation Physique':
-        //             backgroundColor = '#90EE90'; // Vert clair
-        //             borderColor = '#32CD32'; // Vert foncé
-        //             break;
-        //         case 'Français':
-        //             backgroundColor = '#FFC0CB'; // Rose
-        //             borderColor = '#FF69B4'; // Rose foncé
-        //             break;
-        //         case 'Histoire-Géographie':
-        //             backgroundColor = '#D8BFD8'; // Mauve
-        //             borderColor = '#8B008B'; // Violet foncé
-        //             break;
-        //         case 'Maths':
-        //             backgroundColor = '#ADD8E6'; // Bleu clair
-        //             borderColor = '#1E90FF'; // Bleu foncé
-        //             break;
-        //         case 'PC':
-        //             backgroundColor = '#FFA07A'; // Saumon
-        //             borderColor = '#FF6347'; // Tomate
-        //             break;
-        //         case 'Philosophie':
-        //             backgroundColor = '#FFDAB9'; // Pêche
-        //             borderColor = '#CD853F'; // Marron clair
-        //             break;
-        //         case 'Physique-Chimie':
-        //             backgroundColor = '#B0C4DE'; // Bleu gris
-        //             borderColor = '#4169E1'; // Bleu royal
-        //             break;
-        //         case 'Sport':
-        //             backgroundColor = '#98FB98'; // Vert pâle
-        //             borderColor = '#00FA9A'; // Vert émeraude
-        //             break;
-        //         case 'SVT':
-        //             backgroundColor = '#7CFC00'; // Vert prairie
-        //             borderColor = '#32CD32'; // Vert foncé
-        //             break;
-        //         default:
-        //             backgroundColor = '#ccc';
-        //             borderColor = '#333';
-        //     }
+            // Définir les styles en fonction du type d'événement
+            let backgroundColor, borderColor;
+            switch (eventType) {
+                case 'Anglais':
+                    backgroundColor = '#87CEEB'; // Bleu ciel
+                    borderColor = '#1E90FF'; // Bleu foncé
+                    break;
+                case 'Arabe':
+                    backgroundColor = '#FFD700'; // Jaune
+                    borderColor = '#DAA520'; // Doré
+                    break;
+                case 'Éducation Physique':
+                    backgroundColor = '#90EE90'; // Vert clair
+                    borderColor = '#32CD32'; // Vert foncé
+                    break;
+                case 'Français':
+                    backgroundColor = '#FFC0CB'; // Rose
+                    borderColor = '#FF69B4'; // Rose foncé
+                    break;
+                case 'Histoire-Géographie':
+                    backgroundColor = '#D8BFD8'; // Mauve
+                    borderColor = '#8B008B'; // Violet foncé
+                    break;
+                case 'Maths':
+                    backgroundColor = '#ADD8E6'; // Bleu clair
+                    borderColor = '#1E90FF'; // Bleu foncé
+                    break;
+                case 'PC':
+                    backgroundColor = '#FFA07A'; // Saumon
+                    borderColor = '#FF6347'; // Tomate
+                    break;
+                case 'Philosophie':
+                    backgroundColor = '#FFDAB9'; // Pêche
+                    borderColor = '#CD853F'; // Marron clair
+                    break;
+                case 'Physique-Chimie':
+                    backgroundColor = '#B0C4DE'; // Bleu gris
+                    borderColor = '#4169E1'; // Bleu royal
+                    break;
+                case 'Sport':
+                    backgroundColor = '#98FB98'; // Vert pâle
+                    borderColor = '#00FA9A'; // Vert émeraude
+                    break;
+                case 'SVT':
+                    backgroundColor = '#7CFC00'; // Vert prairie
+                    borderColor = '#32CD32'; // Vert foncé
+                    break;
+                default:
+                    backgroundColor = '#ccc';
+                    borderColor = '#333';
+            }
             
-        //     // Appliquer les styles à l'événement
-        //     info.el.style.backgroundColor = backgroundColor;
-        //     info.el.style.borderColor = borderColor;
-        //     info.el.style.border = '1px solid';
-        //     info.el.style.margin = '1px';
-        // },
+            // Appliquer les styles à l'événement
+            info.el.style.backgroundColor = backgroundColor;
+            info.el.style.borderColor = borderColor;
+            info.el.style.border = '1px solid';
+            info.el.style.margin = '1px';
+        },
         editable: true, // Permet le drag and drop et le redimensionnement
         eventDrop: function (info) {
             // Appelé lorsqu'un événement est déplacé
