@@ -253,7 +253,7 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="../pages/matieres.php">
+                <a class="nav-link" href="../pages/matiere.php">
                     <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="ni ni-book-bookmark text-danger text-sm opacity-10"></i>
                     </div>
@@ -502,7 +502,10 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
                         <div id="calendar"></div>
                     </div>
                     <div class="col-md-3 mt-lg-0 mt-5">
-                        <button type="button" class="btn btn-primary btn-sm" id="import-btn" onclick="expo()">Importer</button>
+                        <div class="d-flex justify-content-center mb-2">
+                            <button type="button" class="btn btn-primary btn-sm me-1" id="import-btn">Importer</button>
+                            <a href="export_excel.php" class="btn btn-primary btn-sm ms-1">Exporter</a>
+                        </div>
                         <div class="cardt rounded-0 shadow">
                             <div class="card-header bg-gradient bg-primary text-light">
                                 <h5 class="card-title text-center">Schedule Form</h5>
@@ -680,7 +683,6 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
 
     <!-- Importer Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-
     <script>
         document.getElementById('import-btn').addEventListener('click', handleImportClick);
 
@@ -753,7 +755,75 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
         }
     </script>
 
-    <!-- reload page pour 5s premiere chargement de page -->
+    <!-- Exporter Excel -->
+    <script>
+        document.getElementById('export-btn').addEventListener('click', handleExportClick);
+
+        function handleExportClick() {
+
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+
+            if (!file) {
+                alert("Aucun fichier sélectionné.");
+                return;
+            }
+
+            if (file.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' &&
+                file.type !== 'application/vnd.ms-excel') {
+                alert("Veuillez sélectionner un fichier Excel valide.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const data = event.target.result;
+                const workbook = XLSX.read(data, {
+                    type: 'binary'
+                });
+
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                let jsonData = XLSX.utils.sheet_to_json(worksheet, {
+                    header: 1
+                });
+
+                // Filtrer les lignes vides
+                jsonData = jsonData.filter(row => row.length > 0);
+
+                console.log(jsonData);
+
+                fetch('insert_schedule.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(jsonData), // Les données à envoyer
+                    })
+                    .then(response => response.json()) // Attendre la réponse JSON du serveur
+                    .then(responseData => {
+                        // Afficher la réponse dans la console pour le débogage
+                        console.log('Réponse du serveur:', responseData);
+
+                        if (responseData.status === 'success') {
+                            alert(responseData.message);
+                        } else {
+                            alert(responseData.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors de l\'importation :', error);
+                        alert('Une erreur est survenue lors de l\'importation.');
+                    });
+
+            };
+
+            reader.readAsBinaryString(file);
+        }
+    </script>
+
+    <!--//TODO reload page pour 5s premiere chargement de page -->
     <script>
         window.onload = function() {
             const loadingScreen = document.getElementById('loading-screen');

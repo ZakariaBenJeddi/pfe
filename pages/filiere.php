@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $end_date = date("Y-m-d", strtotime($end_date));
 
     // Requête SQL avec préparation
-    $sql = "SELECT * FROM filiere 
+    $sql = "SELECT filiere.* , niveau.nom_niveau FROM filiere JOIN niveau ON niveau.id_niveau = filiere.id_niveau
               WHERE date_creation BETWEEN :start_date AND :end_date
               ORDER BY date_creation DESC";
 
@@ -69,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
 //* read 
-$sql = "SELECT * FROM filiere";
+$sql = "SELECT filiere.* , niveau.nom_niveau FROM filiere JOIN niveau ON niveau.id_niveau = filiere.id_niveau ";
 $query = $dbh->query($sql);
 $results = $query->fetchAll(PDO::FETCH_OBJ);
 
@@ -472,7 +472,7 @@ try {
                             <p class="text-xs font-weight-bold mb-0"><?= $result->code_filiere; ?></p>
                           </td>
                           <td>
-                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->niveau; ?></p>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->nom_niveau; ?></p>
                           </td>
                           <td class="align-middle text-center">
                             <p class="text-xs font-weight-bold mb-0"><?= $result->nombre_heures_max; ?></p>
@@ -634,16 +634,19 @@ try {
                             <p class="text-xs font-weight-bold mb-0"><?= $result->code_filiere; ?></p>
                           </td>
                           <td>
-                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->niveau; ?></p>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->nom_niveau; ?></p>
                           </td>
                           <td class="align-middle text-center">
                             <p class="text-xs font-weight-bold mb-0"><?= $result->nombre_heures_max; ?></p>
                           </td>
                           <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0"><?= $result->date_creation; ?></p>
+                            <p class="text-xs font-weight-bold mb-0">
+                              <?php $date = new DateTime($result->date_creation);
+                              echo $date->format('Y-m-d'); ?>
+                            </p>
                           </td>
                           <td class="align-middle text-center d-flex">
-                            <a href="edit_filiere.php?id_filiere=<?= $result->id_filiere ?>" class="dropdown-item">
+                            <a href="edit_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
                               <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                             </a>
                             <a href="description_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">

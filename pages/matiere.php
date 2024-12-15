@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $end_date = date("Y-m-d", strtotime($end_date));
 
     // Requête SQL avec préparation
-    $sql = "SELECT * FROM matiere 
+    $sql = "SELECT matiere.* , filiere.nom_filiere FROM matiere JOIN filiere ON  filiere.id_filiere = matiere.id_filiere
               WHERE annee_creation BETWEEN :start_date AND :end_date
               ORDER BY annee_creation DESC";
 
@@ -69,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
 //* read 
-$sql = "SELECT * FROM matiere";
+$sql = "SELECT matiere.* , filiere.nom_filiere FROM matiere JOIN filiere ON  filiere.id_filiere = matiere.id_filiere";
 $query = $dbh->query($sql);
 $results = $query->fetchAll(PDO::FETCH_OBJ);
 
@@ -448,9 +448,12 @@ try {
                     <tr>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nom Matiere</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">code Matiere</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Filiere</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">coeficient</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre sceance semaine </th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre heure semaine </th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Description</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">date creation</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
                     </tr>
                   </thead>
@@ -460,9 +463,6 @@ try {
                         <tr>
                           <td>
                             <div class="d-flex px-2 py-1">
-                              <div>
-                                <img src="../assets/img/small-logos/logo-invision.svg" class="avatar avatar-sm me-3" alt="filiere">
-                              </div>
                               <div class="d-flex flex-column justify-content-center">
                                 <h6 class="mb-0 text-sm"><?= $result->nom_matiere ?></h6>
                               </div>
@@ -471,18 +471,24 @@ try {
                           <td class="align-middle text-center text-sm">
                             <p class="text-xs font-weight-bold mb-0"><?= $result->code_matiere; ?></p>
                           </td>
+                          <td class="align-middle text-center text-sm">
+                            <p class="text-xs font-weight-bold mb-0"><?= $result->nom_filiere; ?></p>
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <p class="text-xs font-weight-bold mb-0"><?= intval($result->coefficient); ?></p>
+                          </td>
                           <td>
                             <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->statut; ?></p>
                           </td>
-                          <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0">
-                              <?= substr($result->description, 0, 20) . (strlen($result->description) > 20 ? '...' : ''); ?>
-                            </p>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->nombre_seance_semaine; ?></p>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->nombre_heures_semaine; ?></p>
                           </td>
                           <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0">
-                              <?php $date = new DateTime($result->annee_creation);
-                              echo $date->format('Y-m-d'); ?>
+                            <p class="text-xs font-weight-bold mb-0" title="<?= $result->description?>">
+                              <?= substr($result->description, 0, 20) . (strlen($result->description) > 20 ? '...' : ''); ?>
                             </p>
                           </td>
                           <td class="align-middle text-center d-flex">
@@ -571,7 +577,7 @@ try {
         var url = window.URL.createObjectURL(blob);
         var a = document.createElement('a');
         a.href = url;
-        a.download = 'filiere.xlsx';
+        a.download = 'matiere.xlsx';
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -580,7 +586,7 @@ try {
   </script>
 
   <!-- //* Date Picker -->
-  <!-- //* AJAX eleves intervalle date  -->
+  <!-- //* AJAX matiere intervalle date  -->
   <script>
     $(function() {
       // Configuration du DateRangePicker
@@ -624,9 +630,6 @@ try {
                         <tr>
                           <td>
                             <div class="d-flex px-2 py-1">
-                              <div>
-                                <img src="../assets/img/small-logos/logo-invision.svg" class="avatar avatar-sm me-3" alt="filiere">
-                              </div>
                               <div class="d-flex flex-column justify-content-center">
                                 <h6 class="mb-0 text-sm"><?= $result->nom_matiere ?></h6>
                               </div>
@@ -635,18 +638,24 @@ try {
                           <td class="align-middle text-center text-sm">
                             <p class="text-xs font-weight-bold mb-0"><?= $result->code_matiere; ?></p>
                           </td>
+                          <td class="align-middle text-center text-sm">
+                            <p class="text-xs font-weight-bold mb-0"><?= $result->nom_filiere; ?></p>
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <p class="text-xs font-weight-bold mb-0"><?= intval($result->coefficient); ?></p>
+                          </td>
                           <td>
                             <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->statut; ?></p>
                           </td>
-                          <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0">
-                            <?= substr($result->description, 0, 20) . (strlen($result->description) > 20 ? '...' : ''); ?>
-                            </p>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->nombre_seance_semaine; ?></p>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->nombre_heures_semaine; ?></p>
                           </td>
                           <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0">
-                              <?php $date = new DateTime($result->annee_creation);
-                              echo $date->format('Y-m-d'); ?>
+                            <p class="text-xs font-weight-bold mb-0" title="<?= $result->description?>">
+                              <?= substr($result->description, 0, 20) . (strlen($result->description) > 20 ? '...' : ''); ?>
                             </p>
                           </td>
                           <td class="align-middle text-center d-flex">
@@ -661,7 +670,7 @@ try {
                             </a>
                           </td>
                         </tr>
-                            `);
+                      `);
               });
             } else {
               // Aucun résultat
