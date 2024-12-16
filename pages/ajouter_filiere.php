@@ -20,14 +20,10 @@ if (isset($_SESSION['last_action'])) {
 $_SESSION['last_action'] = time();
 
 
-$niveau1 = "SHOW COLUMNS FROM filiere LIKE 'niveau'";
-$stmt = $dbh->query($niveau1);
-$row = $stmt->fetch(PDO::FETCH_ASSOC);
+$sqlNiveau = "SELECT * FROM niveau";
+$stmt = $dbh->query($sqlNiveau);
+$AllNiveau = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$enum_values = [];
-if (preg_match("/^enum\((.*)\)$/", $row['Type'], $matches)) {
-  $enum_values = str_getcsv($matches[1], ',', "'");
-}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
   // Récupérer les données du formulaire
@@ -39,15 +35,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
   $nombre_heures_max = $_POST['nombre_heures_max'];
   $date_creation = $_POST['date_creation'] . ' ' . date('H:i:s');
 
-  if (!in_array($niveau, $enum_values)) {
-    die("Valeur non valide pour le champ 'niveau'.");
-  }
+
   // Préparer la requête d'insertion
   $sql = "INSERT INTO filiere (
-      nom_filiere, abriviation_filiere, code_filiere, description, niveau, 
+      nom_filiere,id_niveau, abriviation_filiere, code_filiere, description, 
       nombre_heures_max, date_creation
   ) VALUES (
-      :nom_filiere, :abriviation_filiere, :code_filiere, :description, :niveau, 
+      :nom_filiere, :id_niveau ,:abriviation_filiere, :code_filiere, :description, 
       :nombre_heures_max, :date_creation
   )";
 
@@ -56,10 +50,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
     $stmt = $dbh->prepare($sql);
     $stmt->execute([
       ':nom_filiere' => $nom_filiere,
+      ':id_niveau' => $niveau,
       ':abriviation_filiere' => $abriviation_filiere,
       ':code_filiere' => $code_filiere,
       ':description' => $description,
-      ':niveau' => $niveau,
       ':nombre_heures_max' => $nombre_heures_max,
       ':date_creation' => $date_creation,
     ]);
@@ -164,8 +158,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
                     <div class="form-group">
                       <label for="niveau" class="form-control-label">Niveau</label>
                       <select name="niveau" class="form-select" required>
-                        <?php foreach ($enum_values as $value) : ?>
-                          <option value="<?= htmlspecialchars($value) ?>"><?= htmlspecialchars($value) ?></option>
+                        <?php foreach ($AllNiveau as $value) : ?>
+                          <option value="<?= $value['id_niveau'] ?>"><?= $value['nom_niveau'] ?></option>
                         <?php endforeach; ?>
                       </select>
                     </div>
