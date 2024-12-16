@@ -487,7 +487,7 @@ try {
                             </td>
                           <?php } else { ?>
                             <td class="align-middle text-center text-sm">
-                              <span class="badge badge-sm bg-gradient-success">Inactive</span>
+                              <span class="badge badge-sm bg-gradient-secondary">Inactive</span>
                             </td>
                           <?php } ?>
                           <td class="align-middle text-center">
