@@ -8,7 +8,7 @@ require '../includes/DatabaseConnexion.php';
 
 if (isset($_GET['id'])) {
   $id = $_GET['id'];
-  $sql = "SELECT * FROM filiere WHERE id_filiere = :id";
+  $sql = "SELECT filiere.* , niveau.nom_niveau FROM filiere JOIN niveau ON niveau.id_niveau = filiere.id_niveau WHERE id_filiere = :id ";
   $stmt = $dbh->prepare($sql);
   try {
     $stmt->execute([':id' => $id]);
@@ -35,14 +35,10 @@ if (isset($_SESSION['last_action'])) {
 $_SESSION['last_action'] = time();
 
 
-$niveau = "SHOW COLUMNS FROM filiere LIKE 'niveau'";
-$stmt = $dbh->query($niveau);
-$row = $stmt->fetch(PDO::FETCH_ASSOC);
+$sqlNiveau = "SELECT * FROM niveau";
+$stmt = $dbh->query($sqlNiveau);
+$AllNiveau = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$enum_values = [];
-if (preg_match("/^enum\((.*)\)$/", $row['Type'], $matches)) {
-  $enum_values = str_getcsv($matches[1], ',', "'");
-}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
   // Récupérer les données du formulaire
@@ -55,18 +51,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
   $nombre_heures_max = $_POST['nombre_heures_max'];
   $date_creation = $_POST['date_creation'];
 
-  // Vérifier si la valeur de niveau est valide
-  if (!in_array($niveau, $enum_values)) {
-    die("Valeur non valide pour le champ 'niveau'.");
-  }
-
   // Préparer la requête de mise à jour
   $sql = "UPDATE filiere 
           SET nom_filiere = :nom_filiere, 
+              id_niveau = :id_niveau, 
               abriviation_filiere = :abriviation_filiere, 
               code_filiere = :code_filiere, 
               description = :description, 
-              niveau = :niveau, 
               nombre_heures_max = :nombre_heures_max, 
               date_creation = :date_creation,
               date_modification = NOW()
@@ -78,10 +69,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
     $stmt->execute([
       ':id_filiere' => $id_filiere,
       ':nom_filiere' => $nom_filiere,
+      ':id_niveau' => $niveau,
       ':abriviation_filiere' => $abriviation_filiere,
       ':code_filiere' => $code_filiere,
       ':description' => $description,
-      ':niveau' => $niveau,
       ':nombre_heures_max' => $nombre_heures_max,
       ':date_creation' => $date_creation,
     ]);
@@ -195,9 +186,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
                     <div class="form-group">
                       <label for="niveau" class="form-control-label">Niveau</label>
                       <select name="niveau" class="form-select" required>
-                        <?php foreach (array_unique($enum_values) as $value) : ?>
-                          <option value="<?= htmlspecialchars($value) ?>" <?= ($value === $filiere->niveau) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($value) ?>
+                        <?php foreach ($AllNiveau as $value) : ?>
+                          <option value="<?= $value['id_niveau'] ?>" <?= ($value['nom_niveau'] === $filiere->nom_niveau) ? 'selected' : '' ?>>
+                            <?= $value['nom_niveau'] ?>
                           </option>
                         <?php endforeach; ?>
                       </select>
