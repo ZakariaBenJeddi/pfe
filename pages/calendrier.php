@@ -755,79 +755,11 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
         }
     </script>
 
-    <!-- Exporter Excel -->
-    <script>
-        document.getElementById('export-btn').addEventListener('click', handleExportClick);
-
-        function handleExportClick() {
-
-        }
-
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-
-            if (!file) {
-                alert("Aucun fichier sélectionné.");
-                return;
-            }
-
-            if (file.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' &&
-                file.type !== 'application/vnd.ms-excel') {
-                alert("Veuillez sélectionner un fichier Excel valide.");
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const data = event.target.result;
-                const workbook = XLSX.read(data, {
-                    type: 'binary'
-                });
-
-                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                let jsonData = XLSX.utils.sheet_to_json(worksheet, {
-                    header: 1
-                });
-
-                // Filtrer les lignes vides
-                jsonData = jsonData.filter(row => row.length > 0);
-
-                console.log(jsonData);
-
-                fetch('insert_schedule.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(jsonData), // Les données à envoyer
-                    })
-                    .then(response => response.json()) // Attendre la réponse JSON du serveur
-                    .then(responseData => {
-                        // Afficher la réponse dans la console pour le débogage
-                        console.log('Réponse du serveur:', responseData);
-
-                        if (responseData.status === 'success') {
-                            alert(responseData.message);
-                        } else {
-                            alert(responseData.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Erreur lors de l\'importation :', error);
-                        alert('Une erreur est survenue lors de l\'importation.');
-                    });
-
-            };
-
-            reader.readAsBinaryString(file);
-        }
-    </script>
-
     <!--//TODO reload page pour 5s premiere chargement de page -->
     <script>
         window.onload = function() {
             const loadingScreen = document.getElementById('loading-screen');
-
+            timeReload = 10000
             // Affiche l'animation de chargement
             loadingScreen.style.display = 'flex';
 
@@ -835,7 +767,7 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
                 // Si la page n'a pas encore été rechargée
                 setTimeout(function() {
                     location.reload(); // Recharge la page
-                }, 10000); // Temps en millisecondes (2.55 secondes)
+                }, timeReload); // Temps en millisecondes
                 location.reload(); // Recharge la page
 
                 // Marque la page comme "déjà rechargée"
@@ -844,7 +776,7 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
                 // Cache l'animation après le chargement
                 setTimeout(function() {
                     loadingScreen.style.display = 'none';
-                }, 1000); // Cache l'animation après 1 seconde
+                }, timeReload); // Cache l'animation après 1 seconde
             }
         };
     </script>
