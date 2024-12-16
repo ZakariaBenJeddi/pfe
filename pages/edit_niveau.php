@@ -12,7 +12,7 @@ if (isset($_GET['id'])) {
   $stmt = $dbh->prepare($sql);
   try {
     $stmt->execute([':id' => $id]);
-    $niveau = $stmt->fetch(PDO::FETCH_OBJ);
+    $niveauSelected = $stmt->fetch(PDO::FETCH_OBJ);
   } catch (PDOException $e) {
     echo "Erreur lors de la récupération des données : " . $e->getMessage();
   }
@@ -34,20 +34,46 @@ if (isset($_SESSION['last_action'])) {
 }
 $_SESSION['last_action'] = time();
 
+// Récupérer les valeurs ENUM
+$sqlEnum = "SELECT COLUMN_TYPE 
+            FROM INFORMATION_SCHEMA.COLUMNS 
+            WHERE TABLE_NAME = 'niveau' AND COLUMN_NAME = 'statut'";
+$stmtEnum = $dbh->query($sqlEnum);
+$enumResult = $stmtEnum->fetch(PDO::FETCH_ASSOC);
+
+// Extraire les valeurs de l'ENUM
+$enumValues = [];
+if ($enumResult) {
+  preg_match("/^enum\('(.*)'\)$/", $enumResult['COLUMN_TYPE'], $matches);
+  if (isset($matches[1])) {
+    $enumValues = explode("','", $matches[1]);
+  }
+}
+
+// Récupérer le niveau actuel (exemple)
+$id = $_GET['id'] ?? null;
+$niveauStatut = null;
+
+if ($id) {
+  $sqlNiveau = "SELECT statut FROM niveau WHERE id_niveau = :id";
+  $stmtNiveau = $dbh->prepare($sqlNiveau);
+  $stmtNiveau->execute([':id' => $id]);
+  $niveau = $stmtNiveau->fetch(PDO::FETCH_OBJ);
+  $niveauStatut = $niveau ? $niveau->statut : null;
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
   // Récupérer les données du formulaire
   $id_niveau = $_POST['id_niveau']; // Identifiant du niveau à modifier
   $nom_niveau = $_POST['nom_niveau'];
   $description_niveau = $_POST['description_niveau'];
-  $nombre_heures = $_POST['nombre_heures'];
-
+  $statut = $_POST['statut'];
   // Préparer la requête SQL de mise à jour
   $sql = "UPDATE niveau 
           SET nom_niveau = :nom_niveau, 
-              description_niveau = :description_niveau, 
-              nombre_heures = :nombre_heures, 
-              date_modification = NOW()
+              description = :description_niveau, 
+              statut = :statut, 
+              date_creation = NOW()
           WHERE id_niveau = :id_niveau";
 
   try {
@@ -57,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
       ':id_niveau' => $id_niveau,
       ':nom_niveau' => $nom_niveau,
       ':description_niveau' => $description_niveau,
-      ':nombre_heures' => $nombre_heures,
+      ':statut' => $statut,
     ]);
 
     echo "<script>
@@ -133,29 +159,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="id_niveau" class="form-control-label">ID Niveau</label>
-                      <input class="form-control" type="text" readonly name="id_niveau" id="id_niveau" value="<?= $niveau->id_niveau ?>" required>
+                      <input class="form-control" type="text" readonly name="id_niveau" id="id_niveau" value="<?= $niveauSelected->id_niveau  ?>" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="nom_niveau" class="form-control-label">Nom du Niveau</label>
-                      <input class="form-control" type="text" name="nom_niveau" id="nom_niveau" value="<?= $niveau->nom_niveau ?>" required>
+                      <input class="form-control" type="text" name="nom_niveau" id="nom_niveau" value="<?= $niveauSelected->nom_niveau ?>" required>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="description_niveau" class="form-control-label">Description</label>
-                      <textarea class="form-control" name="description_niveau" id="description_niveau" required><?= $niveau->description ?></textarea>
+                      <textarea class="form-control" name="description_niveau" id="description_niveau" required><?= $niveauSelected->description ?></textarea>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="statut" class="form-control-label">Statut</label>
                       <select name="statut" class="form-select" required>
-                        <?php foreach ($AllStatut as $value) : ?>
-                          <option value="<?= $value['statut'] ?>" <?= ($value['statut'] === $niveau->statut) ? 'selected' : '' ?>>
-                            <?= $value['statut'] ?>
+                        <?php foreach ($enumValues as $value) : ?>
+                          <option value="<?= $value ?>" <?= ($value === $niveauStatut) ? 'selected' : '' ?>>
+                            <?= $value ?>
                           </option>
                         <?php endforeach; ?>
                       </select>
