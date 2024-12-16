@@ -173,6 +173,14 @@ try {
           <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Gestion Pédagogique</h6>
         </li>
         <li class="nav-item">
+          <a class="nav-link" href="../pages/niveau.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fa-solid fa-layer-group text-warning text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Niveau</span>
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" href="../pages/classes.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-building text-warning text-sm opacity-10"></i>
@@ -487,7 +495,7 @@ try {
                             <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->nombre_heures_semaine; ?></p>
                           </td>
                           <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0" title="<?= $result->description?>">
+                            <p class="text-xs font-weight-bold mb-0" title="<?= $result->description ?>">
                               <?= substr($result->description, 0, 20) . (strlen($result->description) > 20 ? '...' : ''); ?>
                             </p>
                           </td>
@@ -654,7 +662,7 @@ try {
                             <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->nombre_heures_semaine; ?></p>
                           </td>
                           <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0" title="<?= $result->description?>">
+                            <p class="text-xs font-weight-bold mb-0" title="<?= $result->description ?>">
                               <?= substr($result->description, 0, 20) . (strlen($result->description) > 20 ? '...' : ''); ?>
                             </p>
                           </td>

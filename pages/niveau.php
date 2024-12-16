@@ -19,6 +19,7 @@ if (isset($_SESSION['last_action'])) {
 }
 $_SESSION['last_action'] = time();
 
+//* select niveau interval date
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
   header('Content-Type: application/json');
   try {
@@ -40,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $end_date = date("Y-m-d", strtotime($end_date));
 
     // Requête SQL avec préparation
-    $sql = "SELECT filiere.* , niveau.nom_niveau FROM filiere JOIN niveau ON niveau.id_niveau = filiere.id_niveau 
+    $sql = "SELECT * from niveau
               WHERE date_creation BETWEEN :start_date AND :end_date
               ORDER BY date_creation DESC";
 
@@ -69,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
 //* read 
-$sql = "SELECT filiere.* , niveau.nom_niveau FROM filiere JOIN niveau ON niveau.id_niveau = filiere.id_niveau ";
+$sql = "SELECT * FROM  niveau";
 $query = $dbh->query($sql);
 $results = $query->fetchAll(PDO::FETCH_OBJ);
 
@@ -85,14 +86,14 @@ try {
       exit;
     }
 
-    $sql = "DELETE FROM filiere WHERE id_filiere = :id";
+    $sql = "DELETE FROM niveau WHERE id_niveau = :id";
     $query = $dbh->prepare($sql);
     $query->bindParam(':id', $id, PDO::PARAM_INT);
 
     if ($query->execute()) {
-      echo "<script>alert('Filiere Bien Supprimée');</script>";
+      echo "<script>alert('Niveau Bien Supprimée');</script>";
 
-      header("Location: filiere.php");
+      header("Location: niveau.php");
       exit;
     } else {
       //* Affichage d'un message d'erreur générique pour éviter de donner des détails à un attaquant
@@ -445,7 +446,7 @@ try {
               </div>
               <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
                 <input type="text" class="form-control w-100 w-md-auto mb-3" id="daterange" name="daterange" value="" />
-                <a class="btn btn-primary btn-sm" href="ajouter_filiere.php">Ajouter Filière</a>
+                <a class="btn btn-primary btn-sm" href="ajouter_niveau.php">Ajouter Niveau</a>
                 <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
               </div>
             </div>
@@ -454,10 +455,9 @@ try {
                 <table class="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nom Filière</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">code filière</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Niveau</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">nombre heures</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Niveau</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">description</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">statut</th>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">date creation</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
                     </tr>
@@ -472,19 +472,24 @@ try {
                                 <img src="../assets/img/small-logos/logo-invision.svg" class="avatar avatar-sm me-3" alt="filiere">
                               </div>
                               <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->nom_filiere ?></h6>
+                                <h6 class="mb-0 text-sm"><?= $result->nom_niveau ?></h6>
                               </div>
                             </div>
                           </td>
                           <td class="align-middle text-center text-sm">
-                            <p class="text-xs font-weight-bold mb-0"><?= $result->code_filiere; ?></p>
+                            <p class="text-xs font-weight-bold mb-0" title="<?= $result->description ?>">
+                              <?= substr($result->description, 0, 50) . (strlen($result->description) > 50 ? '...' : ''); ?>
+                            </p>
                           </td>
-                          <td>
-                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->nom_niveau; ?></p>
-                          </td>
-                          <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0"><?= $result->nombre_heures_max; ?></p>
-                          </td>
+                          <?php if ($result->statut === 'Active') { ?>
+                            <td class="align-middle text-center text-sm">
+                              <span class="badge badge-sm bg-gradient-success">Active</span>
+                            </td>
+                          <?php } else { ?>
+                            <td class="align-middle text-center text-sm">
+                              <span class="badge badge-sm bg-gradient-success">Inactive</span>
+                            </td>
+                          <?php } ?>
                           <td class="align-middle text-center">
                             <p class="text-xs font-weight-bold mb-0">
                               <?php $date = new DateTime($result->date_creation);
@@ -492,13 +497,13 @@ try {
                             </p>
                           </td>
                           <td class="align-middle text-center d-flex">
-                            <a href="edit_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
+                            <a href="edit_niveau.php?id=<?= $result->id_niveau ?>" class="dropdown-item">
                               <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                             </a>
-                            <a href="description_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
+                            <a href="description_niveau.php?id=<?= $result->id_niveau ?>" class="dropdown-item">
                               <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                             </a>
-                            <a href="filiere.php?id=<?= $result->id_filiere ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                            <a href="niveau.php?id=<?= $result->id_niveau ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
                               <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
                             </a>
                           </td>
@@ -526,11 +531,6 @@ try {
 
   <!-- Export Functio -->
   <script>
-    $(document).ready(function() {
-      $('table:first').DataTable(); // Initialiser DataTable pour la première table
-    });
-
-
     function expo() {
       // Obtenir l'instance de DataTable pour la première table
       var table = $('table:first').DataTable();
@@ -634,19 +634,24 @@ try {
                                 <img src="../assets/img/small-logos/logo-invision.svg" class="avatar avatar-sm me-3" alt="filiere">
                               </div>
                               <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->nom_filiere ?></h6>
+                                <h6 class="mb-0 text-sm"><?= $result->nom_niveau ?></h6>
                               </div>
                             </div>
                           </td>
                           <td class="align-middle text-center text-sm">
-                            <p class="text-xs font-weight-bold mb-0"><?= $result->code_filiere; ?></p>
+                            <p class="text-xs font-weight-bold mb-0" title="<?= $result->description ?>">
+                              <?= substr($result->description, 0, 50) . (strlen($result->description) > 50 ? '...' : ''); ?>
+                            </p>
                           </td>
-                          <td>
-                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->nom_niveau; ?></p>
-                          </td>
-                          <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0"><?= $result->nombre_heures_max; ?></p>
-                          </td>
+                          <?php if ($result->statut === 'Active') { ?>
+                            <td class="align-middle text-center text-sm">
+                              <span class="badge badge-sm bg-gradient-success">Active</span>
+                            </td>
+                          <?php } else { ?>
+                            <td class="align-middle text-center text-sm">
+                              <span class="badge badge-sm bg-gradient-success">Inactive</span>
+                            </td>
+                          <?php } ?>
                           <td class="align-middle text-center">
                             <p class="text-xs font-weight-bold mb-0">
                               <?php $date = new DateTime($result->date_creation);
@@ -654,13 +659,13 @@ try {
                             </p>
                           </td>
                           <td class="align-middle text-center d-flex">
-                            <a href="edit_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
+                            <a href="edit_niveau.php?id=<?= $result->id_niveau ?>" class="dropdown-item">
                               <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                             </a>
-                            <a href="description_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
+                            <a href="description_niveau.php?id=<?= $result->id_niveau ?>" class="dropdown-item">
                               <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                             </a>
-                            <a href="filiere.php?id=<?= $result->id_filiere ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                            <a href="niveau.php?id=<?= $result->id_niveau ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
                               <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
                             </a>
                           </td>
@@ -671,7 +676,7 @@ try {
               // Aucun résultat
               tableBody.append(`
                             <tr>
-                                <td colspan="8" class="text-center">Aucune Filiere trouvée pour cette période</td>
+                                <td colspan="5" class="text-center">Aucune Niveau trouvée pour cette période</td>
                             </tr>
                         `);
             }
@@ -681,7 +686,7 @@ try {
             console.error('Erreur de requête:', xhr);
             tableBody.html(`
                         <tr>
-                            <td colspan="9" class="text-center text-danger">
+                            <td colspan="5" class="text-center text-danger">
                                 Erreur lors de la récupération des données
                             </td>
                         </tr>
