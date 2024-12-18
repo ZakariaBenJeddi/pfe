@@ -1,0 +1,6 @@
+projectKey=Gestionecole
+serverUrl=http://localhost:9000
+serverVersion=24.12.0.100206
+dashboardUrl=http://localhost:9000/dashboard?id=Gestionecole
+ceTaskId=15f027bf-01db-46eb-8fca-6d97ad71edae
+ceTaskUrl=http://localhost:9000/api/ce/task?id=15f027bf-01db-46eb-8fca-6d97ad71edae

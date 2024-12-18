@@ -172,7 +172,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="description_niveau" class="form-control-label">Description</label>
-                      <textarea class="form-control" name="description_niveau" id="description_niveau" required><?= $niveauSelected->description ?></textarea>
+                      <textarea rows="5" cols="33" class="form-control" name="description_niveau" id="description_niveau" required><?= $niveauSelected->description ?></textarea>
                     </div>
                   </div>
                   <div class="col-md-6">
