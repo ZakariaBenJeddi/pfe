@@ -19,6 +19,21 @@ if (isset($_SESSION['last_action'])) {
 }
 $_SESSION['last_action'] = time();
 
+$idNiveauSelection = $_GET['id'];
+$nbr_classe = "SELECT COUNT(niveau_id) FROM classe WHERE niveau_id = :idNiveau" ;
+$stmtClasse = $dbh->prepare($nbr_classe);
+$stmtClasse->execute([
+  ':idNiveau' => $idNiveauSelection
+]);
+$nbrClasses = $stmtClasse->fetchColumn();
+
+$nbr_filiere = "SELECT COUNT(id_niveau) FROM filiere WHERE id_niveau = :idNiveau" ;
+$stmtFiliere = $dbh->prepare($nbr_filiere);
+$stmtFiliere->execute([
+  ':idNiveau' => $idNiveauSelection
+]);
+$nbrFiliere = $stmtFiliere->fetchColumn();
+
 if (isset($_GET['id'])) {
   $id_niveau = isset($_GET['id']) ? $_GET['id'] : null;
   if ($id_niveau && filter_var($id_niveau, FILTER_VALIDATE_INT)) {
@@ -384,7 +399,8 @@ if (isset($_GET['id'])) {
                   background-position: center;">
                   <span class="mask bg-gradient-dark"></span>
                   <div class="card-body position-relative z-index-1 p-3">
-                    <i class="fas fa-building text-white p-2">&nbsp;&nbsp;<?= $results[0]->nom_salle ?></i>
+                    <i class="fas fa-building text-white p-2">&nbsp;&nbsp;<?php // $results[0]->nom_salle 
+                                                                          ?></i>
                     <h5 class="text-white mt-4 mb-5 pb-2">
                       <!-- 4562&nbsp;&nbsp;&nbsp;1122&nbsp;&nbsp;&nbsp;4594&nbsp;&nbsp;&nbsp;7852 -->
                     </h5>
@@ -395,8 +411,10 @@ if (isset($_GET['id'])) {
                           <h6 class="text-white mb-0">Capacite</h6>
                         </div>
                         <div>
-                          <p class="text-white mb-0"><?= $results[0]->etage ?> &nbsp;&nbsp;&nbsp;<i class="fas fa-map"></i></p>
-                          <h6 class="text-white mb-0"><?= $results[0]->capacite_salle ?> &nbsp;<i class="fas fa-users"></i></h6>
+                          <p class="text-white mb-0"><?php // $results[0]->etage 
+                                                      ?> &nbsp;&nbsp;&nbsp;<i class="fas fa-map"></i></p>
+                          <h6 class="text-white mb-0"><?php // $results[0]->capacite_salle 
+                                                      ?> &nbsp;<i class="fas fa-users"></i></h6>
                         </div>
                       </div>
                     </div>
@@ -447,10 +465,26 @@ if (isset($_GET['id'])) {
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
                       <h6 class="text-center mb-0">Tableau</h6>
-                      <span class="text-xs">Tableau marquere</span>
+                      <span class="text-xs">Tableau marquere </span>
                       <hr class="horizontal dark my-3">
-                      <!-- <h5 class="mb-0"><?php // $results[0]->description ?> </h5> -->
-                      <p title="<?= $result[0]->description ?>"><?= substr($result[0]->description, 0, 50) . (strlen($result[0]->description) > 50 ? '...' : ''); ?></p>
+                      <span class="text-xs" style="cursor: pointer;" title="<?= $results[0]->description ?>" data-bs-toggle="modal" data-bs-target="#exampleModal"><?= substr($results[0]->description, 0, 38) . (strlen($results[0]->description) > 38 ? '...' : ''); ?></span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="text-center">
+                        <h5 class="modal-title" id="exampleModalLabel">Description Niveau</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="text-center mt-2">
+                        <?= $results[0]->description ?>
+                      </div>
+                      <div class="text-center">
+                        <button type="button" class="btn btn-secondary mt-5" data-bs-dismiss="modal">Close</button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -462,10 +496,10 @@ if (isset($_GET['id'])) {
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
-                      <h6 class="text-center mb-0">Climat</h6>
-                      <span class="text-xs">salle climatise</span>
+                      <h6 class="text-center mb-0">Date</h6>
+                      <span class="text-xs">Date Creation</span>
                       <hr class="horizontal dark my-3">
-                      <h5 class="mb-0"><?php // $results[0]->est_climatisee ?></h5>
+                      <h5 class="mb-0"><?= $results[0]->date_creation ?></h5>
                     </div>
                   </div>
                 </div>
@@ -475,100 +509,23 @@ if (isset($_GET['id'])) {
           <div class="row"> <!-- Delete this ligne if something wrong-->
             <div class="col-md-8 mb-lg-0 mb-4">
               <div class="card mt-4">
-                <div class="card-header pb-0 p-3">
-                  <div class="row">
-                    <div class="col-6 d-flex align-items-center">
-                      <h6 class="mb-0">Nombre de Classe Dans ce Niveau</h6>&nbsp;&nbsp;<i class="fas fa-users text-primary"></i>
+                <div class="row">
+                  <div class="col-6">
+                    <div class="card-header pb-0 p-3">
+                      <h6 class="col-12 mb-0">Nombre de Classe Dans ce Niveau</h6>&nbsp;<i class="fa-solid fa-layer-group text-warning text-sm opacity-10"></i>
+                      <i class="ni ni-building text-warning text-sm opacity-10"></i>
+                    </div>
+                    <div class="card-body p-3 text-center">
+                      <h4><?= $nbrClasses ?></h4>
                     </div>
                   </div>
-                </div>
-                <div class="card-body p-3">
-                  <div class="row">
-                    <div class="col-md-6 mb-md-0 ">
-                      <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0">
-                          <tbody>
-                            <tr>
-                              <td>
-                                <div class="d-flex px-2 py-1">
-                                  <div>
-                                    <img src="../assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
-                                  </div>
-                                  <div class="d-flex flex-column justify-content-center">
-                                    <h6 class="mb-0 text-sm">John Michael</h6>
-                                    <p class="text-xs text-secondary mb-0">john@creative-tim.com</p>
-                                  </div>
-                                </div>
-                              </td>
-                              <td>
-                                <p class="text-xs font-weight-bold mb-0">Manager</p>
-                                <p class="text-xs text-secondary mb-0">Organization</p>
-                              </td>
-
-                            </tr>
-                            <tr>
-                              <td>
-                                <div class="d-flex px-2 py-1">
-                                  <div>
-                                    <img src="../assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
-                                  </div>
-                                  <div class="d-flex flex-column justify-content-center">
-                                    <h6 class="mb-0 text-sm">John Michael</h6>
-                                    <p class="text-xs text-secondary mb-0">john@creative-tim.com</p>
-                                  </div>
-                                </div>
-                              </td>
-                              <td>
-                                <p class="text-xs font-weight-bold mb-0">Manager</p>
-                                <p class="text-xs text-secondary mb-0">Organization</p>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
+                  <div class="col-6">
+                    <div class="card-header pb-0 p-3">
+                      <h6 class="col-12 mb-0">Nombre de Filiere Dans ce Niveau</h6>&nbsp;&nbsp;<i class="fa-solid fa-layer-group text-warning text-sm opacity-10"></i>
+                      <i class="ni ni-books text-warning text-sm opacity-10"></i>
                     </div>
-                    <div class="col-md-6 mb-md-0 mb-4">
-                      <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0">
-                          <tbody>
-                            <tr>
-                              <td>
-                                <div class="d-flex px-2 py-1">
-                                  <div>
-                                    <img src="../assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
-                                  </div>
-                                  <div class="d-flex flex-column justify-content-center">
-                                    <h6 class="mb-0 text-sm">John Michael</h6>
-                                    <p class="text-xs text-secondary mb-0">john@creative-tim.com</p>
-                                  </div>
-                                </div>
-                              </td>
-                              <td>
-                                <p class="text-xs font-weight-bold mb-0">Manager</p>
-                                <p class="text-xs text-secondary mb-0">Organization</p>
-                              </td>
-
-                            </tr>
-                            <tr>
-                              <td>
-                                <div class="d-flex px-2 py-1">
-                                  <div>
-                                    <img src="../assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
-                                  </div>
-                                  <div class="d-flex flex-column justify-content-center">
-                                    <h6 class="mb-0 text-sm">John Michael</h6>
-                                    <p class="text-xs text-secondary mb-0">john@creative-tim.com</p>
-                                  </div>
-                                </div>
-                              </td>
-                              <td>
-                                <p class="text-xs font-weight-bold mb-0">Manager</p>
-                                <p class="text-xs text-secondary mb-0">Organization</p>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
+                    <div class="card-body p-3 text-center">
+                      <h4><?= $nbrFiliere ?></h4>
                     </div>
                   </div>
                 </div>
