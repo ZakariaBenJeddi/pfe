@@ -10,76 +10,76 @@ session_start();
 
 //** Vérification de l'authentification de l'utilisateur
 if (empty($_SESSION['user'])) {
-    header('location:sign-in.php');
-    exit();
+  header('location:sign-in.php');
+  exit();
 }
 
 //** Déconnexion après inactivité
 $inactivity_limit = 300; // 5 minutes
 if (isset($_SESSION['last_action'])) {
-    $inactivity_duration = time() - $_SESSION['last_action'];
-    if ($inactivity_duration > $inactivity_limit) {
-        session_unset();
-        session_destroy();
-        header("Location: logout.php");
-        exit();
-    }
+  $inactivity_duration = time() - $_SESSION['last_action'];
+  if ($inactivity_duration > $inactivity_limit) {
+    session_unset();
+    session_destroy();
+    header("Location: logout.php");
+    exit();
+  }
 }
 $_SESSION['last_action'] = time(); // Mise à jour du timestamp
 
 $idFiliereSelection = $_GET['id'];
-$nbr_classe = "SELECT COUNT(filiere_id) FROM classe WHERE filiere_id = :idFiliere" ;
+$nbr_classe = "SELECT COUNT(id_classe) FROM classe WHERE filiere_id = :idFiliere";
 $stmtClasse = $dbh->prepare($nbr_classe);
 $stmtClasse->execute([
   ':idFiliere' => $idFiliereSelection
 ]);
 $nbrClasses = $stmtClasse->fetchColumn();
 
-// $nbr_niveau = "SELECT COUNT(id_filiere) FROM niveau WHERE id_niveau = :idNiveau" ;
-// $stmtNiveau = $dbh->prepare($nbr_niveau);
-// $stmtNiveau->execute([
-//   ':idNiveau' => $idFiliereSelection
-// ]);
-// $nbrNiveau = $stmtNiveau->fetchColumn();
+$nbr_niveau = "SELECT COUNT(DISTINCT niveau_id) FROM classe WHERE filiere_id = :idFiliere";
+$stmtNiveau = $dbh->prepare($nbr_niveau);
+$stmtNiveau->execute([
+  ':idFiliere' => $idFiliereSelection
+]);
+$nbrNiveau = $stmtNiveau->fetchColumn();
 
 
 //** Validation de l'ID passé dans l'URL
 if (isset($_GET['id'])) {
-    $id_filiere = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); // Validation stricte
-    if ($id_filiere === false || $id_filiere === null) {
-        // ID invalide, redirige vers la liste des filières
-        header('location:filiere.php');
-        exit();
-    }
-
-    // Préparer et exécuter la requête pour éviter les injections SQL
-    try {
-        $sql = "SELECT * FROM filiere WHERE id_filiere = :id_filiere";
-        $query = $dbh->prepare($sql);
-        $query->bindParam(':id_filiere', $id_filiere, PDO::PARAM_INT);
-        $query->execute();
-        $results = $query->fetch(PDO::FETCH_OBJ);
-        if (!$results) {
-            // Aucun résultat trouvé, rediriger
-            header('location:filiere.php');
-            exit();
-        }
-    } catch (PDOException $e) {
-        // Journaliser l'erreur (ne pas afficher les détails directement)
-        error_log("Erreur SQL : " . $e->getMessage());
-        header('location:error.php');
-        exit();
-    }
-} else {
-    // Redirection si aucun ID fourni
+  $id_filiere = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); // Validation stricte
+  if ($id_filiere === false || $id_filiere === null) {
+    // ID invalide, redirige vers la liste des filières
     header('location:filiere.php');
     exit();
+  }
+
+  // Préparer et exécuter la requête pour éviter les injections SQL
+  try {
+    $sql = "SELECT * FROM filiere WHERE id_filiere = :id_filiere";
+    $query = $dbh->prepare($sql);
+    $query->bindParam(':id_filiere', $id_filiere, PDO::PARAM_INT);
+    $query->execute();
+    $results = $query->fetch(PDO::FETCH_OBJ);
+    if (!$results) {
+      // Aucun résultat trouvé, rediriger
+      header('location:filiere.php');
+      exit();
+    }
+  } catch (PDOException $e) {
+    // Journaliser l'erreur (ne pas afficher les détails directement)
+    error_log("Erreur SQL : " . $e->getMessage());
+    header('location:error.php');
+    exit();
+  }
+} else {
+  // Redirection si aucun ID fourni
+  header('location:filiere.php');
+  exit();
 }
 
 // Fonction pour échapper les données avant de les afficher (protection XSS)
 function escape($data)
 {
-    return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+  return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
 }
 ?>
 
@@ -426,28 +426,21 @@ function escape($data)
           <div class="row">
             <div class="col-xl-4 mb-xl-0 mb-4">
               <div class="card bg-transparent shadow-xl">
-                <div class="overflow-hidden position-relative border-radius-xl" style="background-image: url('../assets/img/school/salle/salle1.jpg');
+                <div class="overflow-hidden position-relative border-radius-xl" style="background-image: url('../assets/img/school/filiere/filiere.png');
                   background-repeat: no-repeat; 
-                  background-size: cover;
+                  background-size: contain;
                   background-position: center;">
                   <span class="mask bg-gradient-dark"></span>
                   <div class="card-body position-relative z-index-1 p-3">
-                    <i class="fas fa-building text-white p-2">&nbsp;&nbsp;<?php // $results->nom_salle 
-                                                                          ?></i>
-                    <h5 class="text-white mt-4 mb-5 pb-2">
-                      <!-- 4562&nbsp;&nbsp;&nbsp;1122&nbsp;&nbsp;&nbsp;4594&nbsp;&nbsp;&nbsp;7852 -->
-                    </h5>
+                    <i class="fas fa-university text-white p-2">&nbsp;&nbsp;<?= $results->nom_filiere ?></i>
+                    <h5 class="text-white mt-4 mb-5 pb-2"></h5>
                     <div class="d-flex">
                       <div class="d-flex">
                         <div class="me-4">
-                          <p class="text-white mb-0">Etage</p>
-                          <h6 class="text-white mb-0">Capacite</h6>
                         </div>
                         <div>
-                          <p class="text-white mb-0"><?php // $results->etage 
-                                                      ?> &nbsp;&nbsp;&nbsp;<i class="fas fa-map"></i></p>
-                          <h6 class="text-white mb-0"><?php // $results->capacite_salle 
-                                                      ?> &nbsp;<i class="fas fa-users"></i></h6>
+                          <p class="text-white mb-0"><?php // $results->etage ?> &nbsp;&nbsp;&nbsp;<!-- <i class="fas fa-map"></i></p> -->
+                          <h6 class="text-white mb-0"><?php // $results->capacite_salle ?> &nbsp;<!-- <i class="fas fa-users"></i></h6> -->
                         </div>
                       </div>
                     </div>
@@ -461,7 +454,7 @@ function escape($data)
                   <div class="card">
                     <div class="card-header mx-4 p-3 text-center">
                       <div class="icon icon-shape  icon-lg bg-gradient-primary shadow text-center border-radius-lg cursor-pointer">
-                        <i class="fas fa-chair icon-container" style="transition: transform 0.4s ease; "></i>
+                        <i class="ni ni-books icon-container" style="transition: transform 0.4s ease; "></i>
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
@@ -476,13 +469,12 @@ function escape($data)
                   <div class="card">
                     <div class="card-header mx-4 p-3 text-center">
                       <div class="icon icon-shape icon-lg bg-gradient-primary shadow text-center border-radius-lg cursor-pointer">
-                        <!-- <i class="fab fa-paypal opacity-10 " ></i> -->
-                        <i class="fas fa-video icon-container" style="transition: transform 0.4s ease;"></i>
+                        <i class="fas fa-barcode icon-container" style="transition: transform 0.4s ease;"></i>
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
-                      <h6 class="text-center mb-0">Statut</h6>
-                      <span class="text-xs">Statut Niveau</span>
+                      <h6 class="text-center mb-0">Code</h6>
+                      <span class="text-xs">Code Filiere</span>
                       <hr class="horizontal dark my-3">
                       <h5 class="mb-0"><?= $results->code_filiere ?> </h5>
                     </div>
@@ -492,8 +484,7 @@ function escape($data)
                   <div class="card">
                     <div class="card-header mx-4 p-3 text-center">
                       <div class="icon icon-shape icon-lg bg-gradient-primary shadow text-center border-radius-lg  cursor-pointer">
-                        <!-- <i class="fas fa-chalkboard"></i> -->
-                        <i class="fas fa-chalkboard-teacher icon-container" style="transition: transform 0.4s ease;"></i>
+                        <i class="fas fa-info-circle icon-container" style="transition: transform 0.4s ease;"></i>
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
@@ -525,7 +516,7 @@ function escape($data)
                   <div class="card">
                     <div class="card-header mx-4 p-3 text-center">
                       <div class="icon icon-shape icon-lg bg-gradient-primary shadow text-center border-radius-lg cursor-pointer">
-                        <i class="fas fa-wind icon-container" style="transition: transform 0.4s ease; "></i>
+                        <i class="fas fa-calendar icon-container" style="transition: transform 0.4s ease; "></i>
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
@@ -554,11 +545,11 @@ function escape($data)
                   </div>
                   <div class="col-6">
                     <div class="card-header pb-0 p-3">
-                      <h6 class="col-12 mb-0">Nombre de Filiere Dans ce Niveau</h6>&nbsp;&nbsp;<i class="fa-solid fa-layer-group text-warning text-sm opacity-10"></i>
+                      <h6 class="col-12 mb-0">Nombre de Niveau Dans cette Filiere </h6>&nbsp;&nbsp;<i class="fa-solid fa-layer-group text-warning text-sm opacity-10"></i>
                       <i class="ni ni-books text-warning text-sm opacity-10"></i>
                     </div>
                     <div class="card-body p-3 text-center">
-                      <h4><?php // $nbrFiliere ?></h4>
+                      <h4><?= $nbrNiveau ?></h4>
                     </div>
                   </div>
                 </div>
@@ -584,7 +575,7 @@ function escape($data)
         <div class="col-md-8 mt-4">
           <div class="card">
             <div class="card-header pb-0 px-3">
-              <h6 class="mb-0">Billing Information</h6>
+              <button class="btn btn-primary brn-rounded">Afficher l'emploi du temps de cette Filiere </button>
             </div>
             <div class="card-body pt-4 p-3">
               <ul class="list-group">

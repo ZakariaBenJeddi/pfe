@@ -20,14 +20,14 @@ if (isset($_SESSION['last_action'])) {
 $_SESSION['last_action'] = time();
 
 $idNiveauSelection = $_GET['id'];
-$nbr_classe = "SELECT COUNT(niveau_id) FROM classe WHERE niveau_id = :idNiveau" ;
+$nbr_classe = "SELECT COUNT(niveau_id) FROM classe WHERE niveau_id = :idNiveau";
 $stmtClasse = $dbh->prepare($nbr_classe);
 $stmtClasse->execute([
   ':idNiveau' => $idNiveauSelection
 ]);
 $nbrClasses = $stmtClasse->fetchColumn();
 
-$nbr_filiere = "SELECT COUNT(id_niveau) FROM filiere WHERE id_niveau = :idNiveau" ;
+$nbr_filiere = "SELECT COUNT(id_niveau) FROM filiere WHERE id_niveau = :idNiveau";
 $stmtFiliere = $dbh->prepare($nbr_filiere);
 $stmtFiliere->execute([
   ':idNiveau' => $idNiveauSelection
@@ -393,28 +393,23 @@ if (isset($_GET['id'])) {
           <div class="row">
             <div class="col-xl-4 mb-xl-0 mb-4">
               <div class="card bg-transparent shadow-xl">
-                <div class="overflow-hidden position-relative border-radius-xl" style="background-image: url('../assets/img/school/salle/salle1.jpg');
-                  background-repeat: no-repeat; 
-                  background-size: cover;
-                  background-position: center;">
+                <div class="overflow-hidden position-relative border-radius-xl" style="background-image: url('../assets/img/school/niveau/niveau.jpeg');
+                    background-repeat: no-repeat; 
+                    background-size: contain;
+                    background-position: center;">
                   <span class="mask bg-gradient-dark"></span>
                   <div class="card-body position-relative z-index-1 p-3">
-                    <i class="fas fa-building text-white p-2">&nbsp;&nbsp;<?php // $results[0]->nom_salle 
+                    <i class="fas fa-building text-white p-2">&nbsp;&nbsp;<?= $results[0]->nom_niveau
                                                                           ?></i>
-                    <h5 class="text-white mt-4 mb-5 pb-2">
-                      <!-- 4562&nbsp;&nbsp;&nbsp;1122&nbsp;&nbsp;&nbsp;4594&nbsp;&nbsp;&nbsp;7852 -->
-                    </h5>
+                    <h5 class="text-white mt-4 mb-5 pb-2"></h5>
                     <div class="d-flex">
                       <div class="d-flex">
-                        <div class="me-4">
-                          <p class="text-white mb-0">Etage</p>
-                          <h6 class="text-white mb-0">Capacite</h6>
-                        </div>
+                        <div class="me-4"></div>
                         <div>
                           <p class="text-white mb-0"><?php // $results[0]->etage 
-                                                      ?> &nbsp;&nbsp;&nbsp;<i class="fas fa-map"></i></p>
+                                                      ?> &nbsp;&nbsp;&nbsp;<!-- <i class="fas fa-map"></i></p> -->
                           <h6 class="text-white mb-0"><?php // $results[0]->capacite_salle 
-                                                      ?> &nbsp;<i class="fas fa-users"></i></h6>
+                                                      ?> &nbsp;<!-- <i class="fas fa-users"></i></h6> -->
                         </div>
                       </div>
                     </div>
@@ -428,7 +423,7 @@ if (isset($_GET['id'])) {
                   <div class="card">
                     <div class="card-header mx-4 p-3 text-center">
                       <div class="icon icon-shape  icon-lg bg-gradient-primary shadow text-center border-radius-lg cursor-pointer">
-                        <i class="fas fa-chair icon-container" style="transition: transform 0.4s ease; "></i>
+                        <i class="fa-solid fa-layer-group icon-container" style="transition: transform 0.4s ease; "></i>
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
@@ -442,30 +437,13 @@ if (isset($_GET['id'])) {
                 <div class="col-md-3 mt-md-0 mt-4">
                   <div class="card">
                     <div class="card-header mx-4 p-3 text-center">
-                      <div class="icon icon-shape icon-lg bg-gradient-primary shadow text-center border-radius-lg cursor-pointer">
-                        <!-- <i class="fab fa-paypal opacity-10 " ></i> -->
-                        <i class="fas fa-video icon-container" style="transition: transform 0.4s ease;"></i>
-                      </div>
-                    </div>
-                    <div class="card-body pt-0 p-3 text-center">
-                      <h6 class="text-center mb-0">Statut</h6>
-                      <span class="text-xs">Statut Niveau</span>
-                      <hr class="horizontal dark my-3">
-                      <h5 class="mb-0"><?= $results[0]->nom_niveau ?> </h5>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-3 mt-md-0 mt-4">
-                  <div class="card">
-                    <div class="card-header mx-4 p-3 text-center">
                       <div class="icon icon-shape icon-lg bg-gradient-primary shadow text-center border-radius-lg  cursor-pointer">
-                        <!-- <i class="fas fa-chalkboard"></i> -->
-                        <i class="fas fa-chalkboard-teacher icon-container" style="transition: transform 0.4s ease;"></i>
+                        <i class="fas fa-info-circle icon-container" style="transition: transform 0.4s ease;"></i>
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
-                      <h6 class="text-center mb-0">Tableau</h6>
-                      <span class="text-xs">Tableau marquere </span>
+                      <h6 class="text-center mb-0">Description</h6>
+                      <span class="text-xs">Description Niveau </span>
                       <hr class="horizontal dark my-3">
                       <span class="text-xs" style="cursor: pointer;" title="<?= $results[0]->description ?>" data-bs-toggle="modal" data-bs-target="#exampleModal"><?= substr($results[0]->description, 0, 38) . (strlen($results[0]->description) > 38 ? '...' : ''); ?></span>
                     </div>
@@ -492,13 +470,30 @@ if (isset($_GET['id'])) {
                   <div class="card">
                     <div class="card-header mx-4 p-3 text-center">
                       <div class="icon icon-shape icon-lg bg-gradient-primary shadow text-center border-radius-lg cursor-pointer">
-                        <i class="fas fa-wind icon-container" style="transition: transform 0.4s ease; "></i>
+                        <i class="fas fa-check-circle icon-container" style="transition: transform 0.4s ease;"></i>
+                      </div>
+                    </div>
+                    <div class="card-body pt-0 p-3 text-center">
+                      <h6 class="text-center mb-0">Statut</h6>
+                      <span class="text-xs">Statut Niveau</span>
+                      <hr class="horizontal dark my-3">
+                      <br>
+                      <h5 class="mb-0"><?= $results[0]->statut ?> </h5>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3 mt-md-0 mt-4">
+                  <div class="card">
+                    <div class="card-header mx-4 p-3 text-center">
+                      <div class="icon icon-shape icon-lg bg-gradient-primary shadow text-center border-radius-lg cursor-pointer">
+                        <i class="fas fa-calendar icon-container" style="transition: transform 0.4s ease; "></i>
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
                       <h6 class="text-center mb-0">Date</h6>
                       <span class="text-xs">Date Creation</span>
                       <hr class="horizontal dark my-3">
+                      <br>
                       <h5 class="mb-0"><?= $results[0]->date_creation ?></h5>
                     </div>
                   </div>
@@ -551,7 +546,7 @@ if (isset($_GET['id'])) {
         <div class="col-md-8 mt-4">
           <div class="card">
             <div class="card-header pb-0 px-3">
-              <h6 class="mb-0">Billing Information</h6>
+              <button class="btn btn-primary brn-rounded">Afficher l'emploi du temps de ce Niveau</button>
             </div>
             <div class="card-body pt-4 p-3">
               <ul class="list-group">

@@ -76,6 +76,29 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
 
 ?>
 
+<?php
+function detectDevice() {
+    $userAgent = $_SERVER['HTTP_USER_AGENT'];
+
+    // Vérification pour détecter les appareils mobiles
+    if (preg_match('/mobile/i', $userAgent)) {
+        return 'mobile';
+    } elseif (preg_match('/tablet/i', $userAgent)) {
+        return 'tablet';
+    } else {
+        return 'desktop';
+    }
+}
+
+$device = detectDevice();
+?>
+
+<script type="text/javascript">
+    // Affichage de l'alerte avec le type d'appareil
+    alert("L'utilisateur utilise un appareil: <?php echo $device; ?>");
+</script>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -173,7 +196,7 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-
+        /* Style pour la version PC */
         @keyframes spin {
             0% {
                 transform: rotate(0deg);
@@ -805,6 +828,7 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
             });
         });
     </script>
+    <!-- //TODO changer l'affichage de calendrier si utilisateur entrer avec le telephone -->
 </body>
 <script>
     var scheds = $.parseJSON('<?= json_encode($sched_res) ?>')
