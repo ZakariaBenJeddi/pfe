@@ -8,80 +8,86 @@ ini_set('session.use_strict_mode', 1); // Empêche l'utilisation de sessions non
 
 session_start();
 
+//** Activer le verrouillage des sessions (réduction des risques de fixation de session)
+if (!isset($_SESSION['initialized'])) {
+    session_regenerate_id(true);
+    $_SESSION['initialized'] = true;
+}
+
 //** Vérification de l'authentification de l'utilisateur
 if (empty($_SESSION['user'])) {
-  header('location:sign-in.php');
-  exit();
+    header('location:sign-in.php');
+    exit();
+}
+
+//** Protection contre les attaques CSRF
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        header('location:error.php');
+        exit();
+    }
+}
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 //** Déconnexion après inactivité
 $inactivity_limit = 300; // 5 minutes
 if (isset($_SESSION['last_action'])) {
-  $inactivity_duration = time() - $_SESSION['last_action'];
-  if ($inactivity_duration > $inactivity_limit) {
-    session_unset();
-    session_destroy();
-    header("Location: logout.php");
-    exit();
-  }
+    $inactivity_duration = time() - $_SESSION['last_action'];
+    if ($inactivity_duration > $inactivity_limit) {
+        session_unset();
+        session_destroy();
+        header("Location: logout.php");
+        exit();
+    }
 }
 $_SESSION['last_action'] = time(); // Mise à jour du timestamp
 
-$idFiliereSelection = $_GET['id'];
-$nbr_classe = "SELECT COUNT(id_classe) FROM classe WHERE filiere_id = :idFiliere";
-$stmtClasse = $dbh->prepare($nbr_classe);
-$stmtClasse->execute([
-  ':idFiliere' => $idFiliereSelection
-]);
-$nbrClasses = $stmtClasse->fetchColumn();
-
-$nbr_niveau = "SELECT COUNT(DISTINCT niveau_id) FROM classe WHERE filiere_id = :idFiliere";
-$stmtNiveau = $dbh->prepare($nbr_niveau);
-$stmtNiveau->execute([
-  ':idFiliere' => $idFiliereSelection
-]);
-$nbrNiveau = $stmtNiveau->fetchColumn();
-
-
 //** Validation de l'ID passé dans l'URL
 if (isset($_GET['id'])) {
-  $id_filiere = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); // Validation stricte
-  if ($id_filiere === false || $id_filiere === null) {
-    // ID invalide, redirige vers la liste des filières
+    $id_filiere = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); // Validation stricte
+    if ($id_filiere === false || $id_filiere === null) {
+        header('location:filiere.php');
+        exit();
+    }
+    try {
+        $sql = "SELECT * FROM filiere WHERE id_filiere = :id_filiere";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':id_filiere', $id_filiere, PDO::PARAM_INT);
+        $query->execute();
+        $results = $query->fetch(PDO::FETCH_OBJ);
+        if (!$results) {
+            header('location:filiere.php');
+            exit();
+        }
+        $nbr_classe = "SELECT COUNT(id_classe) FROM classe WHERE filiere_id = :idFiliere";
+        $stmtClasse = $dbh->prepare($nbr_classe);
+        $stmtClasse->execute([':idFiliere' => $id_filiere]);
+        $nbrClasses = $stmtClasse->fetchColumn();
+
+        $nbr_niveau = "SELECT COUNT(DISTINCT niveau_id) FROM classe WHERE filiere_id = :idFiliere";
+        $stmtNiveau = $dbh->prepare($nbr_niveau);
+        $stmtNiveau->execute([':idFiliere' => $id_filiere]);
+        $nbrNiveau = $stmtNiveau->fetchColumn();
+    } catch (PDOException $e) {
+        error_log("Erreur SQL : " . $e->getMessage());
+        header('location:error.php');
+        exit();
+    }
+} else {
+    // Redirection si aucun ID fourni
     header('location:filiere.php');
     exit();
-  }
-
-  // Préparer et exécuter la requête pour éviter les injections SQL
-  try {
-    $sql = "SELECT * FROM filiere WHERE id_filiere = :id_filiere";
-    $query = $dbh->prepare($sql);
-    $query->bindParam(':id_filiere', $id_filiere, PDO::PARAM_INT);
-    $query->execute();
-    $results = $query->fetch(PDO::FETCH_OBJ);
-    if (!$results) {
-      // Aucun résultat trouvé, rediriger
-      header('location:filiere.php');
-      exit();
-    }
-  } catch (PDOException $e) {
-    // Journaliser l'erreur (ne pas afficher les détails directement)
-    error_log("Erreur SQL : " . $e->getMessage());
-    header('location:error.php');
-    exit();
-  }
-} else {
-  // Redirection si aucun ID fourni
-  header('location:filiere.php');
-  exit();
 }
 
 // Fonction pour échapper les données avant de les afficher (protection XSS)
 function escape($data)
 {
-  return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
 }
 ?>
+
 
 
 <!DOCTYPE html>

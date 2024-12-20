@@ -1,57 +1,88 @@
 <?php
 require '../includes/DatabaseConnexion.php';
+
+//** Configurer les options de sécurité pour les sessions
+ini_set('session.cookie_secure', 1); // Cookie accessible uniquement via HTTPS
+ini_set('session.cookie_httponly', 1); // Cookie inaccessible via JavaScript
+ini_set('session.use_strict_mode', 1); // Empêche l'utilisation de sessions non valides
+
 session_start();
 
-if (empty($_SESSION['user'])) {
-  header('location:sign-in.php');
+//** Activer le verrouillage des sessions
+if (!isset($_SESSION['initialized'])) {
+    session_regenerate_id(true);
+    $_SESSION['initialized'] = true;
 }
 
-//* deconnexion
+//** Vérification de l'authentification de l'utilisateur
+if (empty($_SESSION['user'])) {
+    header('location:sign-in.php');
+    exit();
+}
+
+//** Déconnexion après inactivité
 $inactivity_limit = 300; // 5 minutes
 if (isset($_SESSION['last_action'])) {
-  $inactivity_duration = time() - $_SESSION['last_action'];
-  if ($inactivity_duration > $inactivity_limit) {
-    session_unset();
-    session_destroy();
-    header("Location: logout.php");
-    exit();
-  }
+    $inactivity_duration = time() - $_SESSION['last_action'];
+    if ($inactivity_duration > $inactivity_limit) {
+        session_unset();
+        session_destroy();
+        header("Location: logout.php");
+        exit();
+    }
 }
 $_SESSION['last_action'] = time();
 
+//** Validation stricte de l'ID passé dans l'URL
 if (isset($_GET['id'])) {
-  $id_salle = isset($_GET['id']) ? $_GET['id'] : null;
-  if ($id_salle && filter_var($id_salle, FILTER_VALIDATE_INT)) {
+    $id_salle = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); // Validation stricte
+    if ($id_salle === false || $id_salle === null) {
+        // ID invalide, redirige vers la liste des salles
+        header('location:salle.php');
+        exit();
+    }
+} else {
+    // Redirection si aucun ID fourni
+    header('location:salle.php');
+    exit();
+}
+
+try {
+    // Requête préparée pour éviter les injections SQL
     $sql = "SELECT * FROM salle WHERE id_salle = :id_salle";
     $query = $dbh->prepare($sql);
     $query->bindParam(':id_salle', $id_salle, PDO::PARAM_INT);
     $query->execute();
     $results = $query->fetchAll(PDO::FETCH_OBJ);
 
-    $projecteur = 0;
-    if (strpos($results[0]->equipements, "projecteur") !== false) {
-      $projecteur = 1;
-    } else {
-      $projecteur = 0;
+    if (!$results) {
+        // Aucun résultat trouvé, redirige vers la liste des salles
+        header('location:salle.php');
+        exit();
     }
-  } else {
-    // Gérer l'erreur si l'ID est invalide
-    header('location:salle.php');
-  }
-} else {
-  header('location:salle.php');
+
+    // Vérification de la présence du projecteur
+    $projecteur = 0;
+    if (strpos(strtolower($results[0]->equipements ?? ''), "projecteur") !== false) {
+        $projecteur = 1;
+    }
+} catch (PDOException $e) {
+    // Journaliser les erreurs sans les afficher
+    error_log("Erreur SQL : " . $e->getMessage());
+    header('location:error.php');
+    exit();
 }
 
+// Fonction pour échapper les données avant de les afficher (protection XSS)
+function escape($data)
+{
+    return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+}
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
-
-<!-- HEAD -->
 <?php include '../includes/head.php' ?>
-
 <style>
   .icon-container:hover {
     transform: translateY(-10px);

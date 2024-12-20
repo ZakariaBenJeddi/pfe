@@ -1,55 +1,89 @@
 <?php
 require '../includes/DatabaseConnexion.php';
+
+//** Configurer les options de sécurité pour les sessions
+ini_set('session.cookie_secure', 1); // Cookie accessible uniquement via HTTPS
+ini_set('session.cookie_httponly', 1); // Cookie inaccessible via JavaScript
+ini_set('session.use_strict_mode', 1); // Empêche l'utilisation de sessions non valides
+
 session_start();
 
-if (empty($_SESSION['user'])) {
-  header('location:sign-in.php');
+//** Activer le verrouillage des sessions
+if (!isset($_SESSION['initialized'])) {
+    session_regenerate_id(true);
+    $_SESSION['initialized'] = true;
 }
 
-//* deconnexion
+//** Vérification de l'authentification de l'utilisateur
+if (empty($_SESSION['user'])) {
+    header('location:sign-in.php');
+    exit();
+}
+
+//** Déconnexion après inactivité
 $inactivity_limit = 300; // 5 minutes
 if (isset($_SESSION['last_action'])) {
-  $inactivity_duration = time() - $_SESSION['last_action'];
-  if ($inactivity_duration > $inactivity_limit) {
-    session_unset();
-    session_destroy();
-    header("Location: logout.php");
-    exit();
-  }
+    $inactivity_duration = time() - $_SESSION['last_action'];
+    if ($inactivity_duration > $inactivity_limit) {
+        session_unset();
+        session_destroy();
+        header("Location: logout.php");
+        exit();
+    }
 }
 $_SESSION['last_action'] = time();
 
-$idNiveauSelection = $_GET['id'];
-$nbr_classe = "SELECT COUNT(niveau_id) FROM classe WHERE niveau_id = :idNiveau";
-$stmtClasse = $dbh->prepare($nbr_classe);
-$stmtClasse->execute([
-  ':idNiveau' => $idNiveauSelection
-]);
-$nbrClasses = $stmtClasse->fetchColumn();
-
-$nbr_filiere = "SELECT COUNT(id_niveau) FROM filiere WHERE id_niveau = :idNiveau";
-$stmtFiliere = $dbh->prepare($nbr_filiere);
-$stmtFiliere->execute([
-  ':idNiveau' => $idNiveauSelection
-]);
-$nbrFiliere = $stmtFiliere->fetchColumn();
-
+//** Validation stricte de l'ID passé dans l'URL
 if (isset($_GET['id'])) {
-  $id_niveau = isset($_GET['id']) ? $_GET['id'] : null;
-  if ($id_niveau && filter_var($id_niveau, FILTER_VALIDATE_INT)) {
+    $id_niveau = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); // Validation stricte
+    if ($id_niveau === false || $id_niveau === null) {
+        // ID invalide, redirige vers la liste des niveaux
+        header('location:niveau.php');
+        exit();
+    }
+} else {
+    // Redirection si aucun ID fourni
+    header('location:niveau.php');
+    exit();
+}
+
+try {
+    // Requêtes préparées pour éviter les injections SQL
+    $nbr_classe = "SELECT COUNT(niveau_id) FROM classe WHERE niveau_id = :idNiveau";
+    $stmtClasse = $dbh->prepare($nbr_classe);
+    $stmtClasse->execute([':idNiveau' => $id_niveau]);
+    $nbrClasses = $stmtClasse->fetchColumn();
+
+    $nbr_filiere = "SELECT COUNT(id_niveau) FROM filiere WHERE id_niveau = :idNiveau";
+    $stmtFiliere = $dbh->prepare($nbr_filiere);
+    $stmtFiliere->execute([':idNiveau' => $id_niveau]);
+    $nbrFiliere = $stmtFiliere->fetchColumn();
+
     $sql = "SELECT * FROM niveau WHERE id_niveau = :id_niveau";
     $query = $dbh->prepare($sql);
     $query->bindParam(':id_niveau', $id_niveau, PDO::PARAM_INT);
     $query->execute();
     $results = $query->fetchAll(PDO::FETCH_OBJ);
-  } else {
-    // Gérer l'erreur si l'ID est invalide
-    header('location:niveau.php');
-  }
-} else {
-  header('location:niveau.php');
+
+    if (!$results) {
+        // Aucun résultat trouvé, redirection
+        header('location:niveau.php');
+        exit();
+    }
+} catch (PDOException $e) {
+    // Journaliser les erreurs sans les afficher
+    error_log("Erreur SQL : " . $e->getMessage());
+    header('location:error.php');
+    exit();
+}
+
+// Fonction pour échapper les données avant de les afficher (protection XSS)
+function escape($data)
+{
+    return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
