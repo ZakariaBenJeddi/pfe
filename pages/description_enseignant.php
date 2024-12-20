@@ -1,6 +1,8 @@
 <?php
 require '../includes/DatabaseConnexion.php';
 session_start();
+// Désactiver tout output buffering to insert in enseignant_matiere
+ob_clean();
 
 if (empty($_SESSION['user'])) {
   header('location:sign-in.php');
@@ -19,7 +21,45 @@ if (isset($_SESSION['last_action'])) {
 }
 $_SESSION['last_action'] = time();
 
+if (isset($_POST['matiere']) && isset($_POST['id_enseignant'])) {
+  $matiere = $_POST['matiere'];
+  $id_enseignant = $_POST['id_enseignant'];
 
+  // Vérifier si l'enseignant est déjà associé à cette matière
+  $sql = "SELECT * FROM enseignant_matiere WHERE id_enseignant = :id_enseignant";
+  $query = $dbh->prepare($sql);
+  $query->bindParam(':id_enseignant', $id_enseignant, PDO::PARAM_INT);
+  $query->execute();
+
+  header('Content-Type: application/json'); // Définir le type de contenu comme JSON
+
+  if ($query->rowCount() > 0) {
+    echo json_encode([
+      "status" => "error",
+      "message" => "Cet enseignant est déjà associé à une matière."
+    ]);
+    exit;
+  }
+
+  // Si l'enseignant et la matière ne sont pas encore associés
+  $insert_sql = "INSERT INTO enseignant_matiere (id_enseignant, matiere) VALUES (:id_enseignant, :matiere)";
+  $insert_query = $dbh->prepare($insert_sql);
+  $insert_query->bindParam(':id_enseignant', $id_enseignant, PDO::PARAM_INT);
+  $insert_query->bindParam(':matiere', $matiere, PDO::PARAM_STR);
+
+  if ($insert_query->execute()) {
+    echo json_encode([
+      "status" => "success",
+      "message" => "L'enseignant a été associé à la matière avec succès."
+    ]);
+  } else {
+    echo json_encode([
+      "status" => "error",
+      "message" => "Une erreur est survenue lors de l'insertion."
+    ]);
+  }
+  exit;
+}
 
 if (isset($_GET['id'])) {
   $id_enseignant = isset($_GET['id']) ? $_GET['id'] : null;
@@ -36,6 +76,44 @@ if (isset($_GET['id'])) {
 } else {
   header('location:enseignant.php');
 }
+
+// TODO chercher si deja l'enseignant a une matiere pour n'affiche pas le select box
+$id_enseignant_selectionner = $_GET['id'];
+$sqlChercheEnseignantMatiere = "SELECT id_enseignant FROM enseignant_matiere WHERE id_enseignant = :id_enseignant";
+$queryChercheEnseignantMatiere = $dbh->prepare($sqlChercheEnseignantMatiere);
+$queryChercheEnseignantMatiere->bindParam(':id_enseignant', $id_enseignant_selectionner, PDO::PARAM_INT);
+$queryChercheEnseignantMatiere->execute();
+$result_EM = $queryChercheEnseignantMatiere->fetch(PDO::FETCH_ASSOC);
+
+// TODO si la matiere deja affecter afficher elle
+$sql_afficher_matiere_affecter = "SELECT matiere FROM enseignant_matiere WHERE id_enseignant = :id_enseignant";
+$squery_afficher_matiere_affecter = $dbh->prepare($sql_afficher_matiere_affecter);
+$squery_afficher_matiere_affecter->bindParam(':id_enseignant', $id_enseignant_selectionner, PDO::PARAM_INT);
+$squery_afficher_matiere_affecter->execute();
+$result_afficher_matiere_affecter = $squery_afficher_matiere_affecter->fetch(PDO::FETCH_ASSOC);
+
+// TODO afficher les matiere comme option pour affecter a enseignant
+$sqlMatiere = "SELECT DISTINCT(nom_matiere) FROM matiere";
+$queryMatiere = $dbh->query($sqlMatiere);
+$resultsMatieres = $queryMatiere->fetchAll(PDO::FETCH_OBJ);
+
+
+if (isset($_GET['delete_affectation']) && $_GET['delete_affectation'] == 1) {
+  $id_enseignant = isset($_GET['id']) ? (int)$_GET['id'] : null;
+  if ($id_enseignant) {
+      $sql_sup_affec_enseigant_matiere = "DELETE FROM enseignant_matiere WHERE id_enseignant = :id_enseignant";
+      $query_sup_affec_enseigant_matiere = $dbh->prepare($sql_sup_affec_enseigant_matiere);
+      $query_sup_affec_enseigant_matiere->bindParam(':id_enseignant', $id_enseignant, PDO::PARAM_INT);
+      $query_sup_affec_enseigant_matiere->execute();
+      header('Location: description_enseignant.php?id=' . $id_enseignant);
+      exit;
+  } else {
+      echo "Erreur : ID invalide.";
+  }
+}
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -43,7 +121,7 @@ if (isset($_GET['id'])) {
 
 <!-- HEAD -->
 <?php include '../includes/head.php' ?>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
   .icon-container:hover {
     transform: translateY(-10px);
@@ -601,39 +679,33 @@ if (isset($_GET['id'])) {
             <div class="card-body pt-4 p-3">
               <ul class="list-group">
                 <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
-                  <div class="d-flex flex-column">
-                    <h6 class="mb-3 text-sm">Oliver Liam</h6>
-                    <span class="mb-2 text-xs">Company Name: <span class="text-dark font-weight-bold ms-sm-2">Viking Burrito</span></span>
-                    <span class="mb-2 text-xs">Email Address: <span class="text-dark ms-sm-2 font-weight-bold">oliver@burrito.com</span></span>
-                    <span class="text-xs">VAT Number: <span class="text-dark ms-sm-2 font-weight-bold">FRB1235476</span></span>
+                  <div class="d-flex ">
+                    <h6 class="me-5 text-sm"><?= $results[0]->nom_enseignant . ' ' . $results[0]->prenom_enseignant ?></h6>
+
+                    <?php if ($result_EM === false) { ?>
+                      <select name="matiere_select" id="matiere_select" class="form-select ml-3">
+                        <?php foreach ($resultsMatieres as $matiere) { ?>
+                          <option value="<?= $matiere->nom_matiere ?>"><?= $matiere->nom_matiere ?></option>
+                        <?php } ?>
+                      </select>
+                    <?php } else {
+                      if ($result_afficher_matiere_affecter) {
+                        echo $result_afficher_matiere_affecter['matiere'];
+                      } else {
+                        echo "Matiere non trouve";
+                      }
+                    } ?>
+
                   </div>
                   <div class="ms-auto text-end">
-                    <a class="btn btn-link text-danger text-gradient px-3 mb-0" href="javascript:;"><i class="far fa-trash-alt me-2"></i>Delete</a>
-                    <a class="btn btn-link text-dark px-3 mb-0" href="javascript:;"><i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit</a>
-                  </div>
-                </li>
-                <li class="list-group-item border-0 d-flex p-4 mb-2 mt-3 bg-gray-100 border-radius-lg">
-                  <div class="d-flex flex-column">
-                    <h6 class="mb-3 text-sm">Lucas Harper</h6>
-                    <span class="mb-2 text-xs">Company Name: <span class="text-dark font-weight-bold ms-sm-2">Stone Tech Zone</span></span>
-                    <span class="mb-2 text-xs">Email Address: <span class="text-dark ms-sm-2 font-weight-bold">lucas@stone-tech.com</span></span>
-                    <span class="text-xs">VAT Number: <span class="text-dark ms-sm-2 font-weight-bold">FRB1235476</span></span>
-                  </div>
-                  <div class="ms-auto text-end">
-                    <a class="btn btn-link text-danger text-gradient px-3 mb-0" href="javascript:;"><i class="far fa-trash-alt me-2"></i>Delete</a>
-                    <a class="btn btn-link text-dark px-3 mb-0" href="javascript:;"><i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit</a>
-                  </div>
-                </li>
-                <li class="list-group-item border-0 d-flex p-4 mb-2 mt-3 bg-gray-100 border-radius-lg">
-                  <div class="d-flex flex-column">
-                    <h6 class="mb-3 text-sm">Ethan James</h6>
-                    <span class="mb-2 text-xs">Company Name: <span class="text-dark font-weight-bold ms-sm-2">Fiber Notion</span></span>
-                    <span class="mb-2 text-xs">Email Address: <span class="text-dark ms-sm-2 font-weight-bold">ethan@fiber.com</span></span>
-                    <span class="text-xs">VAT Number: <span class="text-dark ms-sm-2 font-weight-bold">FRB1235476</span></span>
-                  </div>
-                  <div class="ms-auto text-end">
-                    <a class="btn btn-link text-danger text-gradient px-3 mb-0" href="javascript:;"><i class="far fa-trash-alt me-2"></i>Delete</a>
-                    <a class="btn btn-link text-dark px-3 mb-0" href="javascript:;"><i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit</a>
+                    <form method="post" action="description_enseignant.php">
+                      <i class="far fa-trash-alt me-2 text-danger"></i>
+                      <a href="description_enseignant.php?delete_affectation=1&id=<?php echo $results[0]->id_enseignant; ?>" 
+                        class="btn btn-link text-danger px-3 mb-0">
+                        Delete
+                      </a>
+                      <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i><input type="button" name="edit" class="btn btn-link text-dark px-3 mb-0" value="Edit" >
+                    </form>
                   </div>
                 </li>
               </ul>
@@ -726,16 +798,54 @@ if (isset($_GET['id'])) {
       </div>
       <!-- FOOTER -->
       <?php include '../includes/footer.php' ?>
-
     </div>
   </main>
   <!-- FIXED PLUGIN  -->
   <?php include '../includes/fixedplugin.php' ?>
+
   <!--   Core JS Files   -->
   <script src="../assets/js/core/popper.min.js"></script>
   <script src="../assets/js/core/bootstrap.min.js"></script>
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+
+  <!-- //TODO apres chaque changement de matiere une self request envoyer -->
+  <script>
+    $(document).ready(function() {
+      $('#matiere_select').change(function() {
+        var selectedMatiere = $(this).val();
+        if (selectedMatiere) {
+          $.ajax({
+            url: window.location.href,
+            type: 'POST',
+            data: {
+              matiere: selectedMatiere,
+              id_enseignant: <?= $results[0]->id_enseignant ?>
+            },
+            dataType: 'json',
+            success: function(response) {
+              if (response.status === "success") {
+                alert(response.message);
+              } else if (response.status === "error") {
+                alert(response.message);
+              }
+              window.location.reload()
+            },
+            error: function(xhr, status, error) {
+              // Afficher la réponse brute pour le debugging
+              console.log("Réponse brute du serveur:", xhr.responseText);
+              alert("Erreur de traitement de la réponse. Vérifiez la console pour plus de détails.");
+            }
+          });
+        } else {
+          alert("Veuillez sélectionner une matière.");
+        }
+      });
+    });
+  </script>
+
+
+
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
