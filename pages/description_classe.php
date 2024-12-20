@@ -1,21 +1,38 @@
 <?php
 require '../includes/DatabaseConnexion.php';
 
-//** Configuration sécurisée des sessions
-ini_set('session.cookie_secure', 1); // Cookies uniquement via HTTPS
-ini_set('session.cookie_httponly', 1); // Cookies inaccessibles via JavaScript
+//** Configurer les options de sécurité pour les sessions
+ini_set('session.cookie_secure', 1); // Cookie accessible uniquement via HTTPS
+ini_set('session.cookie_httponly', 1); // Cookie inaccessible via JavaScript
 ini_set('session.use_strict_mode', 1); // Empêche l'utilisation de sessions non valides
 
 session_start();
 
-//** Vérification de l'authentification
+//** Activer le verrouillage des sessions (réduction des risques de fixation de session)
+if (!isset($_SESSION['initialized'])) {
+    session_regenerate_id(true);
+    $_SESSION['initialized'] = true;
+}
+
+//** Vérification de l'authentification de l'utilisateur
 if (empty($_SESSION['user'])) {
     header('location:sign-in.php');
     exit();
 }
 
-//** Gestion de la déconnexion après inactivité
-$inactivity_limit = 600; // 10 minutes
+//** Protection contre les attaques CSRF
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        header('location:error.php');
+        exit();
+    }
+}
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+//** Déconnexion après inactivité
+$inactivity_limit = 300; // 5 minutes
 if (isset($_SESSION['last_action'])) {
     $inactivity_duration = time() - $_SESSION['last_action'];
     if ($inactivity_duration > $inactivity_limit) {
@@ -25,105 +42,73 @@ if (isset($_SESSION['last_action'])) {
         exit();
     }
 }
-$_SESSION['last_action'] = time();
+$_SESSION['last_action'] = time(); // Mise à jour du timestamp
 
-//** Sélection des niveaux dans un intervalle de dates
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    header('Content-Type: application/json');
+//** Validation de l'ID passé dans l'URL
+if (isset($_GET['id'])) {
+    $id_classe = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); // Validation stricte
+    if ($id_classe === false || $id_classe === null) {
+        header('location:classe.php');
+        exit();
+    }
     try {
-        // Validation stricte des entrées
-        if (empty($_POST['start_date']) || empty($_POST['end_date'])) {
-            throw new Exception("Les deux dates sont requises.");
-        }
-
-        // Nettoyage et validation des dates
-        $start_date = filter_input(INPUT_POST, 'start_date', FILTER_SANITIZE_STRING);
-        $end_date = filter_input(INPUT_POST, 'end_date', FILTER_SANITIZE_STRING);
-
-        if (!$start_date || !$end_date || !strtotime($start_date) || !strtotime($end_date)) {
-            throw new Exception("Format de date invalide.");
-        }
-
-        // Conversion au format MySQL
-        $start_date = date("Y-m-d", strtotime($start_date));
-        $end_date = date("Y-m-d", strtotime($end_date));
-
-        // Préparation de la requête SQL
-        $sql = "SELECT * FROM niveau
-                WHERE date_creation BETWEEN :start_date AND :end_date
-                ORDER BY date_creation DESC";
-
-        $stmt = $dbh->prepare($sql);
-        $stmt->execute([
-            ':start_date' => $start_date,
-            ':end_date' => $end_date
-        ]);
-
-        $results = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-        echo json_encode([
-            'status' => 'success',
-            'data' => $results,
-            'count' => count($results)
-        ]);
-    } catch (Exception $e) {
-        // Réponse JSON pour les erreurs
-        http_response_code(400);
-        echo json_encode([
-            'status' => 'error',
-            'message' => $e->getMessage()
-        ]);
-    }
-    exit();
-}
-
-//** Lecture de tous les niveaux
-try {
-    $sql = "SELECT * FROM niveau";
-    $query = $dbh->query($sql);
-    $results = $query->fetchAll(PDO::FETCH_OBJ);
-} catch (PDOException $e) {
-    error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
-    die("Erreur lors de la récupération des données.");
-}
-
-//** Suppression d'un niveau
-try {
-    if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
-        // Validation de l'ID
-        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-        if ($id === false || $id === null) {
-            echo "<script>alert('ID invalide. Opération annulée.');</script>";
-            exit();
-        }
-
-        // Requête préparée pour la suppression
-        $sql = "DELETE FROM niveau WHERE id_niveau = :id";
+        $sql = "SELECT * FROM classe WHERE id_classe = :id_classe";
         $query = $dbh->prepare($sql);
-        $query->bindParam(':id', $id, PDO::PARAM_INT);
-
-        if ($query->execute()) {
-            echo "<script>alert('Niveau supprimé avec succès.');</script>";
-            header("Location: niveau.php");
+        $query->bindParam(':id_classe', $id_classe, PDO::PARAM_INT);
+        $query->execute();
+        $results = $query->fetch(PDO::FETCH_OBJ);
+        if (!$results) {
+            header('location:classe.php');
             exit();
-        } else {
-            echo "<script>alert('Erreur lors de la suppression.');</script>";
         }
+        $nom_niveau = "SELECT classe.id_classe, niveau.nom_niveau FROM classe JOIN niveau ON niveau.id_niveau = classe.niveau_id WHERE classe.id_classe = :idClasse";
+        $stmtNomNiveau = $dbh->prepare($nom_niveau);
+        $stmtNomNiveau->bindParam(':idClasse', $id_classe, PDO::PARAM_INT);
+        $stmtNomNiveau->execute();
+        $NomNiveau = $stmtNomNiveau->fetch(PDO::FETCH_OBJ);
+        
+
+        $nom_filiere = "SELECT classe.id_classe, filiere.nom_filiere FROM classe JOIN filiere ON filiere.id_filiere = classe.filiere_id WHERE classe.id_classe = :idClasse";
+        $stmtNomFiliere = $dbh->prepare($nom_filiere);
+        $stmtNomFiliere->bindParam(':idClasse', $id_classe, PDO::PARAM_INT);
+        $stmtNomFiliere->execute();
+        $NomFiliere = $stmtNomFiliere->fetch(PDO::FETCH_OBJ);
+
+
+        // $nbr_niveau = "SELECT COUNT(DISTINCT niveau_id) FROM classe WHERE filiere_id = :idFiliere";
+        // $stmtNiveau = $dbh->prepare($nbr_niveau);
+        // $stmtNiveau->execute([':idFiliere' => $id_filiere]);
+        // $nbrNiveau = $stmtNiveau->fetchColumn();
+    } catch (PDOException $e) {
+        error_log("Erreur SQL : " . $e->getMessage());
+        header('location:error.php');
+        exit();
     }
-} catch (PDOException $e) {
-    // Journalisation sécurisée des erreurs
-    error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
-    echo "<script>alert('Une erreur est survenue. Veuillez réessayer plus tard.');</script>";
+} else {
+    // Redirection si aucun ID fourni
+    header('location:classe.php');
     exit();
+}
+
+// Fonction pour échapper les données avant de les afficher (protection XSS)
+function escape($data)
+{
+    return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
 }
 ?>
 
+
+
 <!DOCTYPE html>
 <html lang="en">
-
 <!-- HEAD -->
 <?php include '../includes/head.php' ?>
-
+<style>
+  .icon-container:hover {
+    transform: translateY(-10px);
+    /* Déplace l'élément de 10px vers le haut */
+  }
+</style>
 
 <body class="g-sidenav-show   bg-gray-100">
   <div class="min-height-300 bg-primary position-absolute w-100"></div>
@@ -320,6 +305,7 @@ try {
     </div>
     <div class="sidenav-footer mx-3 ">
       <div class="card card-plain shadow-none" id="sidenavCard">
+        <!-- <img class="w-50 mx-auto" src="../assets/img/illustrations/icon-documentation.svg" alt="sidebar_illustration"> -->
         <img class="w-50 mx-auto mt-5" src="https://elaraki.ac.ma/images/logo2.png" alt="sidebar_illustration">
         <div class="card-body text-center p-3 w-100 pt-0">
           <div class="docs-info">
@@ -328,6 +314,8 @@ try {
           </div>
         </div>
       </div>
+      <!-- <a href="https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard" target="_blank" class="btn btn-dark btn-sm w-100 mb-3">Documentation</a>
+      <a class="btn btn-primary btn-sm mb-0 w-100" href="https://www.creative-tim.com/product/argon-dashboard-pro?ref=sidebarfree" type="button">Upgrade to pro</a> -->
     </div>
   </aside>
   <main class="main-content position-relative border-radius-lg ">
@@ -337,9 +325,9 @@ try {
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
             <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="javascript:;">Pages</a></li>
-            <li class="breadcrumb-item text-sm text-white active" aria-current="page">Tables</li>
+            <li class="breadcrumb-item text-sm text-white active" aria-current="page">Billing</li>
           </ol>
-          <h6 class="font-weight-bolder text-white mb-0">Tables</h6>
+          <h6 class="font-weight-bolder text-white mb-0">Billing</h6>
         </nav>
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
           <div class="ms-md-auto pe-md-3 d-flex align-items-center">
@@ -449,87 +437,245 @@ try {
     <!-- End Navbar -->
     <div class="container-fluid py-4">
       <div class="row">
-        <div class="col-12">
-          <div class="card mb-4">
-            <div class="card-header pb-0 d-flex flex-wrap justify-content-between align-items-center text-center text-md-start">
-              <div class="mb-2 mb-md-0 flex-grow-1 text-center text-md-start">
-                <h6 class="text-primary">Filière</h6>
-              </div>
-              <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
-                <input type="text" class="form-control w-100 w-md-auto mb-3" id="daterange" name="daterange" value="" />
-                <a class="btn btn-primary btn-sm" href="ajouter_niveau.php">Ajouter Niveau</a>
-                <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
+        <div class="col-lg-12">
+          <div class="row">
+            <div class="col-xl-4 mb-xl-0 mb-4">
+              <div class="card bg-transparent shadow-xl">
+                <div class="overflow-hidden position-relative border-radius-xl" style="background-image: url('../assets/img/school/filiere/filiere.png');
+                  background-repeat: no-repeat; 
+                  background-size: contain;
+                  background-position: center;">
+                  <span class="mask bg-gradient-dark"></span>
+                  <div class="card-body position-relative z-index-1 p-3">
+                    <i class="fas fa-university text-white p-2">&nbsp;&nbsp;<?= $results->nom_classe ?></i>
+                    <h5 class="text-white mt-4 mb-5 pb-2"></h5>
+                    <div class="d-flex">
+                      <div class="d-flex">
+                        <div class="me-4">
+                        </div>
+                        <div>
+                          <p class="text-white mb-0"><?php // $results->etage ?> &nbsp;<!-- <i class="fas fa-map"></i></p> -->
+                          <h6 class="text-white mb-0"><?php // $results->capacite_salle ?> &nbsp;<!--<i class="fas fa-users"></i></h6>-->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="card-body px-0 pt-0 pb-2">
-              <div class="table-responsive p-0">
-                <table class="table align-items-center mb-0">
-                  <thead>
-                    <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Niveau</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">description</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">statut</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">date creation</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody id="tableBody">
-                    <?php if ($query->rowCount() > 0) { ?>
-                      <?php foreach ($results as $result) : ?>
-                        <tr>
-                          <td>
-                            <div class="d-flex px-2 py-1">
-                              <div>
-                                <img src="../assets/img/small-logos/logo-invision.svg" class="avatar avatar-sm me-3" alt="filiere">
-                              </div>
-                              <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->nom_niveau ?></h6>
-                              </div>
-                            </div>
-                          </td>
-                          <td class="align-middle text-center text-sm">
-                            <p class="text-xs font-weight-bold mb-0" title="<?= $result->description ?>">
-                              <?= substr($result->description, 0, 50) . (strlen($result->description) > 50 ? '...' : ''); ?>
-                            </p>
-                          </td>
-                          <?php if ($result->statut === 'Active') { ?>
-                            <td class="align-middle text-center text-sm">
-                              <span class="badge badge-sm bg-gradient-success">Active</span>
-                            </td>
-                          <?php } else { ?>
-                            <td class="align-middle text-center text-sm">
-                              <span class="badge badge-sm bg-gradient-secondary">Inactive</span>
-                            </td>
-                          <?php } ?>
-                          <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0">
-                              <?php $date = new DateTime($result->date_creation);
-                              echo $date->format('Y-m-d'); ?>
-                            </p>
-                          </td>
-                          <td class="align-middle text-center d-flex">
-                            <a href="edit_niveau.php?id=<?= $result->id_niveau ?>" class="dropdown-item">
-                              <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
-                            </a>
-                            <a href="description_niveau.php?id=<?= $result->id_niveau ?>" class="dropdown-item">
-                              <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
-                            </a>
-                            <a href="niveau.php?id=<?= $result->id_niveau ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                              <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
-                            </a>
-                          </td>
-                        </tr>
-                      <?php endforeach; ?>
-                    <?php } else { ?>
-                      <tr rowspan="7" class="text-center">
-                        <td class="text-center">
-                          No Content
-                        </td>
-                      </tr>
-                    <?php  } ?>
-                  </tbody>
-                </table>
+            <div class="col-xl-8">
+              <div class="row">
+                <div class="col-md-3">
+                  <div class="card">
+                    <div class="card-header mx-4 p-3 text-center">
+                      <div class="icon icon-shape  icon-lg bg-gradient-primary shadow text-center border-radius-lg cursor-pointer">
+                        <i class="ni ni-building icon-container" style="transition: transform 0.4s ease; "></i>
+                      </div>
+                    </div>
+                    <div class="card-body pt-0 p-3 text-center">
+                      <h6 class="text-center mb-0">Classe</h6>
+                      <span class="text-xs">Nom Classe</span>
+                      <hr class="horizontal dark my-3">
+                      <br>
+                      <h5 class="mb-0"><?= $results->nom_classe ?> </h5>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3 mt-md-0 mt-4">
+                  <div class="card">
+                    <div class="card-header mx-4 p-3 text-center">
+                      <div class="icon icon-shape icon-lg bg-gradient-primary shadow text-center border-radius-lg cursor-pointer">
+                        <i class="fa-solid fa-layer-group icon-container" style="transition: transform 0.4s ease;"></i>
+                      </div>
+                    </div>
+                    <div class="card-body pt-0 p-3 text-center">
+                      <h6 class="text-center mb-0">Niveau</h6>
+                      <span class="text-xs">Nom Niveau</span>
+                      <hr class="horizontal dark my-3">
+                      <h5 class="mb-0"><?= $NomNiveau->nom_niveau ?> </h5>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3 mt-md-0 mt-4">
+                  <div class="card">
+                    <div class="card-header mx-4 p-3 text-center">
+                      <div class="icon icon-shape icon-lg bg-gradient-primary shadow text-center border-radius-lg  cursor-pointer">
+                        <i class="ni ni-books icon-container" style="transition: transform 0.4s ease;"></i>
+                      </div>
+                    </div>
+                    <div class="card-body pt-0 p-3 text-center">
+                      <h6 class="text-center mb-0">Filiere</h6>
+                      <span class="text-xs">Nom filiere</span>
+                      <hr class="horizontal dark my-3">
+                      <br>
+                      <h5 class="mb-0"><?= $NomFiliere->nom_filiere ?> </h5>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3 mt-md-0 mt-4">
+                  <div class="card">
+                    <div class="card-header mx-4 p-3 text-center">
+                      <div class="icon icon-shape icon-lg bg-gradient-primary shadow text-center border-radius-lg cursor-pointer">
+                        <i class="fas fa-calendar icon-container" style="transition: transform 0.4s ease; "></i>
+                      </div>
+                    </div>
+                    <div class="card-body pt-0 p-3 text-center">
+                      <h6 class="text-center mb-0">Date</h6>
+                      <span class="text-xs">Date Creation</span>
+                      <hr class="horizontal dark my-3">
+                      <br>
+                      <h5 class="mb-0"><?= date("d/m/Y", strtotime($results->date_creation)) ?></h5>
+                    </div>
+                  </div>
+                </div>
               </div>
+            </div>
+          </div>
+          <div class="row"> <!-- Delete this ligne if something wrong-->
+            <div class="col-md-8 mb-lg-0 mb-4">
+              <div class="card mt-4">
+                <div class="row">
+                  <div class="col-6">
+                    <div class="card-header pb-0 p-3">
+                      <h6 class="col-12 mb-0">Nombre de Classe Dans cette Filiere</h6>&nbsp;<i class="fa-solid fa-layer-group text-warning text-sm opacity-10"></i>
+                      <i class="ni ni-building text-warning text-sm opacity-10"></i>
+                    </div>
+                    <div class="card-body p-3 text-center">
+                      <h4><?php // $nbrClasses ?></h4>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="card-header pb-0 p-3">
+                      <h6 class="col-12 mb-0">Nombre de Niveau Dans cette Filiere </h6>&nbsp;&nbsp;<i class="fa-solid fa-layer-group text-warning text-sm opacity-10"></i>
+                      <i class="ni ni-books text-warning text-sm opacity-10"></i>
+                    </div>
+                    <div class="card-body p-3 text-center">
+                      <h4><?php // $nbrNiveau ?></h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 mb-lg-0 mb-2">
+              <!-- <div class="card mt-4"> -->
+              <div class="alert alert-danger mt-4 h-75">
+                <h5 class="text-center text-light">
+                  Alert
+                </h5>
+                <hr>
+                <div class="text-light">
+                  Aucun alert
+                </div>
+              </div>
+              <!-- </div> -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-8 mt-4">
+          <div class="card">
+            <div class="card-header pb-0 px-3">
+              <button class="btn btn-primary brn-rounded">Afficher l'emploi du temps de cette Filiere </button>
+            </div>
+            <div class="card-body pt-4 p-3">
+              <!-- <ul class="list-group">
+                <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                  <div class="d-flex flex-column">
+                    <h6 class="mb-3 text-sm">Oliver Liam</h6>
+                    <span class="mb-2 text-xs">Company Name: <span class="text-dark font-weight-bold ms-sm-2">Viking Burrito</span></span>
+                    <span class="mb-2 text-xs">Email Address: <span class="text-dark ms-sm-2 font-weight-bold">oliver@burrito.com</span></span>
+                    <span class="text-xs">VAT Number: <span class="text-dark ms-sm-2 font-weight-bold">FRB1235476</span></span>
+                  </div>
+                  <div class="ms-auto text-end">
+                    <a class="btn btn-link text-danger text-gradient px-3 mb-0" href="javascript:;"><i class="far fa-trash-alt me-2"></i>Delete</a>
+                    <a class="btn btn-link text-dark px-3 mb-0" href="javascript:;"><i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit</a>
+                  </div>
+                </li>
+              </ul> -->
+            </div>
+
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="card h-100 mb-4">
+            <div class="card-header pb-0 px-3">
+              <div class="row">
+                <div class="col-md-6">
+                  <h6 class="mb-0">Nombre de sceance chaque annees</h6>
+                </div>
+                <div class="col-md-6 d-flex justify-content-end align-items-center">
+                  <i class="far fa-calendar-alt me-2"></i>
+                  <small><?php echo (new DateTime('now'))->format('d/m/Y'); ?></small>
+                </div>
+              </div>
+            </div>
+            <div class="card-body pt-4 p-3">
+              <h6 class="text-uppercase text-body text-xs font-weight-bolder mb-3">Annees</h6>
+              <ul class="list-group">
+                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                  <div class="d-flex align-items-center">
+                    <button class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-down"></i></button>
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-1 text-dark text-sm">2024</h6>
+                      <span class="text-xs">244 Sceance</span>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold">
+                    - 4%
+                  </div>
+                </li>
+                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                  <div class="d-flex align-items-center">
+                    <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-1 text-dark text-sm">2023</h6>
+                      <span class="text-xs">271 Sceance</span>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
+                    + 17%
+                  </div>
+                </li>
+              </ul>
+              <ul class="list-group">
+                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                  <div class="d-flex align-items-center">
+                    <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-1 text-dark text-sm">2022</h6>
+                      <span class="text-xs">200 Sceance</span>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
+                    + 1%
+                  </div>
+                </li>
+                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                  <div class="d-flex align-items-center">
+                    <button class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-down"></i></button>
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-1 text-dark text-sm">2021</h6>
+                      <span class="text-xs">191 Sceance</span>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
+                    + 7%
+                  </div>
+                </li>
+                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                  <div class="d-flex align-items-center">
+                    <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
+                    <div class="d-flex flex-column">
+                      <h6 class="mb-1 text-dark text-sm">2020</h6>
+                      <span class="text-xs">151 Sceance</span>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
+                    + 100%
+                  </div>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -539,175 +685,6 @@ try {
 
     </div>
   </main>
-
-  <!-- Export Functio -->
-  <script>
-    function expo() {
-      // Obtenir l'instance de DataTable pour la première table
-      var table = $('table:first').DataTable();
-
-      // Créer un tableau pour les en-têtes et les lignes
-      var data = [];
-      var headers = [];
-
-      // Extraire les en-têtes, en sautant la colonne "Action"
-      table.columns().every(function() {
-        if (this.header().textContent !== "Action") {
-          headers.push(this.header().textContent.trim()); // Enlever les espaces en trop
-        }
-      });
-      data.push(headers);
-
-      // Extraire les données filtrées
-      var filteredData = table.rows({
-        filter: 'applied'
-      }).data();
-
-      filteredData.each(function(valueArray) {
-        var rowData = [];
-        valueArray.forEach(function(value, index) {
-          if (index !== 7) { // Sauter la colonne "Action"
-            rowData.push($('<div>').html(value).text().trim()); // Extraire le texte propre
-          }
-        });
-        data.push(rowData);
-      });
-
-      // Exporter vers Excel avec ExcelJS
-      var workbook = new ExcelJS.Workbook();
-      var worksheet = workbook.addWorksheet('Data Export');
-
-      data.forEach(function(row) {
-        worksheet.addRow(row);
-      });
-
-      workbook.xlsx.writeBuffer().then(function(buffer) {
-        var blob = new Blob([buffer], {
-          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        });
-        var url = window.URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = 'filiere.xlsx';
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-      });
-    }
-  </script>
-
-  <!-- //* Date Picker -->
-  <!-- //* AJAX eleves intervalle date  -->
-  <script>
-    $(function() {
-      // Configuration du DateRangePicker
-      $('#daterange').daterangepicker({
-        opens: 'left',
-        autoUpdateInput: true,
-        locale: {
-          format: 'MM/DD/YYYY', // Format attendu par votre code PHP
-          applyLabel: 'Valider',
-          cancelLabel: 'Annuler',
-          fromLabel: 'Du',
-          toLabel: 'Au',
-          customRangeLabel: 'Période personnalisée',
-          daysOfWeek: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
-          monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
-          firstDay: 1
-        },
-        startDate: moment().subtract(29, 'days'),
-        endDate: moment()
-      }, function(start, end, label) {
-        // Callback pour la sélection de dates
-        const tableBody = $('#tableBody');
-
-        $.ajax({
-          url: '', // Fichier actuel
-          method: 'POST',
-          data: {
-            start_date: start.format('MM/DD/YYYY'),
-            end_date: end.format('MM/DD/YYYY')
-          },
-          dataType: 'json',
-          success: function(response) {
-            // Vider le tableau
-            tableBody.empty();
-
-            // Vérifier s'il y a des résultats
-            if (response.status === 'success' && response.count > 0) {
-              // Parcourir et ajouter chaque eleve
-              response.data.forEach(function(eleve) {
-                tableBody.append(`
-                        <tr>
-                          <td>
-                            <div class="d-flex px-2 py-1">
-                              <div>
-                                <img src="../assets/img/small-logos/logo-invision.svg" class="avatar avatar-sm me-3" alt="filiere">
-                              </div>
-                              <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->nom_niveau ?></h6>
-                              </div>
-                            </div>
-                          </td>
-                          <td class="align-middle text-center text-sm">
-                            <p class="text-xs font-weight-bold mb-0" title="<?= $result->description ?>">
-                              <?= substr($result->description, 0, 50) . (strlen($result->description) > 50 ? '...' : ''); ?>
-                            </p>
-                          </td>
-                          <?php if ($result->statut === 'Active') { ?>
-                            <td class="align-middle text-center text-sm">
-                              <span class="badge badge-sm bg-gradient-success">Active</span>
-                            </td>
-                          <?php } else { ?>
-                            <td class="align-middle text-center text-sm">
-                              <span class="badge badge-sm bg-gradient-success">Inactive</span>
-                            </td>
-                          <?php } ?>
-                          <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0">
-                              <?php $date = new DateTime($result->date_creation);
-                              echo $date->format('Y-m-d'); ?>
-                            </p>
-                          </td>
-                          <td class="align-middle text-center d-flex">
-                            <a href="edit_niveau.php?id=<?= $result->id_niveau ?>" class="dropdown-item">
-                              <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
-                            </a>
-                            <a href="description_niveau.php?id=<?= $result->id_niveau ?>" class="dropdown-item">
-                              <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
-                            </a>
-                            <a href="niveau.php?id=<?= $result->id_niveau ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                              <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
-                            </a>
-                          </td>
-                        </tr>
-                            `);
-              });
-            } else {
-              // Aucun résultat
-              tableBody.append(`
-                            <tr>
-                                <td colspan="5" class="text-center">Aucune Niveau trouvée pour cette période</td>
-                            </tr>
-                        `);
-            }
-          },
-          error: function(xhr) {
-            // Gestion des erreurs
-            console.error('Erreur de requête:', xhr);
-            tableBody.html(`
-                        <tr>
-                            <td colspan="5" class="text-center text-danger">
-                                Erreur lors de la récupération des données
-                            </td>
-                        </tr>
-                    `);
-          }
-        });
-      });
-    });
-  </script>
-
   <!-- FIXED PLUGIN  -->
   <?php include '../includes/fixedplugin.php' ?>
   <!--   Core JS Files   -->
@@ -729,5 +706,4 @@ try {
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
 </body>
-
 </html>
