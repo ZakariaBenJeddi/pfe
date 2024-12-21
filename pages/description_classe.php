@@ -10,90 +10,106 @@ session_start();
 
 //** Activer le verrouillage des sessions (réduction des risques de fixation de session)
 if (!isset($_SESSION['initialized'])) {
-    session_regenerate_id(true);
-    $_SESSION['initialized'] = true;
+  session_regenerate_id(true);
+  $_SESSION['initialized'] = true;
 }
 
 //** Vérification de l'authentification de l'utilisateur
 if (empty($_SESSION['user'])) {
-    header('location:sign-in.php');
-    exit();
+  header('location:sign-in.php');
+  exit();
 }
 
 //** Protection contre les attaques CSRF
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        header('location:error.php');
-        exit();
-    }
+  if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+    header('location:error.php');
+    exit();
+  }
 }
 if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 //** Déconnexion après inactivité
 $inactivity_limit = 300; // 5 minutes
 if (isset($_SESSION['last_action'])) {
-    $inactivity_duration = time() - $_SESSION['last_action'];
-    if ($inactivity_duration > $inactivity_limit) {
-        session_unset();
-        session_destroy();
-        header("Location: logout.php");
-        exit();
-    }
+  $inactivity_duration = time() - $_SESSION['last_action'];
+  if ($inactivity_duration > $inactivity_limit) {
+    session_unset();
+    session_destroy();
+    header("Location: logout.php");
+    exit();
+  }
 }
 $_SESSION['last_action'] = time(); // Mise à jour du timestamp
 
 //** Validation de l'ID passé dans l'URL
 if (isset($_GET['id'])) {
-    $id_classe = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); // Validation stricte
-    if ($id_classe === false || $id_classe === null) {
-        header('location:classe.php');
-        exit();
-    }
-    try {
-        $sql = "SELECT * FROM classe WHERE id_classe = :id_classe";
-        $query = $dbh->prepare($sql);
-        $query->bindParam(':id_classe', $id_classe, PDO::PARAM_INT);
-        $query->execute();
-        $results = $query->fetch(PDO::FETCH_OBJ);
-        if (!$results) {
-            header('location:classe.php');
-            exit();
-        }
-        $nom_niveau = "SELECT classe.id_classe, niveau.nom_niveau FROM classe JOIN niveau ON niveau.id_niveau = classe.niveau_id WHERE classe.id_classe = :idClasse";
-        $stmtNomNiveau = $dbh->prepare($nom_niveau);
-        $stmtNomNiveau->bindParam(':idClasse', $id_classe, PDO::PARAM_INT);
-        $stmtNomNiveau->execute();
-        $NomNiveau = $stmtNomNiveau->fetch(PDO::FETCH_OBJ);
-        
-
-        $nom_filiere = "SELECT classe.id_classe, filiere.nom_filiere FROM classe JOIN filiere ON filiere.id_filiere = classe.filiere_id WHERE classe.id_classe = :idClasse";
-        $stmtNomFiliere = $dbh->prepare($nom_filiere);
-        $stmtNomFiliere->bindParam(':idClasse', $id_classe, PDO::PARAM_INT);
-        $stmtNomFiliere->execute();
-        $NomFiliere = $stmtNomFiliere->fetch(PDO::FETCH_OBJ);
-
-
-        // $nbr_niveau = "SELECT COUNT(DISTINCT niveau_id) FROM classe WHERE filiere_id = :idFiliere";
-        // $stmtNiveau = $dbh->prepare($nbr_niveau);
-        // $stmtNiveau->execute([':idFiliere' => $id_filiere]);
-        // $nbrNiveau = $stmtNiveau->fetchColumn();
-    } catch (PDOException $e) {
-        error_log("Erreur SQL : " . $e->getMessage());
-        header('location:error.php');
-        exit();
-    }
-} else {
-    // Redirection si aucun ID fourni
+  $id_classe = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); // Validation stricte
+  if ($id_classe === false || $id_classe === null) {
     header('location:classe.php');
     exit();
+  }
+  try {
+    $sql = "SELECT * FROM classe WHERE id_classe = :id_classe";
+    $query = $dbh->prepare($sql);
+    $query->bindParam(':id_classe', $id_classe, PDO::PARAM_INT);
+    $query->execute();
+    $results = $query->fetch(PDO::FETCH_OBJ);
+    if (!$results) {
+      header('location:classe.php');
+      exit();
+    }
+    $nom_niveau = "SELECT classe.id_classe, niveau.nom_niveau FROM classe JOIN niveau ON niveau.id_niveau = classe.niveau_id WHERE classe.id_classe = :idClasse";
+    $stmtNomNiveau = $dbh->prepare($nom_niveau);
+    $stmtNomNiveau->bindParam(':idClasse', $id_classe, PDO::PARAM_INT);
+    $stmtNomNiveau->execute();
+    $NomNiveau = $stmtNomNiveau->fetch(PDO::FETCH_OBJ);
+
+
+    $nom_filiere = "SELECT classe.id_classe, filiere.id_filiere , filiere.nom_filiere FROM classe JOIN filiere ON filiere.id_filiere = classe.filiere_id WHERE classe.id_classe = :idClasse";
+    $stmtNomFiliere = $dbh->prepare($nom_filiere);
+    $stmtNomFiliere->bindParam(':idClasse', $id_classe, PDO::PARAM_INT);
+    $stmtNomFiliere->execute();
+    $NomFiliere = $stmtNomFiliere->fetch(PDO::FETCH_OBJ);
+
+    // TODO tous les enseignant 
+    //! apres il faut afficher les enseignant de chaque matier
+    $sql_all_enseignant = "SELECT * FROM enseignant";
+    $query_all_enseignant = $dbh->query($sql_all_enseignant);
+    $results_all_enseignant = $query_all_enseignant->fetchAll(PDO::FETCH_OBJ);
+
+    //TODO les matiere scientifique de cette filiere de cette classe
+    $sql_matiere_deFiliere_classe = "SELECT code_matiere FROM matiere WHERE id_filiere = :id_filiere";
+    $query_matiere_deFiliere_classe = $dbh->prepare($sql_matiere_deFiliere_classe);
+    $query_matiere_deFiliere_classe->bindParam(':id_filiere', $NomFiliere->id_filiere, PDO::PARAM_INT);
+    $query_matiere_deFiliere_classe->execute();
+    $results_matiere_deFiliere_classe = $query_matiere_deFiliere_classe->fetchAll(PDO::FETCH_OBJ);
+
+    //TODO les matiere scientifique de cette filiere de cette classe
+    $sql_all_matiere = "SELECT code_matiere FROM matiere WHERE id_filiere = 8";
+    $query_all_matiere = $dbh->query($sql_all_matiere);
+    $results_all_matiere = $query_all_matiere->fetchAll(PDO::FETCH_OBJ);
+
+    //TODO Créer une liste pour combiner les deux résultats
+    $combined_results = array_merge($results_matiere_deFiliere_classe, $results_all_matiere);
+    $combined_results = array_unique($combined_results, SORT_REGULAR);
+  } catch (PDOException $e) {
+    error_log("Erreur SQL : " . $e->getMessage());
+    header('location:error.php');
+    exit();
+  }
+} else {
+  // Redirection si aucun ID fourni
+  header('location:classes.php');
+  exit();
 }
 
 // Fonction pour échapper les données avant de les afficher (protection XSS)
 function escape($data)
 {
-    return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+  return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
 }
 ?>
 
@@ -454,8 +470,10 @@ function escape($data)
                         <div class="me-4">
                         </div>
                         <div>
-                          <p class="text-white mb-0"><?php // $results->etage ?> &nbsp;<!-- <i class="fas fa-map"></i></p> -->
-                          <h6 class="text-white mb-0"><?php // $results->capacite_salle ?> &nbsp;<!--<i class="fas fa-users"></i></h6>-->
+                          <p class="text-white mb-0"><?php // $results->etage 
+                                                      ?> &nbsp;<!-- <i class="fas fa-map"></i></p> -->
+                          <h6 class="text-white mb-0"><?php // $results->capacite_salle 
+                                                      ?> &nbsp;<!--<i class="fas fa-users"></i></h6>-->
                         </div>
                       </div>
                     </div>
@@ -541,7 +559,8 @@ function escape($data)
                       <i class="ni ni-building text-warning text-sm opacity-10"></i>
                     </div>
                     <div class="card-body p-3 text-center">
-                      <h4><?php // $nbrClasses ?></h4>
+                      <h4><?php // $nbrClasses 
+                          ?></h4>
                     </div>
                   </div>
                   <div class="col-6">
@@ -550,7 +569,8 @@ function escape($data)
                       <i class="ni ni-books text-warning text-sm opacity-10"></i>
                     </div>
                     <div class="card-body p-3 text-center">
-                      <h4><?php // $nbrNiveau ?></h4>
+                      <h4><?php // $nbrNiveau 
+                          ?></h4>
                     </div>
                   </div>
                 </div>
@@ -575,26 +595,40 @@ function escape($data)
       <div class="row">
         <div class="col-md-8 mt-4">
           <div class="card">
-            <div class="card-header pb-0 px-3">
+            <div class="card-header pb-0 text-center">
               <button class="btn btn-primary brn-rounded">Afficher l'emploi du temps de cette Filiere </button>
             </div>
             <div class="card-body pt-4 p-3">
-              <!-- <ul class="list-group">
-                <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
-                  <div class="d-flex flex-column">
-                    <h6 class="mb-3 text-sm">Oliver Liam</h6>
-                    <span class="mb-2 text-xs">Company Name: <span class="text-dark font-weight-bold ms-sm-2">Viking Burrito</span></span>
-                    <span class="mb-2 text-xs">Email Address: <span class="text-dark ms-sm-2 font-weight-bold">oliver@burrito.com</span></span>
-                    <span class="text-xs">VAT Number: <span class="text-dark ms-sm-2 font-weight-bold">FRB1235476</span></span>
-                  </div>
-                  <div class="ms-auto text-end">
-                    <a class="btn btn-link text-danger text-gradient px-3 mb-0" href="javascript:;"><i class="far fa-trash-alt me-2"></i>Delete</a>
-                    <a class="btn btn-link text-dark px-3 mb-0" href="javascript:;"><i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit</a>
-                  </div>
-                </li>
-              </ul> -->
-            </div>
+              <ul class="list-group">
+                <?php foreach ($combined_results as $result) : ?>
+                  <?php if (isset($result->code_matiere)) : ?>
+                    <li class="list-group-item border-0 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center p-4 mb-2 bg-gray-100 border-radius-lg" data-id-classe="<?= htmlspecialchars($result->id_classe, ENT_QUOTES, 'UTF-8') ?>">
+                      <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center w-100">
+                        <span class="font-weight-bold text-dark mb-2 mb-md-0 me-md-4">
+                          <?php echo htmlspecialchars($result->code_matiere); ?>
+                        </span>
+                        <select name="enseignant" class="form-select select-sm w-100 w-md-auto ms-md-3 px-lg-5" onchange="assignEnseignant('<?= htmlspecialchars($result->code_matiere, ENT_QUOTES, 'UTF-8') ?>', this.value)">
+                          <option value="">Sélectionner un enseignant</option>
+                          <?php foreach ($results_all_enseignant as $enseignant) : ?>
+                            <option value="<?= htmlspecialchars($enseignant->id_enseignant, ENT_QUOTES, 'UTF-8') ?>">
+                              <?= htmlspecialchars($enseignant->nom_enseignant, ENT_QUOTES, 'UTF-8') ?>
+                            </option>
+                          <?php endforeach; ?>
+                        </select>
+                      </div>
+                      <form method="post" action="" class="mt-3 mt-md-0 w-100 w-md-auto text-end">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
+                        <input type="hidden" name="code_matiere" value="<?= htmlspecialchars($result->code_matiere, ENT_QUOTES, 'UTF-8') ?>">
+                        <button type="submit" name="delete_affectation" value="1" class="btn btn-link text-danger mb-0">
+                          <i class="far fa-trash-alt me-2"></i> Supprimer
+                        </button>
+                      </form>
+                    </li>
+                  <?php endif; ?>
+                <?php endforeach; ?>
+              </ul>
 
+            </div>
           </div>
         </div>
         <div class="col-md-4 mt-4">
@@ -692,6 +726,58 @@ function escape($data)
   <script src="../assets/js/core/bootstrap.min.js"></script>
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+
+  <script>
+    function assignEnseignant(codeMatiere, idEnseignant) {
+      if (idEnseignant === "") return;
+
+      const idClasse = "<?= htmlspecialchars($results->id_classe, ENT_QUOTES, 'UTF-8') ?>";
+
+      console.log("Données envoyées:", {
+        code_matiere: codeMatiere,
+        id_enseignant: idEnseignant,
+        id_classe: idClasse
+      });
+
+      const data = new FormData();
+      data.append('code_matiere', codeMatiere);
+      data.append('id_enseignant', idEnseignant);
+      data.append('id_classe', idClasse);
+      data.append('csrf_token', "<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>");
+
+      fetch('insert_enseignant_classe_matiere.php', {
+          method: 'POST',
+          body: data
+        })
+        .then(response => {
+          // Vérifier d'abord le type de contenu
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            return response.json();
+          }
+          // Si ce n'est pas du JSON, lire le texte et afficher l'erreur
+          return response.text().then(text => {
+            console.error('Réponse non-JSON reçue:', text);
+            throw new Error('Réponse invalide du serveur');
+          });
+        })
+        .then(result => {
+          console.log('Réponse serveur:', result);
+          if (result.success) {
+            alert('Assignation enregistrée avec succès.');
+          } else {
+            alert('Erreur : ' + (result.message || 'Erreur inconnue'));
+          }
+        })
+        .catch(error => {
+          console.error('Erreur complète:', error);
+          alert('Erreur lors de la requête. Vérifiez la console pour plus de détails.');
+        });
+    }
+  </script>
+
+
+
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
@@ -706,4 +792,5 @@ function escape($data)
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
 </body>
+
 </html>

@@ -449,26 +449,6 @@ try {
                 <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
               </div>
             </div>
-            <!-- Edit data -->
-            <!-- <div id="editData" class="modal fade text-center" tabindex="-1">
-              <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title">Modifier Salle</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body" id="info_update">
-                    <?php // include("edit_salle.php"); 
-                    ?>
-                  </div>
-                  <div class="modal-footer ">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-                  </div>
-                </div>
-              </div>
-            </div> -->
             <form method="post">
               <div class="card-body px-0 pt-0 pb-2">
                 <div class="table-responsive p-0">
@@ -523,16 +503,18 @@ try {
                                 <p class="text-xs font-weight-bold mb-0">-<?= $equi; ?></p>
                               <?php endforeach; ?>
                             </td>
-                            <td class="align-middle text-center d-flex">
-                              <a href="edit_salle.php?id_salle=<?= $result->id_salle ?>" class="dropdown-item">
-                                <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
-                              </a>
-                              <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
-                                <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
-                              </a>
-                              <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                                <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_salle ?>"></i>
-                              </a>
+                            <td class="align-middle text-center">
+                              <div class="d-flex">
+                                <a href="edit_salle.php?id_salle=<?= $result->id_salle ?>" class="dropdown-item">
+                                  <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
+                                </a>
+                                <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
+                                  <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                                </a>
+                                <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                  <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_salle ?>"></i>
+                                </a>
+                              </div>
                             </td>
                           </tr>
                         <?php endforeach; ?>
@@ -709,16 +691,18 @@ try {
                                         <p class="text-xs font-weight-bold mb-0">-<?= $equi; ?></p>
                                       <?php endforeach; ?>
                                     </td>
-                                    <td class="align-middle text-center d-flex">
-                                      <a href="javascript:void(0);" class="dropdown-item">
-                                        <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true" id="<?php echo $result->id_salle ?>"></i>
-                                      </a>
-                                      <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
-                                        <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
-                                      </a>
-                                      <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                                        <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_salle ?>"></i>
-                                      </a>
+                                    <td class="align-middle text-center">
+                              <div class="d-flex">
+                                <a href="edit_salle.php?id_salle=<?= $result->id_salle ?>" class="dropdown-item">
+                                  <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
+                                </a>
+                                <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
+                                  <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                                </a>
+                                <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                  <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_salle ?>"></i>
+                                </a>
+                              </div>
                                     </td>
                                 </tr>
                             `);

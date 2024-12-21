@@ -516,16 +516,18 @@ try {
                               <span class="badge badge-sm bg-gradient-secondary">Retraité</span>
                             </td>
                           <?php } ?>
-                          <td class="align-middle text-center d-flex">
-                            <a href="edit_eleve.php?id_eleve=<?= $result->id_eleve ?>" class="dropdown-item">
-                              <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
-                            </a>
-                            <a href="description_eleve.php?id=<?= $result->id_eleve ?>" class="dropdown-item">
-                              <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
-                            </a>
-                            <a href="eleve.php?id=<?= $result->id_eleve ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                              <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_eleve ?>"></i>
-                            </a>
+                          <td class="align-middle text-center">
+                            <div class="d-flex">
+                              <a href="edit_eleve.php?id_eleve=<?= $result->id_eleve ?>" class="dropdown-item">
+                                <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
+                              </a>
+                              <a href="description_eleve.php?id=<?= $result->id_eleve ?>" class="dropdown-item">
+                                <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                              </a>
+                              <a href="eleve.php?id=<?= $result->id_eleve ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_eleve ?>"></i>
+                              </a>
+                            </div>
                           </td>
                         </tr>
                       <?php endforeach; ?>
@@ -695,16 +697,18 @@ try {
                               <span class="badge badge-sm bg-gradient-secondary">Retraité</span>
                             </td>
                           <?php } ?>
-                          <td class="align-middle text-center d-flex">
-                            <a href="edit_eleve.php?id_eleve=<?= $result->id_eleve ?>" class="dropdown-item">
-                              <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
-                            </a>
-                            <a href="description_eleve.php?id=<?= $result->id_eleve ?>" class="dropdown-item">
-                              <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
-                            </a>
-                            <a href="eleve.php?id=<?= $result->id_eleve ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                              <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_eleve ?>"></i>
-                            </a>
+                          <td class="align-middle text-center">
+                            <div class="d-flex">
+                              <a href="edit_eleve.php?id_eleve=<?= $result->id_eleve ?>" class="dropdown-item">
+                                <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
+                              </a>
+                              <a href="description_eleve.php?id=<?= $result->id_eleve ?>" class="dropdown-item">
+                                <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                              </a>
+                              <a href="eleve.php?id=<?= $result->id_eleve ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_eleve ?>"></i>
+                              </a>
+                            </div>
                           </td>
                         </tr>
                             `);

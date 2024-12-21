@@ -527,16 +527,18 @@ try {
                           <td class="align-middle text-center">
                             <span class="text-secondary text-xs font-weight-bold"><?= $result->salaire ?> DH</span>
                           </td>
-                          <td class="align-middle text-center d-flex">
-                            <a href="edit_ensaignant.php?id=<?= $result->id_enseignant ?>" class="dropdown-item">
-                              <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
-                            </a>
-                            <a href="description_enseignant.php?id=<?= $result->id_enseignant ?>" class="dropdown-item">
-                              <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
-                            </a>
-                            <a href="enseignant.php?id=<?= $result->id_enseignant ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                              <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_enseignant ?>"></i>
-                            </a>
+                          <td class="align-middle text-center">
+                            <div class="d-flex">
+                              <a href="edit_ensaignant.php?id=<?= $result->id_enseignant ?>" class="dropdown-item">
+                                <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
+                              </a>
+                              <a href="description_enseignant.php?id=<?= $result->id_enseignant ?>" class="dropdown-item">
+                                <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                              </a>
+                              <a href="enseignant.php?id=<?= $result->id_enseignant ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_enseignant ?>"></i>
+                              </a>
+                            </div>
                           </td>
                         </tr>
                       <?php endforeach; ?>
@@ -620,7 +622,7 @@ try {
   </script>
 
   <!-- //* Date Picker -->
-  <!-- //* AJAX salle intervalle date  -->
+  <!-- //* AJAX eleves intervalle date  -->
   <script>
     $(function() {
       // Configuration du DateRangePicker
@@ -640,6 +642,118 @@ try {
         },
         startDate: moment().subtract(29, 'days'),
         endDate: moment()
+      }, function(start, end, label) {
+        // Callback pour la sélection de dates
+        const tableBody = $('#tableBody');
+
+        $.ajax({
+          url: '', // Fichier actuel
+          method: 'POST',
+          data: {
+            start_date: start.format('MM/DD/YYYY'),
+            end_date: end.format('MM/DD/YYYY')
+          },
+          dataType: 'json',
+          success: function(response) {
+            // Vider le tableau
+            tableBody.empty();
+
+            // Vérifier s'il y a des résultats
+            if (response.status === 'success' && response.count > 0) {
+              // Parcourir et ajouter chaque eleve
+              response.data.forEach(function(enseignant) {
+                tableBody.append(`
+                        <tr>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div>
+                                <img src="../assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
+                              </div>
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm"><?= $result->nom_enseignant . ' ' . $result->prenom_enseignant ?></h6>
+                                <p class="text-xs text-secondary mb-0"><?= $result->email_enseignant ?></p>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0">Enseignant</p>
+                            <p class="text-xs text-secondary mb-0"><?= $result->specialite ?></p>
+                          </td>
+                          <td class="align-middle text-center">
+                            <div class="d-flex align-items-center justify-content-center">
+                              <span class="me-2 text-xs font-weight-bold"><?= $result->degree ?>%</span>
+                              <div>
+                                <div class="progress">
+                                  <div class="progress-bar 
+                                    <?php if ($result->degree <= 30) {
+                                      echo 'bg-gradient-danger';
+                                    }
+                                    if ($result->degree <= 50 && $result->degree > 30) {
+                                      echo 'bg-gradient-warning';
+                                    }
+                                    if ($result->degree >= 30 && $result->degree < 90) {
+                                      echo 'bg-gradient-info';
+                                    }
+                                    if ($result->degree >= 90) {
+                                      echo 'bg-gradient-success';
+                                    } ?>" role="progressbar" aria-valuenow="<?= $result->degree ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $result->degree ?>%;">
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <?php if ($result->est_connecte === 0) { ?>
+                            <td class="align-middle text-center text-sm">
+                              <span class="badge badge-sm bg-gradient-secondary">Offline</span>
+                            </td>
+                          <?php } else { ?>
+                            <td class="align-middle text-center text-sm">
+                              <span class="badge badge-sm bg-gradient-success">Online</span>
+                            </td>
+                          <?php } ?>
+                          <td class="align-middle text-center">
+                            <span class="text-secondary text-xs font-weight-bold"><?= $result->date_naissance ?></span>
+                          </td>
+                          <td class="align-middle text-center">
+                            <span class="text-secondary text-xs font-weight-bold"><?= $result->salaire ?> DH</span>
+                          </td>
+                          <td class="align-middle text-center">
+                            <div class="d-flex">
+                              <a href="edit_ensaignant.php?id=<?= $result->id_enseignant ?>" class="dropdown-item">
+                                <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
+                              </a>
+                              <a href="description_enseignant.php?id=<?= $result->id_enseignant ?>" class="dropdown-item">
+                                <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                              </a>
+                              <a href="enseignant.php?id=<?= $result->id_enseignant ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_enseignant ?>"></i>
+                              </a>
+                            </div>
+                          </td>
+                        </tr>
+                            `);
+              });
+            } else {
+              // Aucun résultat
+              tableBody.append(`
+                            <tr>
+                                <td colspan="8" class="text-center">Aucune Eleve trouvée pour cette période</td>
+                            </tr>
+                        `);
+            }
+          },
+          error: function(xhr) {
+            // Gestion des erreurs
+            console.error('Erreur de requête:', xhr);
+            tableBody.html(`
+                        <tr>
+                            <td colspan="9" class="text-center text-danger">
+                                Erreur lors de la récupération des données
+                            </td>
+                        </tr>
+                    `);
+          }
+        });
       });
     });
   </script>

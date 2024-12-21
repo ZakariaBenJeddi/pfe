@@ -491,16 +491,18 @@ try {
                               echo $date->format('Y-m-d'); ?>
                             </p>
                           </td>
-                          <td class="align-middle text-center d-flex">
-                            <a href="edit_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
-                              <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
-                            </a>
-                            <a href="description_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
-                              <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
-                            </a>
-                            <a href="filiere.php?id=<?= $result->id_filiere ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                              <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
-                            </a>
+                          <td class="align-middle text-center">
+                            <div class="d-flex">
+                              <a href="edit_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
+                                <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
+                              </a>
+                              <a href="description_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
+                                <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                              </a>
+                              <a href="filiere.php?id=<?= $result->id_filiere ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
+                              </a>
+                            </div>
                           </td>
                         </tr>
                       <?php endforeach; ?>
@@ -653,16 +655,18 @@ try {
                               echo $date->format('Y-m-d'); ?>
                             </p>
                           </td>
-                          <td class="align-middle text-center d-flex">
-                            <a href="edit_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
-                              <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
-                            </a>
-                            <a href="description_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
-                              <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
-                            </a>
-                            <a href="filiere.php?id=<?= $result->id_filiere ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                              <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
-                            </a>
+                          <td class="align-middle text-center">
+                            <div class="d-flex">
+                              <a href="edit_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
+                                <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
+                              </a>
+                              <a href="description_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
+                                <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                              </a>
+                              <a href="filiere.php?id=<?= $result->id_filiere ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
+                              </a>
+                            </div>
                           </td>
                         </tr>
                             `);

@@ -531,16 +531,18 @@ try {
                               <?= $result->annee_scolaire; ?>
                             </p>
                           </td>
-                          <td class="align-middle text-center d-flex">
-                            <a href="edit_classe.php?id=<?= $result->id_classe ?>" class="dropdown-item mt-5">
-                              <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
-                            </a>
-                            <a href="description_classe.php?id=<?= $result->id_classe ?>" class="dropdown-item mt-5">
-                              <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
-                            </a>
-                            <a href="classes.php?id=<?= $result->id_classe ?>&del=1" class="dropdown-item mt-5" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                              <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
-                            </a>
+                          <td class="align-middle text-center">
+                            <div class="d-flex">
+                              <a href="edit_classe.php?id=<?= $result->id_classe ?>" class="dropdown-item">
+                                <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
+                              </a>
+                              <a href="description_classe.php?id=<?= $result->id_classe ?>" class="dropdown-item">
+                                <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                              </a>
+                              <a href="classes.php?id=<?= $result->id_classe ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
+                              </a>
+                            </div>
                           </td>
                         </tr>
                       <?php endforeach; ?>
@@ -717,16 +719,17 @@ try {
                               <?= $result->annee_scolaire; ?>
                             </p>
                           </td>
-                          <td class="align-middle text-center d-flex">
-                            <a href="edit_niveau.php?id=<?= $result->id_niveau ?>" class="dropdown-item">
-                              <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
-                            </a>
-                            <a href="description_niveau.php?id=<?= $result->id_niveau ?>" class="dropdown-item">
-                              <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
-                            </a>
-                            <a href="niveau.php?id=<?= $result->id_niveau ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                              <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
-                            </a>
+                          <td class="align-middle text-center">
+                            <div class="d-flex">
+                              <a href="edit_classe.php?id=<?= $result->id_classe ?>" class="dropdown-item">
+                                <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
+                              </a>
+                              <a href="description_classe.php?id=<?= $result->id_classe ?>" class="dropdown-item">
+                                <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                              </a>
+                              <a href="classes.php?id=<?= $result->id_classe ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
+                              </a>
                           </td>
                         </tr>
                         `);

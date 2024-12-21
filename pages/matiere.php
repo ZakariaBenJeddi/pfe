@@ -499,15 +499,17 @@ try {
                               <?= substr($result->description, 0, 20) . (strlen($result->description) > 20 ? '...' : ''); ?>
                             </p>
                           </td>
-                          <td class="align-middle text-center d-flex">
-                            <a href="edit_matiere.php?id=<?= $result->id_matiere ?>" class="dropdown-item">
-                              <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
-                            </a>
-                            <a href="description_matiere.php?id=<?= $result->id_matiere ?>" class="dropdown-item">
-                              <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
-                            </a>
-                            <a href="matiere.php?id=<?= $result->id_matiere ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                              <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
+                          <td class="align-middle text-center">
+                            <div class="d-flex">
+                              <a href="edit_matiere.php?id=<?= $result->id_matiere ?>" class="dropdown-item">
+                                <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
+                              </a>
+                              <a href="description_matiere.php?id=<?= $result->id_matiere ?>" class="dropdown-item">
+                                <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                              </a>
+                              <a href="matiere.php?id=<?= $result->id_matiere ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
+                            </div>
                             </a>
                           </td>
                         </tr>
@@ -666,16 +668,17 @@ try {
                               <?= substr($result->description, 0, 20) . (strlen($result->description) > 20 ? '...' : ''); ?>
                             </p>
                           </td>
-                          <td class="align-middle text-center d-flex">
-                            <a href="edit_matiere.php?id=<?= $result->id_matiere ?>" class="dropdown-item">
-                              <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
-                            </a>
-                            <a href="description_matiere.php?id=<?= $result->id_matiere ?>" class="dropdown-item">
-                              <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
-                            </a>
-                            <a href="matiere.php?id=<?= $result->id_matiere ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                              <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
-                            </a>
+                          <td class="align-middle text-center">
+                            <div class="d-flex">
+                              <a href="edit_matiere.php?id=<?= $result->id_matiere ?>" class="dropdown-item">
+                                <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
+                              </a>
+                              <a href="description_matiere.php?id=<?= $result->id_matiere ?>" class="dropdown-item">
+                                <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                              </a>
+                              <a href="matiere.php?id=<?= $result->id_matiere ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
+                            </div>
                           </td>
                         </tr>
                       `);

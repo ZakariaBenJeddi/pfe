@@ -679,7 +679,7 @@ if (isset($_GET['delete_affectation']) && $_GET['delete_affectation'] == 1) {
             <div class="card-body pt-4 p-3">
               <ul class="list-group">
                 <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
-                  <div class="d-flex ">
+                  <div class="d-flex">
                     <h6 class="me-5 text-sm"><?= $results[0]->nom_enseignant . ' ' . $results[0]->prenom_enseignant ?></h6>
 
                     <?php if ($result_EM === false) { ?>
