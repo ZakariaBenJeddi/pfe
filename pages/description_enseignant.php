@@ -684,14 +684,15 @@ if (isset($_GET['delete_affectation']) && $_GET['delete_affectation'] == 1) {
 
                     <?php if ($result_EM === false) { ?>
                       <select name="matiere_select" id="matiere_select" class="form-select ml-3">
+                        <option value="">Choisir Matiere</option>
                         <?php foreach ($resultsMatieres as $matiere) { ?>
                           <option value="<?= $matiere->nom_matiere ?>"><?= $matiere->nom_matiere ?></option>
                         <?php } ?>
                       </select>
                     <?php } else {
-                      if ($result_afficher_matiere_affecter) {
-                        echo $result_afficher_matiere_affecter['matiere'];
-                      } else {
+                      if ($result_afficher_matiere_affecter) { ?>
+                        <input class="form-control" type="text" value="<?= $result_afficher_matiere_affecter['matiere'] ?>" readonly>
+                      <?php } else {
                         echo "Matiere non trouve";
                       }
                     } ?>
@@ -704,7 +705,6 @@ if (isset($_GET['delete_affectation']) && $_GET['delete_affectation'] == 1) {
                         class="btn btn-link text-danger px-3 mb-0">
                         Delete
                       </a>
-                      <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i><input type="button" name="edit" class="btn btn-link text-dark px-3 mb-0" value="Edit" >
                     </form>
                   </div>
                 </li>
@@ -843,8 +843,6 @@ if (isset($_GET['delete_affectation']) && $_GET['delete_affectation'] == 1) {
       });
     });
   </script>
-
-
 
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
