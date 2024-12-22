@@ -106,6 +106,30 @@ if (isset($_GET['id'])) {
   exit();
 }
 
+//TODO Traitement de la suppression d'une affectation
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_affectation'])) {
+  if (isset($_POST['code_matiere'])) {
+      try {
+          // Récupérer l'id_matiere
+          $stmt_matiere = $dbh->prepare("SELECT id_matiere FROM matiere WHERE code_matiere = ?");
+          $stmt_matiere->execute([$_POST['code_matiere']]);
+          $matiere = $stmt_matiere->fetch(PDO::FETCH_OBJ);
+
+          if ($matiere) {
+              // Supprimer l'affectation
+              $stmt_delete = $dbh->prepare("DELETE FROM enseignant_classes_matieres WHERE matiere_id = ? AND classe_id = ?");
+              $stmt_delete->execute([$matiere->id_matiere, $id_classe]);
+
+              // Rediriger pour éviter la resoumission
+              // header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . $id_classe . "&success=1");
+              echo '<script>alert("L\'affectation a été supprimée avec succès.")</script>';
+          }
+      } catch (PDOException $e) {
+          echo "Erreur lors de la suppression : " . $e->getMessage();
+      }
+  }
+}
+
 // Fonction pour échapper les données avant de les afficher (protection XSS)
 function escape($data)
 {
@@ -602,24 +626,56 @@ function escape($data)
               <ul class="list-group">
                 <?php foreach ($combined_results as $result) : ?>
                   <?php if (isset($result->code_matiere)) : ?>
-                    <li class="list-group-item border-0 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center p-4 mb-2 bg-gray-100 border-radius-lg" data-id-classe="<?= htmlspecialchars($result->id_classe, ENT_QUOTES, 'UTF-8') ?>">
+                    <li class="list-group-item border-0 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center p-4 mb-2 bg-gray-100 border-radius-lg">
                       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center w-100">
                         <span class="font-weight-bold text-dark mb-2 mb-md-0 me-md-4">
                           <?php echo htmlspecialchars($result->code_matiere); ?>
                         </span>
-                        <select name="enseignant" class="form-select select-sm w-100 w-md-auto ms-md-3 px-lg-5" onchange="assignEnseignant('<?= htmlspecialchars($result->code_matiere, ENT_QUOTES, 'UTF-8') ?>', this.value)">
-                          <option value="">Sélectionner un enseignant</option>
-                          <?php foreach ($results_all_enseignant as $enseignant) : ?>
-                            <option value="<?= htmlspecialchars($enseignant->id_enseignant, ENT_QUOTES, 'UTF-8') ?>">
-                              <?= htmlspecialchars($enseignant->nom_enseignant, ENT_QUOTES, 'UTF-8') ?>
-                            </option>
-                          <?php endforeach; ?>
-                        </select>
+
+                        <?php
+                        // D'abord obtenir l'ID de la matière à partir du code
+                        $stmt_matiere = $dbh->prepare("SELECT id_matiere FROM matiere WHERE code_matiere = ?");
+                        $stmt_matiere->execute([$result->code_matiere]);
+                        $matiere = $stmt_matiere->fetch(PDO::FETCH_OBJ);
+
+                        if ($matiere) {
+                          // Vérifier si un enseignant est déjà affecté
+                          $stmt = $dbh->prepare("SELECT e.nom_enseignant, e.prenom_enseignant 
+                                FROM enseignant_classes_matieres ecm 
+                                JOIN enseignant e ON ecm.enseignant_id = e.id_enseignant 
+                                WHERE ecm.matiere_id = ? AND ecm.classe_id = ?");
+                          $stmt->execute([$matiere->id_matiere, $id_classe]);
+                          $enseignant_affecte = $stmt->fetch(PDO::FETCH_OBJ);
+
+                          if ($enseignant_affecte) :
+                        ?>
+                            <input type="text" class="form-control w-100 w-md-auto ms-md-3 px-lg-5" value="<?= htmlspecialchars($enseignant_affecte->nom_enseignant . ' ' . $enseignant_affecte->prenom_enseignant) ?>" readonly>
+                          <?php else : ?>
+                            <select name="enseignant" class="form-select select-sm w-100 w-md-auto ms-md-3 px-lg-5" onchange="assignEnseignant('<?= htmlspecialchars($result->code_matiere, ENT_QUOTES, 'UTF-8') ?>', this.value)">
+                              <option value="">Sélectionner un enseignant</option>
+                              <?php foreach ($results_all_enseignant as $enseignant) : ?>
+                                <option value="<?= htmlspecialchars($enseignant->id_enseignant, ENT_QUOTES, 'UTF-8') ?>">
+                                  <?= htmlspecialchars($enseignant->nom_enseignant . ' ' . $enseignant->prenom_enseignant) ?>
+                                </option>
+                              <?php endforeach; ?>
+                            </select>
+                        <?php endif;
+                        }
+                        ?>
                       </div>
+
+                      <!-- <form method="post" action="" class="mt-3 mt-md-0 w-100 w-md-auto text-end">
+                        <input type="hidden" name="csrf_token" value="<?php // htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
+                        <input type="hidden" name="code_matiere" value="<?php // htmlspecialchars($result->code_matiere, ENT_QUOTES, 'UTF-8') ?>">
+                        <button type="submit" name="delete_affectation" value="1" class="btn btn-link text-danger mb-0">
+                          <i class="far fa-trash-alt me-2"></i> Supprimer
+                        </button>
+                      </form> -->
                       <form method="post" action="" class="mt-3 mt-md-0 w-100 w-md-auto text-end">
                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
                         <input type="hidden" name="code_matiere" value="<?= htmlspecialchars($result->code_matiere, ENT_QUOTES, 'UTF-8') ?>">
-                        <button type="submit" name="delete_affectation" value="1" class="btn btn-link text-danger mb-0">
+                        <input type="hidden" name="id_classe" value="<?= htmlspecialchars($id_classe, ENT_QUOTES, 'UTF-8') ?>">
+                        <button type="submit" name="delete_affectation" value="1" class="btn btn-link text-danger mb-0" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette affectation ?');">
                           <i class="far fa-trash-alt me-2"></i> Supprimer
                         </button>
                       </form>
@@ -627,7 +683,6 @@ function escape($data)
                   <?php endif; ?>
                 <?php endforeach; ?>
               </ul>
-
             </div>
           </div>
         </div>
@@ -765,6 +820,7 @@ function escape($data)
           console.log('Réponse serveur:', result);
           if (result.success) {
             alert('Assignation enregistrée avec succès.');
+            window.location.reload()
           } else {
             alert('Erreur : ' + (result.message || 'Erreur inconnue'));
           }
