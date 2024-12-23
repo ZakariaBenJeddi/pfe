@@ -76,7 +76,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 //** Lecture de tous les niveaux
 try {
-  $sql = "SELECT * FROM classe";
+  $sql = "SELECT classe.* ,filiere.nom_filiere , niveau.nom_niveau FROM classe 
+        JOIN filiere ON classe.filiere_id  = filiere.id_filiere 
+        JOIN niveau ON classe.niveau_id  = niveau.id_niveau";
   $query = $dbh->query($sql);
   $results = $query->fetchAll(PDO::FETCH_OBJ);
 } catch (PDOException $e) {
@@ -490,14 +492,14 @@ try {
                           <td>
                             <div class="d-flex px-2 py-1">
                               <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->niveau_id ?></h6>
+                                <h6 class="mb-0 text-sm"><?= $result->nom_niveau ?></h6>
                               </div>
                             </div>
                           </td>
                           <td>
                             <div class="d-flex px-2 py-1">
                               <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->filiere_id ?></h6>
+                                <h6 class="mb-0 text-sm"><?= $result->nom_filiere ?></h6>
                               </div>
                             </div>
                           </td>

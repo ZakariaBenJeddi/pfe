@@ -40,11 +40,12 @@ $date_cette_anne = date('Y');
 $date_anne_dernier = date('Y', strtotime('-1 year'));
 
 // Fonction générique pour calculer le pourcentage de changement
-function calculerPourcentageChangement($valeur_actuelle, $valeur_precedente) {
-    if ($valeur_precedente <= 0) {
-        return null;
-    }
-    return (($valeur_actuelle - $valeur_precedente) / $valeur_precedente) * 100;
+function calculerPourcentageChangement($valeur_actuelle, $valeur_precedente)
+{
+  if ($valeur_precedente <= 0) {
+    return null;
+  }
+  return (($valeur_actuelle - $valeur_precedente) / $valeur_precedente) * 100;
 }
 
 //* Calcul pour les élèves
@@ -58,8 +59,8 @@ $query->execute();
 $nbr_eleves_inscrit_anne_dernier = $query->fetchColumn();
 
 $pourcentage = calculerPourcentageChangement(
-    $nbr_eleves_inscrit_cette_anne,
-    $nbr_eleves_inscrit_anne_dernier
+  $nbr_eleves_inscrit_cette_anne,
+  $nbr_eleves_inscrit_anne_dernier
 );
 
 //* Calcul pour les enseignants
@@ -73,8 +74,8 @@ $query->execute();
 $nbr_enseignants_inscrit_anne_dernier = $query->fetchColumn();
 
 $pourcentage_enseignant = calculerPourcentageChangement(
-    $nbr_enseignants_inscrit_cette_anne,
-    $nbr_enseignants_inscrit_anne_dernier
+  $nbr_enseignants_inscrit_cette_anne,
+  $nbr_enseignants_inscrit_anne_dernier
 );
 
 //* Calcul pour les absences
@@ -91,8 +92,8 @@ $query->execute();
 $nbr_absences_hier = $query->fetchColumn();
 
 $pourcentage_absence = calculerPourcentageChangement(
-    $nbr_absences_aujourdhui,
-    $nbr_absences_hier
+  $nbr_absences_aujourdhui,
+  $nbr_absences_hier
 );
 
 //* Affichage des résultats avec gestion des erreurs
@@ -108,12 +109,90 @@ if ($pourcentage_absence === null) {
   echo "<script>alert(`Impossible de calculer le pourcentage d'absences (pas de données hier)`)\n</script>";
 }
 
+
+// Fonction pour traduire les jours en français
+function translateDay($englishDay)
+{
+  $translations = [
+    'Mon' => 'Lun',
+    'Tue' => 'Mar',
+    'Wed' => 'Mer',
+    'Thu' => 'Jeu',
+    'Fri' => 'Ven',
+    'Sat' => 'Sam',
+    'Sun' => 'Dim'
+  ];
+  return $translations[$englishDay] ?? $englishDay;
+}
+
+// Requête SQL améliorée pour récupérer les absences de la semaine
+$query_absc = "SELECT 
+  e.genre,
+  DATE_FORMAT(a.date_absence, '%a') AS jour,
+  COUNT(DISTINCT a.id_absence) AS nb_absences
+  FROM absences a
+  JOIN eleves e ON a.id_eleve = e.id_eleve
+  WHERE a.date_absence BETWEEN DATE_SUB(CURRENT_DATE, INTERVAL 6 DAY) AND CURRENT_DATE
+  AND a.statut = 'validee'
+  GROUP BY e.genre, jour
+  ORDER BY FIELD(jour, 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')";
+
+$stmt_absc = $dbh->prepare($query_absc);
+$stmt_absc->execute();
+
+// Initialiser le tableau avec tous les jours à 0
+$jours = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+$data = [
+  'garçon' => array_fill_keys($jours, 0),
+  'fille' => array_fill_keys($jours, 0)
+];
+
+// Remplir les données
+while ($row = $stmt_absc->fetch(PDO::FETCH_ASSOC)) {
+  $genre = $row['genre'] === 'Masculin' ? 'garçon' : 'fille';
+  $jour = $row['jour'];
+  $data[$genre][$jour] = (int)$row['nb_absences'];
+}
+
+// Préparer les données pour le graphique
+$chartData = [
+  'garçon' => [],
+  'fille' => []
+];
+
+foreach ($jours as $jour) {
+  $chartData['garçon'][] = [
+    'x' => translateDay($jour),
+    'y' => $data['garçon'][$jour]
+  ];
+  $chartData['fille'][] = [
+    'x' => translateDay($jour),
+    'y' => $data['fille'][$jour]
+  ];
+}
+
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <!-- HEAD -->
 <?php include '../includes/head.php' ?>
+<style>
+.dropdown-item {
+  padding: 0.5rem 1rem;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(13, 110, 253, 0.1);
+}
+
+.dropdown-item.active {
+  background-color: rgba(13, 110, 253, 0.1);
+  color: #0d6efd;
+}
+
+</style>
 
 <body class="g-sidenav-show  bg-gray-100">
   <div class="min-height-300 bg-primary position-absolute w-100"></div>
@@ -504,7 +583,7 @@ if ($pourcentage_absence === null) {
                   <div class="numbers">
                     <p class="text-sm mb-0 text-uppercase font-weight-bold">Abscence</p>
                     <h5 class="font-weight-bolder">
-                      <?= $nbr_abscence ; ?>
+                      <?= $nbr_abscence; ?>
                     </h5>
                     <p class="mb-0">
                       <span class="<?= $pourcentage_absence < 0 ? 'text-danger' : 'text-success'; ?> text-sm font-weight-bolder">
@@ -551,51 +630,85 @@ if ($pourcentage_absence === null) {
         </div>
       </div>
       <div class="row mt-4">
-        <!-- //! Abscence chart -->
+        <!-- Absence chart card -->
         <div class="col-lg-7 mb-lg-0 mb-5">
-          <div class="card shadow">
+          <div class="card shadow-sm hover:shadow-lg transition-shadow duration-300">
             <div class="card-body">
-              <div class="row">
-                <div class="col-6">
-                  <div class="d-flex align-items-center">
-                    <span class="text-secondary me-2">Abscence Chart</span>
-                    <span class="fw-semibold">$3,232</span>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="d-flex align-items-center justify-content-end">
-                    <span class="text-warning text-sm font-weight-bolder">-4%</span> than last day
+              <!-- Header -->
+              <div class="row mb-4">
+                <div class="col-sm-6">
+                  <div class="d-flex align-items-center mb-2 mb-sm-0">
+                    <div class="me-3">
+                      <span class="badge bg-primary-subtle text-primary p-2 rounded-circle">
+                        <i class="fas fa-chart-bar"></i>
+                      </span>
+                    </div>
+                    <div>
+                      <p class="card-title mb-0 text-secondary">Statistiques des Absences</p>
+                      <?php
+                      // Calcul du total des absences aujourd'hui
+                      $total_absences = $data['garçon']['Mon'] + $data['fille']['Mon']; // Supposons que 'Mon' représente aujourd'hui
+                      ?>
+                      <span class="fw-semibold text-dark"><?= $total_absences ?> absence(s)</span>
+                    </div>
                   </div>
                 </div>
               </div>
-
-              <div id="column-chart"></div>
-
-              <div class="">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="dropdown">
-                    <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                      Last 7 days
-                    </button>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="#">Yesterday</a></li>
-                      <li><a class="dropdown-item" href="#">Today</a></li>
-                      <li><a class="dropdown-item" href="#">Last 7 days</a></li>
-                      <li><a class="dropdown-item" href="#">Last 30 days</a></li>
-                      <li><a class="dropdown-item" href="#">Last 90 days</a></li>
-                    </ul>
-                  </div>
-                  <a href="#" class="btn btn-link text-decoration-none d-flex align-items-center">
-                    LEADS REPORT
-                    <svg class="ms-2" style="width: 6px; height: 10px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4" />
-                    </svg>
-                  </a>
+              <!-- Chart -->
+              <div id="column-chart" class="mt-2"></div>
+              <!-- Footer -->
+              <div class="d-flex justify-content-between align-items-center mt-4">
+                <div class="dropdown">
+                  <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    <span>7 derniers jours</span>
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <a class="dropdown-item d-flex align-items-center" href="#">
+                        <i class="fas fa-clock me-2 text-secondary"></i>
+                        Aujourd'hui
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item d-flex align-items-center" href="#">
+                        <i class="fas fa-calendar-day me-2 text-secondary"></i>
+                        Hier
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item d-flex align-items-center active" href="#">
+                        <i class="fas fa-calendar-week me-2 text-secondary"></i>
+                        7 derniers jours
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item d-flex align-items-center" href="#">
+                        <i class="fas fa-calendar me-2 text-secondary"></i>
+                        30 derniers jours
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item d-flex align-items-center" href="#">
+                        <i class="fas fa-calendar-alt me-2 text-secondary"></i>
+                        90 derniers jours
+                      </a>
+                    </li>
+                  </ul>
                 </div>
+
+                <a href="#" class="btn btn-primary d-flex align-items-center">
+                  <span>Rapport détaillé</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right ms-2" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z" />
+                  </svg>
+                </a>
               </div>
+
             </div>
           </div>
         </div>
+
         <div class="col-lg-5">
           <div class="card card-carousel overflow-hidden h-100 p-0">
             <div id="carouselExampleCaptions" class="carousel slide h-100" data-bs-ride="carousel">
@@ -923,147 +1036,104 @@ if ($pourcentage_absence === null) {
   <!-- //! LINE CHART BLEU ROSE -->
   <script>
     const options = {
-      colors: ["#0d6efd", "#ffc107"],
+      colors: ["#0d6efd", "#f62459"],
       series: [{
-          name: "garçon",
+          name: "Garçons",
           color: "#0d6efd",
-          data: [{
-              x: "Mon",
-              y: 231
-            },
-            {
-              x: "Tue",
-              y: 122
-            },
-            {
-              x: "Wed",
-              y: 63
-            },
-            {
-              x: "Thu",
-              y: 421
-            },
-            {
-              x: "Fri",
-              y: 122
-            },
-            {
-              x: "Sat",
-              y: 323
-            },
-            {
-              x: "Sun",
-              y: 111
-            },
-          ],
+          data: <?= json_encode($chartData['garçon']) ?>
         },
         {
-          name: "fille",
+          name: "Filles",
           color: "#f62459",
-          data: [{
-              x: "Mon",
-              y: 232
-            },
-            {
-              x: "Tue",
-              y: 113
-            },
-            {
-              x: "Wed",
-              y: 341
-            },
-            {
-              x: "Thu",
-              y: 224
-            },
-            {
-              x: "Fri",
-              y: 522
-            },
-            {
-              x: "Sat",
-              y: 411
-            },
-            {
-              x: "Sun",
-              y: 243
-            },
-          ],
-        },
+          data: <?= json_encode($chartData['fille']) ?>
+        }
       ],
       chart: {
         type: "bar",
-        height: "320px",
+        height: 320,
         fontFamily: "system-ui, -apple-system, sans-serif",
         toolbar: {
-          show: false,
-        },
+          show: false
+        }
       },
       plotOptions: {
         bar: {
           horizontal: false,
           columnWidth: "70%",
           borderRadiusApplication: "end",
-          borderRadius: 4,
-        },
+          borderRadius: 4
+        }
       },
       tooltip: {
         shared: true,
         intersect: false,
         style: {
-          fontFamily: "system-ui, -apple-system, sans-serif",
+          fontFamily: "system-ui, -apple-system, sans-serif"
         },
+        y: {
+          formatter: function(value) {
+            return value + " absence(s)";
+          }
+        }
       },
       states: {
         hover: {
           filter: {
             type: "darken",
-            value: 1,
-          },
-        },
+            value: 1
+          }
+        }
       },
       stroke: {
         show: true,
         width: 0,
-        colors: ["transparent"],
+        colors: ["transparent"]
       },
       grid: {
         show: false,
-        strokeDashArray: 4,
         padding: {
           left: 2,
           right: 2,
           top: -14
-        },
+        }
       },
       dataLabels: {
-        enabled: false,
+        enabled: false
       },
       legend: {
-        show: false,
+        show: true,
+        position: 'top',
+        horizontalAlign: 'left',
+        offsetY: -5,
+        labels: {
+          colors: '#6c757d'
+        }
       },
       xaxis: {
-        floating: false,
         labels: {
-          show: true,
           style: {
             fontFamily: "system-ui, -apple-system, sans-serif",
             colors: '#6c757d'
           }
         },
         axisBorder: {
-          show: false,
+          show: false
         },
         axisTicks: {
-          show: false,
-        },
+          show: false
+        }
       },
       yaxis: {
-        show: false,
-      },
-      fill: {
-        opacity: 1,
-      },
+        show: true,
+        labels: {
+          formatter: function(value) {
+            return Math.floor(value);
+          },
+          style: {
+            colors: '#6c757d'
+          }
+        }
+      }
     };
 
     if (document.getElementById("column-chart") && typeof ApexCharts !== 'undefined') {
@@ -1071,6 +1141,7 @@ if ($pourcentage_absence === null) {
       chart.render();
     }
   </script>
+
 
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
