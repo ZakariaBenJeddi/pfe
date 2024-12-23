@@ -1,4 +1,8 @@
 <?php
+
+use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Date;
+use PhpOffice\PhpSpreadsheet\Calculation\TextData\Format;
+
 session_start();
 if (empty($_SESSION['user'])) {
   header('location:sign-in.php');
@@ -18,9 +22,92 @@ if (isset($_SESSION['last_action'])) {
 }
 $_SESSION['last_action'] = time();
 
-//!Récupère le nombre total de salles
+//**Récupère le nombre total de salles
 $query_nbr_salle = $dbh->query("SELECT COUNT(*) FROM salle ");
 $nbr_salle = $query_nbr_salle->fetchColumn();
+//**Récupère le nombre total de salles
+$query_nbr_eleves = $dbh->query("SELECT COUNT(*) FROM eleves ");
+$nbr_eleves = $query_nbr_eleves->fetchColumn();
+//**Récupère le nombre total de enseignant
+$query_nbr_enseignant = $dbh->query("SELECT COUNT(*) FROM enseignant ");
+$nbr_enseignant = $query_nbr_enseignant->fetchColumn();
+//**Récupère le nombre total d'abscence
+$query_nbr_abscence = $dbh->query("SELECT COUNT(*) FROM absences ");
+$nbr_abscence = $query_nbr_abscence->fetchColumn();
+
+// Récupération des dates
+$date_cette_anne = date('Y');
+$date_anne_dernier = date('Y', strtotime('-1 year'));
+
+// Fonction générique pour calculer le pourcentage de changement
+function calculerPourcentageChangement($valeur_actuelle, $valeur_precedente) {
+    if ($valeur_precedente <= 0) {
+        return null;
+    }
+    return (($valeur_actuelle - $valeur_precedente) / $valeur_precedente) * 100;
+}
+
+//* Calcul pour les élèves
+$query = $dbh->prepare("SELECT COUNT(*) FROM eleves WHERE YEAR(date_inscription) = :date");
+$query->bindParam(":date", $date_cette_anne);
+$query->execute();
+$nbr_eleves_inscrit_cette_anne = $query->fetchColumn();
+
+$query->bindParam(":date", $date_anne_dernier);
+$query->execute();
+$nbr_eleves_inscrit_anne_dernier = $query->fetchColumn();
+
+$pourcentage = calculerPourcentageChangement(
+    $nbr_eleves_inscrit_cette_anne,
+    $nbr_eleves_inscrit_anne_dernier
+);
+
+//* Calcul pour les enseignants
+$query = $dbh->prepare("SELECT COUNT(*) FROM enseignant WHERE YEAR(date_creation) = :date");
+$query->bindParam(":date", $date_cette_anne);
+$query->execute();
+$nbr_enseignants_inscrit_cette_anne = $query->fetchColumn();
+
+$query->bindParam(":date", $date_anne_dernier);
+$query->execute();
+$nbr_enseignants_inscrit_anne_dernier = $query->fetchColumn();
+
+$pourcentage_enseignant = calculerPourcentageChangement(
+    $nbr_enseignants_inscrit_cette_anne,
+    $nbr_enseignants_inscrit_anne_dernier
+);
+
+//* Calcul pour les absences
+$date_aujourdhui = date('Y-m-d');
+$date_hier = date('Y-m-d', strtotime('-1 day'));
+
+$query = $dbh->prepare("SELECT COUNT(*) FROM absences WHERE date_absence = :date");
+$query->bindParam(":date", $date_aujourdhui);
+$query->execute();
+$nbr_absences_aujourdhui = $query->fetchColumn();
+
+$query->bindParam(":date", $date_hier);
+$query->execute();
+$nbr_absences_hier = $query->fetchColumn();
+
+$pourcentage_absence = calculerPourcentageChangement(
+    $nbr_absences_aujourdhui,
+    $nbr_absences_hier
+);
+
+//* Affichage des résultats avec gestion des erreurs
+if ($pourcentage === null) {
+  echo "<script>alert(`Impossible de calculer le pourcentage d'élèves (pas de données l'année dernière)`)\n</script>";
+}
+
+if ($pourcentage_enseignant === null) {
+  echo "<script>alert(`Impossible de calculer le pourcentage d'enseignants (pas de données l'année dernière)`)\n</script>";
+}
+
+if ($pourcentage_absence === null) {
+  echo "<script>alert(`Impossible de calculer le pourcentage d'absences (pas de données hier)`)\n</script>";
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -198,7 +285,6 @@ $nbr_salle = $query_nbr_salle->fetchColumn();
             <span class="nav-link-text ms-1">Frais de scolarité</span>
           </a>
         </li>
-
         <!-- Section Compte -->
         <li class="nav-item mt-3">
           <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Mon Compte</h6>
@@ -356,32 +442,6 @@ $nbr_salle = $query_nbr_salle->fetchColumn();
     <div class="container-fluid py-4">
       <div class="row">
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-          <div class="card" id="nombre_salle">
-            <div class="card-body p-3">
-              <div class="row">
-                <div class="col-8">
-                  <div class="numbers">
-                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Nombre Salle</p>
-                    <h5 class="font-weight-bolder">
-                      <?= $nbr_salle //*nombre salle ; 
-                      ?>
-                    </h5>
-                    <p class="mb-0">
-                      <span class="text-success text-sm font-weight-bolder">11</span>
-                      Salles actuellement
-                    </p>
-                  </div>
-                </div>
-                <div class="col-4 text-end">
-                  <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
-                    <i class="ni ni-building text-light text-lg opacity-10" aria-hidden="true"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
           <div class="card" id="nombre_eleve">
             <div class="card-body p-3">
               <div class="row">
@@ -389,11 +449,13 @@ $nbr_salle = $query_nbr_salle->fetchColumn();
                   <div class="numbers">
                     <p class="text-sm mb-0 text-uppercase font-weight-bold">Nombre eleve</p>
                     <h5 class="font-weight-bolder">
-                      5,100
+                      <?= $nbr_eleves ?>
                     </h5>
                     <p class="mb-0">
-                      <span class="text-success text-sm font-weight-bolder">+6%</span>
-                      l'année dernière
+                      <span class="<?= $pourcentage < 0 ? 'text-danger' : 'text-success'; ?> text-sm font-weight-bolder">
+                        <?= number_format($pourcentage, 2) . "%"; ?>
+                      </span>
+                      l'année précédente
                     </p>
                   </div>
                 </div>
@@ -414,11 +476,13 @@ $nbr_salle = $query_nbr_salle->fetchColumn();
                   <div class="numbers">
                     <p class="text-sm mb-0 text-uppercase font-weight-bold">Ensaignant</p>
                     <h5 class="font-weight-bolder">
-                      +3,462
+                      <?= $nbr_enseignant ?>
                     </h5>
                     <p class="mb-0">
-                      <span class="text-danger text-sm font-weight-bolder">-2%</span>
-                      since last quarter
+                      <span class="<?= $pourcentage_enseignant < 0 ? 'text-danger' : 'text-success'; ?> text-sm font-weight-bolder">
+                        <?= number_format($pourcentage_enseignant, 2) . "%"; ?>
+                      </span>
+                      l'année précédente
                     </p>
                   </div>
                 </div>
@@ -440,16 +504,45 @@ $nbr_salle = $query_nbr_salle->fetchColumn();
                   <div class="numbers">
                     <p class="text-sm mb-0 text-uppercase font-weight-bold">Abscence</p>
                     <h5 class="font-weight-bolder">
-                      19
+                      <?= $nbr_abscence ; ?>
                     </h5>
                     <p class="mb-0">
-                      <span class="text-warning text-sm font-weight-bolder">-4%</span> than last day x
+                      <span class="<?= $pourcentage_absence < 0 ? 'text-danger' : 'text-success'; ?> text-sm font-weight-bolder">
+                        <?= number_format($pourcentage_absence, 2) . "%"; ?>
+                      </span>
+                      par rapport à hier
                     </p>
                   </div>
                 </div>
                 <div class="col-4 text-end">
                   <div class="icon icon-shape bg-gradient-warning shadow-warning text-center rounded-circle">
                     <i class="fas fa-user-slash text-lg opacity-10" aria-hidden="true"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+          <div class="card" id="nombre_salle">
+            <div class="card-body p-3">
+              <div class="row">
+                <div class="col-8">
+                  <div class="numbers">
+                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Nombre Salle</p>
+                    <h5 class="font-weight-bolder">
+                      <?= $nbr_salle //*nombre salle ; 
+                      ?>
+                    </h5>
+                    <p class="mb-0">
+                      <span class="text-success text-sm font-weight-bolder">11</span>
+                      Salles actuellement
+                    </p>
+                  </div>
+                </div>
+                <div class="col-4 text-end">
+                  <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
+                    <i class="ni ni-building text-light text-lg opacity-10" aria-hidden="true"></i>
                   </div>
                 </div>
               </div>
