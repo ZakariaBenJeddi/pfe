@@ -69,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
 //* read 
-$sql = "SELECT * FROM eleves";
+$sql = "SELECT eleves.* , classe.nom_classe ,classe.niveau_id , classe.filiere_id FROM eleves LEFT JOIN classe ON classe.id_classe = eleves.id_classe ";
 $query = $dbh->query($sql);
 $results = $query->fetchAll(PDO::FETCH_OBJ);
 
@@ -486,13 +486,13 @@ try {
                             </div>
                           </td>
                           <td class="align-middle text-center text-sm">
-                            <p class="text-xs font-weight-bold mb-0"><?= $result->niveau_scolaire; ?></p>
+                            <p class="text-xs font-weight-bold mb-0"><?php echo  $result->niveau_id ===NULL ? 'Aucun Niveau' : $result->niveau_id  ; ?></p>
                           </td>
                           <td>
-                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">Class</p>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?php echo $result->nom_classe === null ? 'Aucun Classe' : $result->nom_classe ;  ?></p>
                           </td>
                           <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0">Filiere</p>
+                          <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?php echo $result->filiere_id ===NULL? 'Aucun Filiere' : $result->filiere_id ?></p>
                           </td>
                           <td class="align-middle text-center">
                             <p class="text-xs font-weight-bold mb-0"><?= $result->telephone; ?></p>

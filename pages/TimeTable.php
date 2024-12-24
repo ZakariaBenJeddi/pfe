@@ -490,7 +490,7 @@ $roomsSchedule = $generator->getRoomsSchedule();
 </head>
 
 <body>
-  <a href="info_calendar.php">configurer donnes</a>
+  <a href="TimeTableInfo.php">configurer donnes</a>
   <!-- section pour les classes -->
   <div id="classes-section" class="schedule-section active">
     <?php foreach ($allSchedules as $classId => $data) : ?>

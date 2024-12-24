@@ -109,24 +109,24 @@ if (isset($_GET['id'])) {
 //TODO Traitement de la suppression d'une affectation
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_affectation'])) {
   if (isset($_POST['code_matiere'])) {
-      try {
-          // Récupérer l'id_matiere
-          $stmt_matiere = $dbh->prepare("SELECT id_matiere FROM matiere WHERE code_matiere = ?");
-          $stmt_matiere->execute([$_POST['code_matiere']]);
-          $matiere = $stmt_matiere->fetch(PDO::FETCH_OBJ);
+    try {
+      // Récupérer l'id_matiere
+      $stmt_matiere = $dbh->prepare("SELECT id_matiere FROM matiere WHERE code_matiere = ?");
+      $stmt_matiere->execute([$_POST['code_matiere']]);
+      $matiere = $stmt_matiere->fetch(PDO::FETCH_OBJ);
 
-          if ($matiere) {
-              // Supprimer l'affectation
-              $stmt_delete = $dbh->prepare("DELETE FROM enseignant_classes_matieres WHERE matiere_id = ? AND classe_id = ?");
-              $stmt_delete->execute([$matiere->id_matiere, $id_classe]);
+      if ($matiere) {
+        // Supprimer l'affectation
+        $stmt_delete = $dbh->prepare("DELETE FROM enseignant_classes_matieres WHERE matiere_id = ? AND classe_id = ?");
+        $stmt_delete->execute([$matiere->id_matiere, $id_classe]);
 
-              // Rediriger pour éviter la resoumission
-              // header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . $id_classe . "&success=1");
-              echo '<script>alert("L\'affectation a été supprimée avec succès.")</script>';
-          }
-      } catch (PDOException $e) {
-          echo "Erreur lors de la suppression : " . $e->getMessage();
+        // Rediriger pour éviter la resoumission
+        // header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . $id_classe . "&success=1");
+        echo '<script>alert("L\'affectation a été supprimée avec succès.")</script>';
       }
+    } catch (PDOException $e) {
+      echo "Erreur lors de la suppression : " . $e->getMessage();
+    }
   }
 }
 
@@ -619,10 +619,11 @@ function escape($data)
       <div class="row">
         <div class="col-md-8 mt-4">
           <div class="card">
-            <div class="card-header pb-0 text-center">
+            <div class="card-header pb-0 text-center border-bottom">
               <button class="btn btn-primary brn-rounded">Afficher l'emploi du temps de cette Filiere </button>
             </div>
             <div class="card-body pt-4 p-3">
+              <h4 class="text-center mt-3">Configuer Classe Enseignant</h4>
               <ul class="list-group">
                 <?php foreach ($combined_results as $result) : ?>
                   <?php if (isset($result->code_matiere)) : ?>
@@ -663,14 +664,6 @@ function escape($data)
                         }
                         ?>
                       </div>
-
-                      <!-- <form method="post" action="" class="mt-3 mt-md-0 w-100 w-md-auto text-end">
-                        <input type="hidden" name="csrf_token" value="<?php // htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
-                        <input type="hidden" name="code_matiere" value="<?php // htmlspecialchars($result->code_matiere, ENT_QUOTES, 'UTF-8') ?>">
-                        <button type="submit" name="delete_affectation" value="1" class="btn btn-link text-danger mb-0">
-                          <i class="far fa-trash-alt me-2"></i> Supprimer
-                        </button>
-                      </form> -->
                       <form method="post" action="" class="mt-3 mt-md-0 w-100 w-md-auto text-end">
                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
                         <input type="hidden" name="code_matiere" value="<?= htmlspecialchars($result->code_matiere, ENT_QUOTES, 'UTF-8') ?>">

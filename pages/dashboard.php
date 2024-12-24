@@ -98,15 +98,15 @@ $pourcentage_absence = calculerPourcentageChangement(
 
 //* Affichage des résultats avec gestion des erreurs
 if ($pourcentage === null) {
-  echo "<script>alert(`Impossible de calculer le pourcentage d'élèves (pas de données l'année dernière)`)\n</script>";
+  setcookie("show_alert", "1", time() + 2); // Expire dans 2 secondes
 }
 
 if ($pourcentage_enseignant === null) {
-  echo "<script>alert(`Impossible de calculer le pourcentage d'enseignants (pas de données l'année dernière)`)\n</script>";
+  // echo "<script>alert(`Impossible de calculer le pourcentage d'enseignants (pas de données l'année dernière)`)\n</script>";
 }
 
 if ($pourcentage_absence === null) {
-  echo "<script>alert(`Impossible de calculer le pourcentage d'absences (pas de données hier)`)\n</script>";
+  // echo "<script>alert(`Impossible de calculer le pourcentage d'absences (pas de données hier)`)\n</script>";
 }
 
 
@@ -179,19 +179,18 @@ foreach ($jours as $jour) {
 <!-- HEAD -->
 <?php include '../includes/head.php' ?>
 <style>
-.dropdown-item {
-  padding: 0.5rem 1rem;
-}
+  .dropdown-item {
+    padding: 0.5rem 1rem;
+  }
 
-.dropdown-item:hover {
-  background-color: rgba(13, 110, 253, 0.1);
-}
+  .dropdown-item:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+  }
 
-.dropdown-item.active {
-  background-color: rgba(13, 110, 253, 0.1);
-  color: #0d6efd;
-}
-
+  .dropdown-item.active {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+  }
 </style>
 
 <body class="g-sidenav-show  bg-gray-100">
@@ -530,12 +529,18 @@ foreach ($jours as $jour) {
                     <h5 class="font-weight-bolder">
                       <?= $nbr_eleves ?>
                     </h5>
-                    <p class="mb-0">
-                      <span class="<?= $pourcentage < 0 ? 'text-danger' : 'text-success'; ?> text-sm font-weight-bolder">
-                        <?= number_format($pourcentage, 2) . "%"; ?>
-                      </span>
-                      l'année précédente
-                    </p>
+                    <?php if ($pourcentage !== null) { ?>
+                      <p class="mb-0">
+                        <span class="<?= $pourcentage < 0 ? 'text-danger' : 'text-success'; ?> text-sm font-weight-bolder">
+                          <?= number_format($pourcentage, 2) . "%"; ?>
+                        </span>
+                        l'année précédente
+                      </p>
+                    <?php } else { ?>
+                      <p class="text-danger text-sm mb-0 mb-3">
+                        <i class="fas fa-exclamation-circle text-danger text-lg"></i> Error pourcentage élèves
+                      </p>
+                    <?php } ?>
                   </div>
                 </div>
                 <div class="col-4 text-end">
@@ -557,12 +562,18 @@ foreach ($jours as $jour) {
                     <h5 class="font-weight-bolder">
                       <?= $nbr_enseignant ?>
                     </h5>
-                    <p class="mb-0">
-                      <span class="<?= $pourcentage_enseignant < 0 ? 'text-danger' : 'text-success'; ?> text-sm font-weight-bolder">
-                        <?= number_format($pourcentage_enseignant, 2) . "%"; ?>
-                      </span>
-                      l'année précédente
-                    </p>
+                    <?php if ($pourcentage_enseignant !== null) { ?>
+                      <p class="mb-0">
+                        <span class="<?= $pourcentage_enseignant < 0 ? 'text-danger' : 'text-success'; ?> text-sm font-weight-bolder">
+                          <?= number_format($pourcentage_enseignant, 2) . "%"; ?>
+                        </span>
+                        l'année précédente
+                      </p>
+                    <?php } else { ?>
+                      <p class="text-danger text-sm mb-0 mb-3">
+                        <i class="fas fa-exclamation-circle text-danger text-lg"></i> Error pourcentage
+                      </p>
+                    <?php } ?>
                   </div>
                 </div>
                 <div class="col-4 text-end">
@@ -585,12 +596,18 @@ foreach ($jours as $jour) {
                     <h5 class="font-weight-bolder">
                       <?= $nbr_abscence; ?>
                     </h5>
-                    <p class="mb-0">
-                      <span class="<?= $pourcentage_absence < 0 ? 'text-danger' : 'text-success'; ?> text-sm font-weight-bolder">
-                        <?= number_format($pourcentage_absence, 2) . "%"; ?>
-                      </span>
-                      par rapport à hier
-                    </p>
+                    <?php if ($pourcentage_absence !== null) { ?>
+                      <p class="mb-0">
+                        <span class="<?= $pourcentage_absence < 0 ? 'text-danger' : 'text-success'; ?> text-sm font-weight-bolder">
+                          <?= number_format($pourcentage_absence, 2) . "%"; ?>
+                        </span>
+                        par rapport à hier
+                      </p>
+                    <?php } else { ?>
+                      <p class="text-danger text-sm mb-0 mb-3">
+                        <i class="fas fa-exclamation-circle text-danger text-lg"></i> Error pourcentage
+                      </p>
+                    <?php } ?>
                   </div>
                 </div>
                 <div class="col-4 text-end">
@@ -610,11 +627,10 @@ foreach ($jours as $jour) {
                   <div class="numbers">
                     <p class="text-sm mb-0 text-uppercase font-weight-bold">Nombre Salle</p>
                     <h5 class="font-weight-bolder">
-                      <?= $nbr_salle //*nombre salle ; 
-                      ?>
+                      <?= $nbr_salle ; ?>
                     </h5>
                     <p class="mb-0">
-                      <span class="text-success text-sm font-weight-bolder">11</span>
+                      <span class="text-success text-sm font-weight-bolder"><?= $nbr_salle ?></span>
                       Salles actuellement
                     </p>
                   </div>

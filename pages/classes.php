@@ -1,21 +1,12 @@
 <?php
 require '../includes/DatabaseConnexion.php';
-
-//** Configuration sécurisée des sessions
-ini_set('session.cookie_secure', 1); // Cookies uniquement via HTTPS
-ini_set('session.cookie_httponly', 1); // Cookies inaccessibles via JavaScript
-ini_set('session.use_strict_mode', 1); // Empêche l'utilisation de sessions non valides
-
 session_start();
-
-//** Vérification de l'authentification
 if (empty($_SESSION['user'])) {
-  header('location:sign-in.php');
-  exit();
+  header('location:sign-up.php');
 }
 
-//** Gestion de la déconnexion après inactivité
-$inactivity_limit = 600; // 10 minutes
+//* deconnexion
+$inactivity_limit = 300; // 5 minutes
 if (isset($_SESSION['last_action'])) {
   $inactivity_duration = time() - $_SESSION['last_action'];
   if ($inactivity_duration > $inactivity_limit) {
@@ -27,28 +18,30 @@ if (isset($_SESSION['last_action'])) {
 }
 $_SESSION['last_action'] = time();
 
-//** Sélection des niveaux dans un intervalle de dates
+
+//* classe ajax
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
   header('Content-Type: application/json');
   try {
-    // Validation stricte des entrées
-    if (empty($_POST['start_date']) || empty($_POST['end_date'])) {
-      throw new Exception("Les deux dates sont requises.");
+    // Validation des dates
+    if (!isset($_POST['start_date']) || !isset($_POST['end_date'])) {
+      throw new Exception("Les dates sont requises");
     }
+
     // Nettoyage et validation des dates
-    $start_date = filter_input(INPUT_POST, 'start_date', FILTER_SANITIZE_STRING);
-    $end_date = filter_input(INPUT_POST, 'end_date', FILTER_SANITIZE_STRING);
-    if (!$start_date || !$end_date || !strtotime($start_date) || !strtotime($end_date)) {
-      throw new Exception("Format de date invalide.");
+    $start_date = filter_var($_POST['start_date'], FILTER_SANITIZE_STRING);
+    $end_date = filter_var($_POST['end_date'], FILTER_SANITIZE_STRING);
+
+    if (!$start_date || !$end_date) {
+      throw new Exception("Format de date invalide");
     }
-    // Conversion au format MySQL
+
+    // Conversion des dates au format MySQL
     $start_date = date("Y-m-d", strtotime($start_date));
     $end_date = date("Y-m-d", strtotime($end_date));
 
-    // Préparation de la requête SQL
-    $sql = "SELECT * FROM classe
-                WHERE date_creation BETWEEN :start_date AND :end_date
-                ORDER BY date_creation DESC";
+    // Requête SQL avec préparation
+    $sql = "SELECT * FROM classe WHERE date_creation BETWEEN :start_date AND :end_date ORDER BY date_creation DESC";
 
     $stmt = $dbh->prepare($sql);
     $stmt->execute([
@@ -64,64 +57,64 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       'count' => count($results)
     ]);
   } catch (Exception $e) {
-    // Réponse JSON pour les erreurs
     http_response_code(400);
     echo json_encode([
       'status' => 'error',
       'message' => $e->getMessage()
     ]);
   }
-  exit();
+  exit;
 }
 
-//** Lecture de tous les niveaux
-try {
-  $sql = "SELECT classe.* ,filiere.nom_filiere , niveau.nom_niveau FROM classe 
-        JOIN filiere ON classe.filiere_id  = filiere.id_filiere 
-        JOIN niveau ON classe.niveau_id  = niveau.id_niveau";
-  $query = $dbh->query($sql);
-  $results = $query->fetchAll(PDO::FETCH_OBJ);
-} catch (PDOException $e) {
-  error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
-  die("Erreur lors de la récupération des données.");
-}
 
-//** Suppression d'un niveau
+$sql = "SELECT classe.* ,filiere.nom_filiere , niveau.nom_niveau FROM classe 
+          JOIN filiere ON classe.filiere_id  = filiere.id_filiere 
+          JOIN niveau ON classe.niveau_id  = niveau.id_niveau";
+$query = $dbh->query($sql);
+$results = $query->fetchAll(PDO::FETCH_OBJ);
+
+
 try {
+  // Configuration de PDO pour lever des exceptions en cas d'erreur
+  $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+  // Vérification de l'existence des paramètres GET et validation de l'ID
   if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
-    // Validation de l'ID
-    $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-    if ($id === false || $id === null) {
+    $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
+    // Si l'ID n'est pas valide, redirigez vers une page d'erreur ou arrêtez le script
+    if ($id === false) {
       echo "<script>alert('ID invalide. Opération annulée.');</script>";
-      exit();
+      exit;
     }
-
-    // Requête préparée pour la suppression
+    // Requête sécurisée avec PDO
     $sql = "DELETE FROM classe WHERE id_classe = :id";
     $query = $dbh->prepare($sql);
     $query->bindParam(':id', $id, PDO::PARAM_INT);
-
+    // Exécution de la requête et gestion des erreurs
     if ($query->execute()) {
-      echo "<script>alert('Classe supprimé avec succès.');</script>";
-      header("Location: classe.php");
-      exit();
+      echo "<script>alert('Classe Bien Supprimée');</script>";
+
+      // Utilisez une redirection sécurisée
+      header("Location: classes.php");
+      exit;
     } else {
+      // Affichage d'un message d'erreur générique pour éviter de donner des détails à un attaquant
       echo "<script>alert('Erreur lors de la suppression.');</script>";
     }
   }
 } catch (PDOException $e) {
-  // Journalisation sécurisée des erreurs
+  // Journalisez l'erreur dans un fichier sécurisé
   error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
   echo "<script>alert('Une erreur est survenue. Veuillez réessayer plus tard.');</script>";
-  exit();
+  exit;
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <!-- HEAD -->
 <?php include '../includes/head.php' ?>
+
 
 
 <body class="g-sidenav-show   bg-gray-100">
@@ -308,7 +301,7 @@ try {
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="../pages/logout.php">
+          <a class="nav-link" href="../pages/sign-out.php">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-button-power text-danger text-sm opacity-10"></i>
             </div>
@@ -452,26 +445,26 @@ try {
           <div class="card mb-4">
             <div class="card-header pb-0 d-flex flex-wrap justify-content-between align-items-center text-center text-md-start">
               <div class="mb-2 mb-md-0 flex-grow-1 text-center text-md-start">
-                <h6 class="text-primary">Classe</h6>
+                <h6 class="text-primary">Ensaignant</h6>
               </div>
               <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
                 <input type="text" class="form-control w-100 w-md-auto mb-3" id="daterange" name="daterange" value="" />
-                <a class="btn btn-primary btn-sm" href="ajouter_niveau.php">Ajouter Niveau</a>
+                <a class="btn btn-primary btn-sm" href="ajouter_enseignant.php">Ajouter Ensaignant</a>
                 <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
               </div>
             </div>
+            <hr>
             <div class="card-body px-0 pt-0 pb-2">
               <div class="table-responsive p-0">
-                <table class="table align-items-center mb-0">
+                <table class="table align-items-center mb-0" id="table_classe">
                   <thead>
                     <tr>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Classe</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">niveau</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">filiere</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">responsable</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">statut</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Niveau</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder text-center opacity-7 ps-2">Filiere</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">capacite</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">date_creation</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">date creation</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
                     </tr>
                   </thead>
@@ -482,31 +475,18 @@ try {
                           <td>
                             <div class="d-flex px-2 py-1">
                               <div>
-                                <img src="../assets/img/small-logos/logo-invision.svg" class="avatar avatar-sm me-3" alt="filiere">
+                                <img src="../assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
                               </div>
                               <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->nom_classe ?></h6>
+                                <p class="text-secondary text-xs font-weight-bold"><?= $result->nom_classe ?></p>
                               </div>
                             </div>
+                          </td>
+                          <td  class="align-middle text-center">
+                            <p class="text-secondary text-xs font-weight-bold"><?= $result->nom_niveau ?></p>
                           </td>
                           <td>
-                            <div class="d-flex px-2 py-1">
-                              <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->nom_niveau ?></h6>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <div class="d-flex px-2 py-1">
-                              <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->nom_filiere ?></h6>
-                              </div>
-                            </div>
-                          </td>
-                          <td class="align-middle text-center text-sm">
-                            <p class="text-xs font-weight-bold mb-0" title="<?= $result->nom_responsable ?>">
-                              <?= substr($result->nom_responsable, 0, 50) . (strlen($result->nom_responsable) > 50 ? '...' : ''); ?>
-                            </p>
+                            <p class="text-secondary text-xs font-weight-bold"><?= $result->nom_filiere ?></p>
                           </td>
                           <?php if ($result->statut === 'Active') { ?>
                             <td class="align-middle text-center text-sm">
@@ -514,24 +494,14 @@ try {
                             </td>
                           <?php } else { ?>
                             <td class="align-middle text-center text-sm">
-                              <span class="badge badge-sm bg-gradient-secondary">Inactive</span>
+                              <span class="badge badge-sm bg-gradient-success">Inactive</span>
                             </td>
                           <?php } ?>
-                          <td>
-                            <div class="d-flex px-2 py-1">
-                              <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->capacite ?></h6>
-                              </div>
-                            </div>
+                          <td class="align-middle text-center">
+                            <span class="text-secondary text-xs font-weight-bold"><?= $result->capacite ?></span>
                           </td>
                           <td class="align-middle text-center">
-                            <!-- <p class="text-xs font-weight-bold mb-0">
-                              <?php // $date = new DateTime($result->date_creation);
-                              //echo $date->format('Y-m-d'); ?>
-                            </p> -->
-                            <p class="text-xs font-weight-bold mb-0">
-                              <?= $result->annee_scolaire; ?>
-                            </p>
+                            <span class="text-secondary text-xs font-weight-bold"><?= $result->date_creation ?></span>
                           </td>
                           <td class="align-middle text-center">
                             <div class="d-flex">
@@ -542,19 +512,13 @@ try {
                                 <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                               </a>
                               <a href="classes.php?id=<?= $result->id_classe ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                                <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
+                                <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_classe ?>"></i>
                               </a>
                             </div>
                           </td>
                         </tr>
                       <?php endforeach; ?>
-                    <?php } else { ?>
-                      <tr rowspan="7" class="text-center">
-                        <td class="text-center">
-                          No Content
-                        </td>
-                      </tr>
-                    <?php  } ?>
+                    <?php } ?>
                   </tbody>
                 </table>
               </div>
@@ -568,25 +532,33 @@ try {
     </div>
   </main>
 
-  <!-- Export Functio -->
-  <script>
-    function expo() {
-      // Obtenir l'instance de DataTable pour la première table
-      var table = $('table:first').DataTable();
+  <!-- FIXED PLUGIN  -->
+  <?php include '../includes/fixedplugin.php' ?>
 
-      // Créer un tableau pour les en-têtes et les lignes
+  <!-- call script export ensaignant -->
+  <!-- <script src="../assets/js/ensaignant/export.js"></script> -->
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('#table_classe').DataTable(); // Initialize DataTable
+    });
+
+    function expo() {
+      // Obtain DataTable instance
+      var table = $('#table_classe').DataTable();
+
+      // Create data array for headers and rows
       var data = [];
       var headers = [];
 
-      // Extraire les en-têtes, en sautant la colonne "Action"
+      // Extract headers, skipping "Action" column
       table.columns().every(function() {
         if (this.header().textContent !== "Action") {
-          headers.push(this.header().textContent.trim()); // Enlever les espaces en trop
+          headers.push(this.header().textContent.trim()); // Trim to remove extra whitespace
         }
       });
       data.push(headers);
 
-      // Extraire les données filtrées
+      // Extract filtered data
       var filteredData = table.rows({
         filter: 'applied'
       }).data();
@@ -594,14 +566,15 @@ try {
       filteredData.each(function(valueArray) {
         var rowData = [];
         valueArray.forEach(function(value, index) {
-          if (index !== 7) { // Sauter la colonne "Action"
-            rowData.push($('<div>').html(value).text().trim()); // Extraire le texte propre
+          if (index !== 7) { // Skip "Action" column
+            // Use jQuery to get the text content directly
+            rowData.push($('<div>').html(value).text().trim()); // Wrap value in a div to extract text
           }
         });
         data.push(rowData);
       });
 
-      // Exporter vers Excel avec ExcelJS
+      // Export to Excel with ExcelJS
       var workbook = new ExcelJS.Workbook();
       var worksheet = workbook.addWorksheet('Data Export');
 
@@ -616,7 +589,7 @@ try {
         var url = window.URL.createObjectURL(blob);
         var a = document.createElement('a');
         a.href = url;
-        a.download = 'filiere.xlsx';
+        a.download = 'classess.xlsx';
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -664,37 +637,24 @@ try {
             // Vérifier s'il y a des résultats
             if (response.status === 'success' && response.count > 0) {
               // Parcourir et ajouter chaque eleve
-              response.data.forEach(function(classe) {
+              response.data.forEach(function(enseignant) {
                 tableBody.append(`
                         <tr>
                           <td>
                             <div class="d-flex px-2 py-1">
                               <div>
-                                <img src="../assets/img/small-logos/logo-invision.svg" class="avatar avatar-sm me-3" alt="filiere">
+                                <img src="../assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
                               </div>
                               <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->nom_classe ?></h6>
+                                <p class="text-secondary text-xs font-weight-bold"><?= $result->nom_classe ?></p>
                               </div>
                             </div>
+                          </td>
+                          <td  class="align-middle text-center">
+                            <p class="text-secondary text-xs font-weight-bold"><?= $result->nom_niveau ?></p>
                           </td>
                           <td>
-                            <div class="d-flex px-2 py-1">
-                              <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->niveau_id ?></h6>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <div class="d-flex px-2 py-1">
-                              <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->filiere_id ?></h6>
-                              </div>
-                            </div>
-                          </td>
-                          <td class="align-middle text-center text-sm">
-                            <p class="text-xs font-weight-bold mb-0" title="<?= $result->nom_responsable ?>">
-                              <?= substr($result->nom_responsable, 0, 50) . (strlen($result->nom_responsable) > 50 ? '...' : ''); ?>
-                            </p>
+                            <p class="text-secondary text-xs font-weight-bold"><?= $result->nom_filiere ?></p>
                           </td>
                           <?php if ($result->statut === 'Active') { ?>
                             <td class="align-middle text-center text-sm">
@@ -702,24 +662,14 @@ try {
                             </td>
                           <?php } else { ?>
                             <td class="align-middle text-center text-sm">
-                              <span class="badge badge-sm bg-gradient-secondary">Inactive</span>
+                              <span class="badge badge-sm bg-gradient-success">Inactive</span>
                             </td>
                           <?php } ?>
-                          <td>
-                            <div class="d-flex px-2 py-1">
-                              <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->capacite ?></h6>
-                              </div>
-                            </div>
+                          <td class="align-middle text-center">
+                            <span class="text-secondary text-xs font-weight-bold"><?= $result->capacite ?></span>
                           </td>
                           <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0">
-                              <?php $date = new DateTime($result->date_creation);
-                              echo $date->format('Y-m-d'); ?>
-                            </p>
-                            <p class="text-xs font-weight-bold mb-0">
-                              <?= $result->annee_scolaire; ?>
-                            </p>
+                            <span class="text-secondary text-xs font-weight-bold"><?= $result->date_creation ?></span>
                           </td>
                           <td class="align-middle text-center">
                             <div class="d-flex">
@@ -730,17 +680,18 @@ try {
                                 <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                               </a>
                               <a href="classes.php?id=<?= $result->id_classe ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                                <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
+                                <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_classe ?>"></i>
                               </a>
+                            </div>
                           </td>
                         </tr>
-                        `);
+                            `);
               });
             } else {
               // Aucun résultat
               tableBody.append(`
                             <tr>
-                                <td colspan="5" class="text-center">Aucune Niveau trouvée pour cette période</td>
+                                <td colspan="8" class="text-center">Aucune Classe trouvée pour cette période</td>
                             </tr>
                         `);
             }
@@ -750,7 +701,7 @@ try {
             console.error('Erreur de requête:', xhr);
             tableBody.html(`
                         <tr>
-                            <td colspan="5" class="text-center text-danger">
+                            <td colspan="9" class="text-center text-danger">
                                 Erreur lors de la récupération des données
                             </td>
                         </tr>
@@ -761,8 +712,6 @@ try {
     });
   </script>
 
-  <!-- FIXED PLUGIN  -->
-  <?php include '../includes/fixedplugin.php' ?>
   <!--   Core JS Files   -->
   <script src="../assets/js/core/popper.min.js"></script>
   <script src="../assets/js/core/bootstrap.min.js"></script>
