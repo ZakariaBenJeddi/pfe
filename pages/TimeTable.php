@@ -164,7 +164,6 @@ class MultiClassScheduleGenerator
   }
 
 
-
   private function getDailyTimeSlots()
   {
     if ($this->session_duration === 150) {
