@@ -943,6 +943,19 @@ $roomsSchedule = $generator->getRoomsSchedule();
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
   <script>
+    // Dézoomer l'écran à 80% (0.8)
+    function zoomOutScreen(scale) {
+      document.body.style.transform = `scale(${scale})`; // Applique le zoom-out
+      document.body.style.transformOrigin = 'top left'; // Définit le point d'origine pour le zoom
+      document.body.style.width = `${100 / scale}%`; // Ajuste la largeur pour éviter les barres de défilement
+    }
+
+    if (window.innerWidth <= 768) {
+      // Appeler la fonction pour dézoomer à 50%
+      zoomOutScreen(0.5);
+    }
+  </script>
+  <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
       var options = {
