@@ -173,6 +173,7 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
+
         /* Style pour la version PC */
         @keyframes spin {
             0% {
@@ -779,6 +780,21 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
                 }, timeReload); // Cache l'animation après 1 seconde
             }
         };
+    </script>
+
+    <!-- dezoumer la page si le type d'ecran est portable -->
+    <script>
+        // Dézoomer l'écran à 80% (0.8)
+        function zoomOutScreen(scale) {
+            document.body.style.transform = `scale(${scale})`; // Applique le zoom-out
+            document.body.style.transformOrigin = 'top left'; // Définit le point d'origine pour le zoom
+            document.body.style.width = `${100 / scale}%`; // Ajuste la largeur pour éviter les barres de défilement
+        }
+
+        if (window.innerWidth <= 768) {
+            // Appeler la fonction pour dézoomer à 50%
+            zoomOutScreen(0.5);
+        }
     </script>
 
     <script>

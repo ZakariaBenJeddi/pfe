@@ -10,111 +10,111 @@ session_start();
 
 //** Vérification de l'authentification
 if (empty($_SESSION['user'])) {
-    header('location:sign-in.php');
-    exit();
+  header('location:sign-in.php');
+  exit();
 }
 
 //** Gestion de la déconnexion après inactivité
 $inactivity_limit = 600; // 10 minutes
 if (isset($_SESSION['last_action'])) {
-    $inactivity_duration = time() - $_SESSION['last_action'];
-    if ($inactivity_duration > $inactivity_limit) {
-        session_unset();
-        session_destroy();
-        header("Location: logout.php");
-        exit();
-    }
+  $inactivity_duration = time() - $_SESSION['last_action'];
+  if ($inactivity_duration > $inactivity_limit) {
+    session_unset();
+    session_destroy();
+    header("Location: logout.php");
+    exit();
+  }
 }
 $_SESSION['last_action'] = time();
 
 //** Sélection des niveaux dans un intervalle de dates
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    header('Content-Type: application/json');
-    try {
-        // Validation stricte des entrées
-        if (empty($_POST['start_date']) || empty($_POST['end_date'])) {
-            throw new Exception("Les deux dates sont requises.");
-        }
+  header('Content-Type: application/json');
+  try {
+    // Validation stricte des entrées
+    if (empty($_POST['start_date']) || empty($_POST['end_date'])) {
+      throw new Exception("Les deux dates sont requises.");
+    }
 
-        // Nettoyage et validation des dates
-        $start_date = filter_input(INPUT_POST, 'start_date', FILTER_SANITIZE_STRING);
-        $end_date = filter_input(INPUT_POST, 'end_date', FILTER_SANITIZE_STRING);
+    // Nettoyage et validation des dates
+    $start_date = filter_input(INPUT_POST, 'start_date', FILTER_SANITIZE_STRING);
+    $end_date = filter_input(INPUT_POST, 'end_date', FILTER_SANITIZE_STRING);
 
-        if (!$start_date || !$end_date || !strtotime($start_date) || !strtotime($end_date)) {
-            throw new Exception("Format de date invalide.");
-        }
+    if (!$start_date || !$end_date || !strtotime($start_date) || !strtotime($end_date)) {
+      throw new Exception("Format de date invalide.");
+    }
 
-        // Conversion au format MySQL
-        $start_date = date("Y-m-d", strtotime($start_date));
-        $end_date = date("Y-m-d", strtotime($end_date));
+    // Conversion au format MySQL
+    $start_date = date("Y-m-d", strtotime($start_date));
+    $end_date = date("Y-m-d", strtotime($end_date));
 
-        // Préparation de la requête SQL
-        $sql = "SELECT * FROM niveau
+    // Préparation de la requête SQL
+    $sql = "SELECT * FROM niveau
                 WHERE date_creation BETWEEN :start_date AND :end_date
                 ORDER BY date_creation DESC";
 
-        $stmt = $dbh->prepare($sql);
-        $stmt->execute([
-            ':start_date' => $start_date,
-            ':end_date' => $end_date
-        ]);
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute([
+      ':start_date' => $start_date,
+      ':end_date' => $end_date
+    ]);
 
-        $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+    $results = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-        echo json_encode([
-            'status' => 'success',
-            'data' => $results,
-            'count' => count($results)
-        ]);
-    } catch (Exception $e) {
-        // Réponse JSON pour les erreurs
-        http_response_code(400);
-        echo json_encode([
-            'status' => 'error',
-            'message' => $e->getMessage()
-        ]);
-    }
-    exit();
+    echo json_encode([
+      'status' => 'success',
+      'data' => $results,
+      'count' => count($results)
+    ]);
+  } catch (Exception $e) {
+    // Réponse JSON pour les erreurs
+    http_response_code(400);
+    echo json_encode([
+      'status' => 'error',
+      'message' => $e->getMessage()
+    ]);
+  }
+  exit();
 }
 
 //** Lecture de tous les niveaux
 try {
-    $sql = "SELECT * FROM niveau";
-    $query = $dbh->query($sql);
-    $results = $query->fetchAll(PDO::FETCH_OBJ);
+  $sql = "SELECT * FROM niveau";
+  $query = $dbh->query($sql);
+  $results = $query->fetchAll(PDO::FETCH_OBJ);
 } catch (PDOException $e) {
-    error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
-    die("Erreur lors de la récupération des données.");
+  error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+  die("Erreur lors de la récupération des données.");
 }
 
 //** Suppression d'un niveau
 try {
-    if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
-        // Validation de l'ID
-        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-        if ($id === false || $id === null) {
-            echo "<script>alert('ID invalide. Opération annulée.');</script>";
-            exit();
-        }
-
-        // Requête préparée pour la suppression
-        $sql = "DELETE FROM niveau WHERE id_niveau = :id";
-        $query = $dbh->prepare($sql);
-        $query->bindParam(':id', $id, PDO::PARAM_INT);
-
-        if ($query->execute()) {
-            echo "<script>alert('Niveau supprimé avec succès.');</script>";
-            header("Location: niveau.php");
-            exit();
-        } else {
-            echo "<script>alert('Erreur lors de la suppression.');</script>";
-        }
+  if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
+    // Validation de l'ID
+    $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+    if ($id === false || $id === null) {
+      echo "<script>alert('ID invalide. Opération annulée.');</script>";
+      exit();
     }
+
+    // Requête préparée pour la suppression
+    $sql = "DELETE FROM niveau WHERE id_niveau = :id";
+    $query = $dbh->prepare($sql);
+    $query->bindParam(':id', $id, PDO::PARAM_INT);
+
+    if ($query->execute()) {
+      echo "<script>alert('Niveau supprimé avec succès.');</script>";
+      header("Location: niveau.php");
+      exit();
+    } else {
+      echo "<script>alert('Erreur lors de la suppression.');</script>";
+    }
+  }
 } catch (PDOException $e) {
-    // Journalisation sécurisée des erreurs
-    error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
-    echo "<script>alert('Une erreur est survenue. Veuillez réessayer plus tard.');</script>";
-    exit();
+  // Journalisation sécurisée des erreurs
+  error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+  echo "<script>alert('Une erreur est survenue. Veuillez réessayer plus tard.');</script>";
+  exit();
 }
 ?>
 
@@ -222,6 +222,14 @@ try {
               <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
             </div>
             <span class="nav-link-text ms-1">Emplois du Temps</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="../pages/TimeTableInfo.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fa fa-cog text-dark text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Configuration TimeTable</span>
           </a>
         </li>
 

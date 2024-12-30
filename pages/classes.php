@@ -216,6 +216,14 @@ try {
             <span class="nav-link-text ms-1">Emplois du Temps</span>
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link " href="../pages/TimeTableInfo.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fa fa-cog text-dark text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Configuration TimeTable</span>
+          </a>
+        </li>
 
         <!-- Section Suivi -->
         <li class="nav-item">
@@ -482,7 +490,7 @@ try {
                               </div>
                             </div>
                           </td>
-                          <td  class="align-middle text-center">
+                          <td class="align-middle text-center">
                             <p class="text-secondary text-xs font-weight-bold"><?= $result->nom_niveau ?></p>
                           </td>
                           <td>

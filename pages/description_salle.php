@@ -10,73 +10,73 @@ session_start();
 
 //** Activer le verrouillage des sessions
 if (!isset($_SESSION['initialized'])) {
-    session_regenerate_id(true);
-    $_SESSION['initialized'] = true;
+  session_regenerate_id(true);
+  $_SESSION['initialized'] = true;
 }
 
 //** Vérification de l'authentification de l'utilisateur
 if (empty($_SESSION['user'])) {
-    header('location:sign-in.php');
-    exit();
+  header('location:sign-in.php');
+  exit();
 }
 
 //** Déconnexion après inactivité
 $inactivity_limit = 300; // 5 minutes
 if (isset($_SESSION['last_action'])) {
-    $inactivity_duration = time() - $_SESSION['last_action'];
-    if ($inactivity_duration > $inactivity_limit) {
-        session_unset();
-        session_destroy();
-        header("Location: logout.php");
-        exit();
-    }
+  $inactivity_duration = time() - $_SESSION['last_action'];
+  if ($inactivity_duration > $inactivity_limit) {
+    session_unset();
+    session_destroy();
+    header("Location: logout.php");
+    exit();
+  }
 }
 $_SESSION['last_action'] = time();
 
 //** Validation stricte de l'ID passé dans l'URL
 if (isset($_GET['id'])) {
-    $id_salle = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); // Validation stricte
-    if ($id_salle === false || $id_salle === null) {
-        // ID invalide, redirige vers la liste des salles
-        header('location:salle.php');
-        exit();
-    }
-} else {
-    // Redirection si aucun ID fourni
+  $id_salle = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); // Validation stricte
+  if ($id_salle === false || $id_salle === null) {
+    // ID invalide, redirige vers la liste des salles
     header('location:salle.php');
     exit();
+  }
+} else {
+  // Redirection si aucun ID fourni
+  header('location:salle.php');
+  exit();
 }
 
 try {
-    // Requête préparée pour éviter les injections SQL
-    $sql = "SELECT * FROM salle WHERE id_salle = :id_salle";
-    $query = $dbh->prepare($sql);
-    $query->bindParam(':id_salle', $id_salle, PDO::PARAM_INT);
-    $query->execute();
-    $results = $query->fetchAll(PDO::FETCH_OBJ);
+  // Requête préparée pour éviter les injections SQL
+  $sql = "SELECT * FROM salle WHERE id_salle = :id_salle";
+  $query = $dbh->prepare($sql);
+  $query->bindParam(':id_salle', $id_salle, PDO::PARAM_INT);
+  $query->execute();
+  $results = $query->fetchAll(PDO::FETCH_OBJ);
 
-    if (!$results) {
-        // Aucun résultat trouvé, redirige vers la liste des salles
-        header('location:salle.php');
-        exit();
-    }
-
-    // Vérification de la présence du projecteur
-    $projecteur = 0;
-    if (strpos(strtolower($results[0]->equipements ?? ''), "projecteur") !== false) {
-        $projecteur = 1;
-    }
-} catch (PDOException $e) {
-    // Journaliser les erreurs sans les afficher
-    error_log("Erreur SQL : " . $e->getMessage());
-    header('location:error.php');
+  if (!$results) {
+    // Aucun résultat trouvé, redirige vers la liste des salles
+    header('location:salle.php');
     exit();
+  }
+
+  // Vérification de la présence du projecteur
+  $projecteur = 0;
+  if (strpos(strtolower($results[0]->equipements ?? ''), "projecteur") !== false) {
+    $projecteur = 1;
+  }
+} catch (PDOException $e) {
+  // Journaliser les erreurs sans les afficher
+  error_log("Erreur SQL : " . $e->getMessage());
+  header('location:error.php');
+  exit();
 }
 
 // Fonction pour échapper les données avant de les afficher (protection XSS)
 function escape($data)
 {
-    return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+  return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
 }
 ?>
 
@@ -189,6 +189,14 @@ function escape($data)
             <span class="nav-link-text ms-1">Emplois du Temps</span>
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link " href="../pages/TimeTableInfo.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fa fa-cog text-dark text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Configuration TimeTable</span>
+          </a>
+        </li>
 
         <!-- Section Suivi -->
         <li class="nav-item">
@@ -294,8 +302,7 @@ function escape($data)
           </div>
         </div>
       </div>
-      <!-- <a href="https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard" target="_blank" class="btn btn-dark btn-sm w-100 mb-3">Documentation</a>
-      <a class="btn btn-primary btn-sm mb-0 w-100" href="https://www.creative-tim.com/product/argon-dashboard-pro?ref=sidebarfree" type="button">Upgrade to pro</a> -->
+
     </div>
   </aside>
   <main class="main-content position-relative border-radius-lg ">

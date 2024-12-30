@@ -101,14 +101,14 @@ $resultsMatieres = $queryMatiere->fetchAll(PDO::FETCH_OBJ);
 if (isset($_GET['delete_affectation']) && $_GET['delete_affectation'] == 1) {
   $id_enseignant = isset($_GET['id']) ? (int)$_GET['id'] : null;
   if ($id_enseignant) {
-      $sql_sup_affec_enseigant_matiere = "DELETE FROM enseignant_matiere WHERE id_enseignant = :id_enseignant";
-      $query_sup_affec_enseigant_matiere = $dbh->prepare($sql_sup_affec_enseigant_matiere);
-      $query_sup_affec_enseigant_matiere->bindParam(':id_enseignant', $id_enseignant, PDO::PARAM_INT);
-      $query_sup_affec_enseigant_matiere->execute();
-      header('Location: description_enseignant.php?id=' . $id_enseignant);
-      exit;
+    $sql_sup_affec_enseigant_matiere = "DELETE FROM enseignant_matiere WHERE id_enseignant = :id_enseignant";
+    $query_sup_affec_enseigant_matiere = $dbh->prepare($sql_sup_affec_enseigant_matiere);
+    $query_sup_affec_enseigant_matiere->bindParam(':id_enseignant', $id_enseignant, PDO::PARAM_INT);
+    $query_sup_affec_enseigant_matiere->execute();
+    header('Location: description_enseignant.php?id=' . $id_enseignant);
+    exit;
   } else {
-      echo "Erreur : ID invalide.";
+    echo "Erreur : ID invalide.";
   }
 }
 
@@ -226,6 +226,14 @@ if (isset($_GET['delete_affectation']) && $_GET['delete_affectation'] == 1) {
               <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
             </div>
             <span class="nav-link-text ms-1">Emplois du Temps</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="../pages/TimeTableInfo.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fa fa-cog text-dark text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Configuration TimeTable</span>
           </a>
         </li>
 
@@ -689,10 +697,10 @@ if (isset($_GET['delete_affectation']) && $_GET['delete_affectation'] == 1) {
                           <option value="<?= $matiere->nom_matiere ?>"><?= $matiere->nom_matiere ?></option>
                         <?php } ?>
                       </select>
-                    <?php } else {
+                      <?php } else {
                       if ($result_afficher_matiere_affecter) { ?>
                         <input class="form-control" type="text" value="<?= $result_afficher_matiere_affecter['matiere'] ?>" readonly>
-                      <?php } else {
+                    <?php } else {
                         echo "Matiere non trouve";
                       }
                     } ?>
@@ -701,8 +709,7 @@ if (isset($_GET['delete_affectation']) && $_GET['delete_affectation'] == 1) {
                   <div class="ms-auto text-end">
                     <form method="post" action="description_enseignant.php">
                       <i class="far fa-trash-alt me-2 text-danger"></i>
-                      <a href="description_enseignant.php?delete_affectation=1&id=<?php echo $results[0]->id_enseignant; ?>" 
-                        class="btn btn-link text-danger px-3 mb-0">
+                      <a href="description_enseignant.php?delete_affectation=1&id=<?php echo $results[0]->id_enseignant; ?>" class="btn btn-link text-danger px-3 mb-0">
                         Delete
                       </a>
                     </form>

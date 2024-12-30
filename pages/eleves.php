@@ -218,6 +218,14 @@ try {
             <span class="nav-link-text ms-1">Emplois du Temps</span>
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link " href="../pages/TimeTableInfo.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fa fa-cog text-dark text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Configuration TimeTable</span>
+          </a>
+        </li>
 
         <!-- Section Suivi -->
         <li class="nav-item">
@@ -486,13 +494,13 @@ try {
                             </div>
                           </td>
                           <td class="align-middle text-center text-sm">
-                            <p class="text-xs font-weight-bold mb-0"><?php echo  $result->niveau_id ===NULL ? 'Aucun Niveau' : $result->niveau_id  ; ?></p>
+                            <p class="text-xs font-weight-bold mb-0"><?php echo  $result->niveau_id === NULL ? 'Aucun Niveau' : $result->niveau_id; ?></p>
                           </td>
                           <td>
-                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?php echo $result->nom_classe === null ? 'Aucun Classe' : $result->nom_classe ;  ?></p>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?php echo $result->nom_classe === null ? 'Aucun Classe' : $result->nom_classe;  ?></p>
                           </td>
                           <td class="align-middle text-center">
-                          <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?php echo $result->filiere_id ===NULL? 'Aucun Filiere' : $result->filiere_id ?></p>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?php echo $result->filiere_id === NULL ? 'Aucun Filiere' : $result->filiere_id ?></p>
                           </td>
                           <td class="align-middle text-center">
                             <p class="text-xs font-weight-bold mb-0"><?= $result->telephone; ?></p>

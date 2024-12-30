@@ -581,6 +581,14 @@ $roomsSchedule = $generator->getRoomsSchedule();
             <span class="nav-link-text ms-1">Emplois du Temps</span>
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link " href="../pages/TimeTableInfo.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fa fa-cog text-dark text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Configuration TimeTable</span>
+          </a>
+        </li>
 
         <!-- Section Suivi -->
         <li class="nav-item">
@@ -686,8 +694,6 @@ $roomsSchedule = $generator->getRoomsSchedule();
           </div>
         </div>
       </div>
-      <!-- <a href="https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard" target="_blank" class="btn btn-dark btn-sm w-100 mb-3">Documentation</a>
-      <a class="btn btn-primary btn-sm mb-0 w-100" href="https://www.creative-tim.com/product/argon-dashboard-pro?ref=sidebarfree" type="button">Upgrade to pro</a> -->
     </div>
   </aside>
   <main class="main-content position-relative border-radius-lg ">
@@ -772,7 +778,7 @@ $roomsSchedule = $generator->getRoomsSchedule();
     </nav>
     <!-- End Navbar -->
     <div class=" pb-0 mt-5 me-5 text-end text-primary">
-      <a href="TimeTableInfo.php" class="btn btn-light px-3">configurer donnes</a>
+      <a href="TimeTableConfig.php" class="btn btn-light px-3">configurer donnes</a>
     </div>
     <div class="px-0 pt-0 ">
       <!-- section pour les classes -->
@@ -936,7 +942,8 @@ $roomsSchedule = $generator->getRoomsSchedule();
     <!-- </div> -->
   </main>
   <!-- FIXED PLUGIN  -->
-  <?php include '../includes/fixedplugin.php' ?>
+  <?php // include '../includes/fixedplugin.php' 
+  ?>
   <!--   Core JS Files   -->
   <script src="../assets/js/core/popper.min.js"></script>
   <script src="../assets/js/core/bootstrap.min.js"></script>

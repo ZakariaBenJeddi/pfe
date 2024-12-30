@@ -292,6 +292,14 @@ foreach ($jours as $jour) {
             <span class="nav-link-text ms-1">Emplois du Temps</span>
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link " href="../pages/TimeTableInfo.php">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fa fa-cog text-dark text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Configuration TimeTable</span>
+          </a>
+        </li>
 
         <!-- Section Suivi -->
         <li class="nav-item">
@@ -627,7 +635,7 @@ foreach ($jours as $jour) {
                   <div class="numbers">
                     <p class="text-sm mb-0 text-uppercase font-weight-bold">Nombre Salle</p>
                     <h5 class="font-weight-bolder">
-                      <?= $nbr_salle ; ?>
+                      <?= $nbr_salle; ?>
                     </h5>
                     <p class="mb-0">
                       <span class="text-success text-sm font-weight-bolder"><?= $nbr_salle ?></span>
