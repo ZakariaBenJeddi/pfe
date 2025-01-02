@@ -15,7 +15,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
   exit;
 }
 
-$sql = "SELECT ecm.* ,e.nom_enseignant , m.nom_matiere ,c.nom_classe
+$sql = "SELECT ecm.* , e.nom_enseignant ,e.prenom_enseignant , m.nom_matiere ,c.nom_classe
         FROM enseignant_classes_matieres ecm
         JOIN enseignant e ON e.id_enseignant = ecm.enseignant_id
         JOIN matiere m ON m.id_matiere = ecm.matiere_id
@@ -24,22 +24,16 @@ $sql = "SELECT ecm.* ,e.nom_enseignant , m.nom_matiere ,c.nom_classe
 $query = $dbh->prepare($sql);
 $query->execute();
 $results = $query->fetchAll(PDO::FETCH_ASSOC);
-// var_dump($results);
 
 if (isset($_GET['action'])) {
   header('Content-Type: application/json');
-
   switch ($_GET['action']) {
-    case 'get_classes':
-      if (isset($_GET['enseignant_id'])) {
-        $prof_id = intval($_GET['enseignant_id']);
-        $query = "SELECT DISTINCT c.id_classe, c.nom_classe 
-                  FROM classe c 
-                  JOIN enseignant_classes_matieres ecm ON c.id_classe = ecm.classe_id 
-                  WHERE ecm.enseignant_id = ?
-                  ORDER BY c.nom_classe";
+      // PHP section corrections
+    case 'get_groupes':
+      if (isset($_GET['professeur_id'])) {
+        $query = "SELECT id_classe, nom_classe FROM classe";
         $stmt = $dbh->prepare($query);
-        $stmt->execute([$prof_id]);
+        $stmt->execute();
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
       }
       exit;
@@ -47,11 +41,15 @@ if (isset($_GET['action'])) {
     case 'get_matieres':
       if (isset($_GET['classe_id'])) {
         $classe_id = intval($_GET['classe_id']);
-        $query = "SELECT DISTINCT m.id_matiere, m.nom_matiere 
-                  FROM matiere m 
-                  JOIN enseignant_classes_matieres ecm ON m.id_matiere = ecm.matiere_id 
-                  WHERE ecm.classe_id = ?
-                  ORDER BY m.nom_matiere";
+        $query = "SELECT DISTINCT m.id_matiere as id, 
+              CONCAT(m.nom_matiere, ' (', m.code_matiere, ')') as nom 
+              FROM matiere m 
+              WHERE m.id_filiere IN (
+                SELECT filiere_id FROM classe WHERE id_classe = ?
+                UNION 
+                SELECT 8
+              )
+              ORDER BY m.nom_matiere";
         $stmt = $dbh->prepare($query);
         $stmt->execute([$classe_id]);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
@@ -60,66 +58,48 @@ if (isset($_GET['action'])) {
   }
 }
 
+// Insertion
 if (isset($_POST['valid'])) {
   try {
-    $enseignant_id = isset($_POST['enseignant_id']) ? intval($_POST['enseignant_id']) : 0;
-    $classe_id = isset($_POST['classe_id']) ? intval($_POST['classe_id']) : 0;
-    $matiere_id = isset($_POST['matiere_id']) ? intval($_POST['matiere_id']) : 0;
-
-    if ($enseignant_id && $classe_id && $matiere_id) {
-      // Vérifier si cette affectation existe déjà
-      $check_query = "SELECT id FROM enseignant_classes_matieres 
-                          WHERE enseignant_id = ? AND classe_id = ? AND matiere_id = ?";
-      $check_stmt = $dbh->prepare($check_query);
-      $check_stmt->execute([$enseignant_id, $classe_id, $matiere_id]);
-
-      if ($check_stmt->rowCount() > 0) {
-        echo "<script>alert('Cette affectation existe déjà!');</script>";
-      } else {
-        $query = "INSERT INTO enseignant_classes_matieres 
-                         (enseignant_id, classe_id, matiere_id) 
-                         VALUES (?, ?, ?)";
-        $stmt = $dbh->prepare($query);
-        $stmt->execute([$enseignant_id, $classe_id, $matiere_id]);
-        echo "<script>alert('Affectation ajoutée avec succès!');</script>";
-      }
-      echo "<script>window.location.href = window.location.href;</script>";
+    $enseignant_id = filter_var($_POST['professeur_id'], FILTER_VALIDATE_INT);
+    $classe_id = filter_var($_POST['groupe_id'], FILTER_VALIDATE_INT);
+    $matiere_id = filter_var($_POST['matiere_id'], FILTER_VALIDATE_INT);
+    // Vérification si l'affectation existe déjà
+    $check = $dbh->prepare("SELECT id FROM enseignant_classes_matieres 
+                            WHERE enseignant_id = ? AND classe_id = ? AND matiere_id = ?");
+    $check->execute([$enseignant_id, $classe_id, $matiere_id]);
+    if ($check->rowCount() > 0) {
+      $_SESSION['error'] = "Cette affectation existe déjà!";
     } else {
-      echo "<script>alert('Veuillez remplir tous les champs.');</script>";
+      $query = "INSERT INTO enseignant_classes_matieres (enseignant_id, classe_id, matiere_id) 
+                VALUES (?, ?, ?)";
+      $stmt = $dbh->prepare($query);
+      $stmt->execute([$enseignant_id, $classe_id, $matiere_id]);
+      $_SESSION['success'] = "Affectation ajoutée avec succès!";
     }
   } catch (PDOException $e) {
-    echo "<script>alert('Erreur lors de l\'enregistrement: " . addslashes($e->getMessage()) . "');</script>";
+    $_SESSION['error'] = "Erreur lors de l'ajout de l'affectation";
   }
+  header('Location: TimeTableInfo.php');
+  exit;
 }
 
-// Code pour la suppression
-if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
+// Suppression 
+if (isset($_GET['id']) && isset($_GET['del'])) {
   try {
     $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
+    $query = $dbh->prepare("DELETE FROM enseignant_classes_matieres WHERE id = ?");
 
-    if ($id === false) {
-      echo "<script>alert('Paramètre invalide. Opération annulée.');</script>";
-      exit;
-    }
-
-    $sql = "DELETE FROM enseignant_classes_matieres WHERE id = :id";
-    $query = $dbh->prepare($sql);
-    $query->bindParam(':id', $id, PDO::PARAM_INT);
-
-    if ($query->execute()) {
-      echo "<script>
-                    alert('Affectation bien supprimée');
-                    window.location.href = 'TimeTableInfo.php';
-                  </script>";
-      exit;
+    if ($query->execute([$id])) {
+      $_SESSION['success'] = "Affectation supprimée avec succès";
     } else {
-      echo "<script>alert('Erreur lors de la suppression.');</script>";
+      $_SESSION['error'] = "Erreur lors de la suppression";
     }
   } catch (PDOException $e) {
-    error_log($e->getMessage(), 3, 'error.log');
-    echo "<script>alert('Une erreur est survenue. Veuillez réessayer plus tard.');</script>";
-    exit;
+    $_SESSION['error'] = "Erreur lors de la suppression";
   }
+  header('Location: TimeTableInfo.php');
+  exit;
 }
 ?>
 
@@ -469,6 +449,15 @@ if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
       </div>
     </nav>
     <!-- End Navbar -->
+    <div class="container">
+      <?php if (isset($_SESSION['success'])) : ?>
+        <div class="alert alert-success"><?= $_SESSION['success'];unset($_SESSION['success']); ?></div>
+      <?php endif; ?>
+
+      <?php if (isset($_SESSION['error'])) : ?>
+        <div class="alert alert-danger"><?= $_SESSION['error'];unset($_SESSION['error']); ?></div>
+      <?php endif; ?>
+    </div>
     <div class=" pb-0 mt-5 me-5 text-end text-primary">
       <a href="TimeTableConfig.php" class="btn btn-light px-3">configurer donnes</a>
     </div>
@@ -487,7 +476,7 @@ if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
                   <option value="">Choisir un Formatuer</option>
                   <?php
                   $query = "SELECT id_enseignant, nom_enseignant FROM enseignant ORDER BY nom_enseignant";
-                  $stmt = $pdo->query($query);
+                  $stmt = $dbh->query($query);
                   while ($prof = $stmt->fetch()) {
                     echo "<option value='" . htmlspecialchars($prof['id_enseignant']) . "'>" .
                       htmlspecialchars($prof['nom_enseignant']) . "</option>";
@@ -506,19 +495,6 @@ if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
                 <select class="form-control mb-3" id="matiere_id" name="matiere_id" disabled require>
                   <option value="">Choisir un Matiere</option>
                 </select>
-
-                <div class="row">
-                  <div class="col-lg-6">
-                    <!-- Nombre de séances -->
-                    <label for="nbr_seance">Nombre de séances :</label>
-                    <input class="form-control mb-5" type="number" id="nbr_seance" name="nbr_seance" min="1" require>
-                  </div>
-                  <div class="col-lg-6">
-                    <!-- date senance -->
-                    <label for="nbr_seance">Date :</label>
-                    <input type="text" class="form-control text-center  mb-5" id="daterange" name="daterange" value="" require />
-                  </div>
-                </div>
                 <input type="submit" name="valid" class="btn btn-primary w-100 py-3 px-5" value="Valider">
                 <a href="TimeTableInsertIntoCalendar.php" class="btn btn-success w-100 py-3 px-5 mt-3">Generer</a>
               </form>
@@ -553,19 +529,19 @@ if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
                               <i class="ni ni-single-02 text-primary opacity-10"></i>
                             </div>
                             <div class="d-flex flex-column justify-content-center ms-3">
-                              <h6 class="mb-0 text-sm"><?= $result['nom_p'] ?></h6>
+                              <h6 class="mb-0 text-sm"><?= $result['nom_enseignant'] . " " . $result['prenom_enseignant']  ?></h6>
                             </div>
                           </div>
                         </td>
                         <td>
-                          <p class="text-xs font-weight-bold mb-0"><?= $result['nom_g'] ?></p>
+                          <p class="text-xs font-weight-bold mb-0"><?= $result['nom_classe'] ?></p>
                         </td>
                         <td class="align-middle text-center text-sm">
-                          <p class="text-xs font-weight-bold mb-0"><?= $result['nom_m'] ?></p>
+                          <p class="text-xs font-weight-bold mb-0"><?= $result['nom_matiere'] ?></p>
                         </td>
                         <td class="align-middle text-center text-sm">
                           <div class="d-flex justify-content-center align-items-center">
-                            <a href="TimeTableInfo.php?id=<?= $result['id'] ?>&professeur_id=<?= $result['professeur_id'] ?>&groupe_id=<?= $result['groupe_id'] ?>&matiere_id=<?= $result['matiere_id'] ?>&nbr_seance=<?= $result['nbr_seance'] ?>&date_debut=<?= $result['date_debut'] ?>&date_fin=<?= $result['date_fin'] ?>&del=1" onClick="return confirm('Etes-vous sûr que vous voulez supprimer Affectation de?\nFotmateur(trice): <?= addslashes($result['nom_p']) ?>\nGroupe: <?= addslashes($result['nom_g']) ?>\nNombre Seance :<?= addslashes($result['nbr_seance']) ?> ')">
+                            <a href="TimeTableInfo.php?id=<?= $result['id'] ?>&del=1" onClick="return confirm('Etes-vous sûr que vous voulez supprimer Affectation de?\nFotmateur(trice): <?= addslashes($result['nom_enseignant'] . " " . $result['prenom_enseignant']) ?>\nClasse: <?= addslashes($result['nom_classe']) ?>\nMatiere : <?= addslashes($result['nom_matiere']) ?>')">
                               <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
                             </a>
                           </div>
@@ -609,7 +585,7 @@ if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
           .then(data => {
             groupeSelect.innerHTML = '<option value="">Choisir un groupe</option>';
             data.forEach(groupe => {
-              groupeSelect.innerHTML += `<option value="${groupe.id}">${groupe.nom}</option>`;
+              groupeSelect.innerHTML += `<option value="${groupe.id_classe}">${groupe.nom_classe}</option>`;
             });
           })
           .catch(error => console.error('Erreur:', error));
@@ -621,13 +597,14 @@ if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
       }
     });
 
+    // JavaScript corrections
     document.getElementById('groupe_id').addEventListener('change', function() {
       const groupeId = this.value;
       const matiereSelect = document.getElementById('matiere_id');
 
       if (groupeId) {
         matiereSelect.disabled = false;
-        fetch(`?action=get_matieres&groupe_id=${groupeId}`)
+        fetch(`?action=get_matieres&classe_id=${groupeId}`) // Changed from groupe_id to classe_id
           .then(response => response.json())
           .then(data => {
             matiereSelect.innerHTML = '<option value="">Choisir une matière</option>';
@@ -636,9 +613,6 @@ if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
             });
           })
           .catch(error => console.error('Erreur:', error));
-      } else {
-        matiereSelect.disabled = true;
-        matiereSelect.innerHTML = '<option value="">Choisir une matière</option>';
       }
     });
 

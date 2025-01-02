@@ -72,7 +72,7 @@ if (isset($_GET['professeur_id'])) {
 
 
 $conn3 = new mysqli('localhost', 'root', '', 'dummy_db');
-$prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
+$prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list");
 
 ?>
 
@@ -187,7 +187,7 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
     </style>
 </head>
 
-<body class="g-sidenav-show   bg-gray-100">
+<body class="g-sidenav-show bg-gray-100">
     <div class="min-height-300 bg-primary position-absolute w-100"></div>
     <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
         <div class="sidenav-header">
@@ -495,6 +495,43 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
         </nav>
         <div class="container-fluid py-4">
             <div class="container py-5 " style="margin-top: 13rem !important;" id="page-container">
+                <div class="row mb-5">
+                    <p>ajouter le padding au seance et le text ne sort pas hors de sont container</p>
+                    
+                    <div class="col-lg-4">
+                        <div class="filter-group">
+                            <label for="teacher-select" class="text-light">Professeur:</label>
+                            <select class="form-select" id="teacher-select">
+                                <option value="">Tous les professeurs</option>
+                                <?php foreach ($prfs as $prof) : ?>
+                                    <option value="<?= htmlspecialchars($prof['nom']) ?>"><?= htmlspecialchars($prof['nom']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="filter-group">
+                            <label for="group-select" class="text-light">Groupe:</label>
+                            <select class="form-select" id="group-select">
+                                <option value="">Tous les groupes</option>
+                                <?php foreach ($grps as $groupe) : ?>
+                                    <option value="<?= htmlspecialchars($groupe['nom']) ?>"><?= htmlspecialchars($groupe['nom']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="filter-group">
+                            <label for="room-select" class="text-light">Salle:</label>
+                            <select class="form-select" id="room-select">
+                                <option value="">Toutes les salles</option>
+                                <?php foreach ($slls as $salle) : ?>
+                                    <option value="<?= htmlspecialchars($salle['nom']) ?>"><?= htmlspecialchars($salle['nom']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-md-9">
                         <div id="loading-screen" style="display: none;">
