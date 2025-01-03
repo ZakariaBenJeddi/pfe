@@ -58,28 +58,61 @@ if (isset($_GET['action'])) {
   }
 }
 
-// Insertion
-if (isset($_POST['valid'])) {
-  try {
-    $enseignant_id = filter_var($_POST['professeur_id'], FILTER_VALIDATE_INT);
-    $classe_id = filter_var($_POST['groupe_id'], FILTER_VALIDATE_INT);
-    $matiere_id = filter_var($_POST['matiere_id'], FILTER_VALIDATE_INT);
-    // Vérification si l'affectation existe déjà
-    $check = $dbh->prepare("SELECT id FROM enseignant_classes_matieres 
-                            WHERE enseignant_id = ? AND classe_id = ? AND matiere_id = ?");
-    $check->execute([$enseignant_id, $classe_id, $matiere_id]);
-    if ($check->rowCount() > 0) {
-      $_SESSION['error'] = "Cette affectation existe déjà!";
-    } else {
-      $query = "INSERT INTO enseignant_classes_matieres (enseignant_id, classe_id, matiere_id) 
-                VALUES (?, ?, ?)";
-      $stmt = $dbh->prepare($query);
-      $stmt->execute([$enseignant_id, $classe_id, $matiere_id]);
-      $_SESSION['success'] = "Affectation ajoutée avec succès!";
-    }
-  } catch (PDOException $e) {
-    $_SESSION['error'] = "Erreur lors de l'ajout de l'affectation";
+
+function ajouterAffectation($dbh, $enseignant_id, $classe_id, $matiere_id)
+{
+  // 1. Vérifier si la même affectation existe déjà
+  $check1 = $dbh->prepare("SELECT id FROM enseignant_classes_matieres 
+                        WHERE enseignant_id = ? AND classe_id = ? AND matiere_id = ?");
+  $check1->execute([$enseignant_id, $classe_id, $matiere_id]);
+  if ($check1->rowCount() > 0) {
+    $_SESSION['error'] = "Cette affectation existe déjà!";
+    return;
   }
+
+  // 2. Vérifier si la matière est déjà affectée à cette classe
+  $check2 = $dbh->prepare("SELECT ecm.id, CONCAT(e.nom_enseignant, ' ', e.prenom_enseignant) as nom_complet 
+                        FROM enseignant_classes_matieres ecm
+                        JOIN enseignant e ON e.id_enseignant = ecm.enseignant_id 
+                        WHERE classe_id = ? AND matiere_id = ?");
+  $check2->execute([$classe_id, $matiere_id]);
+  if ($check2->rowCount() > 0) {
+    $result = $check2->fetch(PDO::FETCH_ASSOC);
+    $_SESSION['error'] = "Cette matière est déjà affectée à cette classe par l'enseignant " . $result['nom_complet'];
+    return;
+  }
+
+  // 3. Vérifier si l'enseignant est déjà affecté à cette classe
+  $check3 = $dbh->prepare("SELECT ecm.id, m.nom_matiere 
+                        FROM enseignant_classes_matieres ecm
+                        JOIN matiere m ON m.id_matiere = ecm.matiere_id 
+                        WHERE enseignant_id = ? AND classe_id = ?");
+  $check3->execute([$enseignant_id, $classe_id]);
+  if ($check3->rowCount() > 0) {
+    $result = $check3->fetch(PDO::FETCH_ASSOC);
+    $_SESSION['error'] = "Cet enseignant est déjà affecté à cette classe pour la matière " . $result['nom_matiere'];
+    return;
+  }
+
+  // Si toutes les vérifications sont passées, insérer
+  try {
+    $query = "INSERT INTO enseignant_classes_matieres (enseignant_id, classe_id, matiere_id) 
+              VALUES (?, ?, ?)";
+    $stmt = $dbh->prepare($query);
+    $stmt->execute([$enseignant_id, $classe_id, $matiere_id]);
+    $_SESSION['success'] = "Affectation ajoutée avec succès!";
+  } catch (PDOException $e) {
+    $_SESSION['error'] = "Erreur lors de l'affectation : " . $e->getMessage();
+  }
+}
+
+// Traitement du formulaire
+if (isset($_POST['valid'])) {
+  $enseignant_id = filter_var($_POST['professeur_id'], FILTER_VALIDATE_INT);
+  $classe_id = filter_var($_POST['groupe_id'], FILTER_VALIDATE_INT);
+  $matiere_id = filter_var($_POST['matiere_id'], FILTER_VALIDATE_INT);
+
+  ajouterAffectation($dbh, $enseignant_id, $classe_id, $matiere_id);
   header('Location: TimeTableInfo.php');
   exit;
 }
@@ -451,11 +484,13 @@ if (isset($_GET['id']) && isset($_GET['del'])) {
     <!-- End Navbar -->
     <div class="container">
       <?php if (isset($_SESSION['success'])) : ?>
-        <div class="alert alert-success"><?= $_SESSION['success'];unset($_SESSION['success']); ?></div>
+        <div class="alert alert-success"><?= $_SESSION['success'];
+                                          unset($_SESSION['success']); ?></div>
       <?php endif; ?>
 
       <?php if (isset($_SESSION['error'])) : ?>
-        <div class="alert alert-danger"><?= $_SESSION['error'];unset($_SESSION['error']); ?></div>
+        <div class="alert alert-danger"><?= $_SESSION['error'];
+                                        unset($_SESSION['error']); ?></div>
       <?php endif; ?>
     </div>
     <div class=" pb-0 mt-5 me-5 text-end text-primary">
@@ -475,11 +510,11 @@ if (isset($_GET['id']) && isset($_GET['del'])) {
                 <select class="form-control mb-3" id="professeur_id" name="professeur_id" require>
                   <option value="">Choisir un Formatuer</option>
                   <?php
-                  $query = "SELECT id_enseignant, nom_enseignant FROM enseignant ORDER BY nom_enseignant";
+                  $query = "SELECT id_enseignant, nom_enseignant , prenom_enseignant FROM enseignant ORDER BY nom_enseignant";
                   $stmt = $dbh->query($query);
                   while ($prof = $stmt->fetch()) {
                     echo "<option value='" . htmlspecialchars($prof['id_enseignant']) . "'>" .
-                      htmlspecialchars($prof['nom_enseignant']) . "</option>";
+                      htmlspecialchars($prof['nom_enseignant'] . ' ' . $prof['prenom_enseignant']) . "</option>";
                   }
                   ?>
                 </select>

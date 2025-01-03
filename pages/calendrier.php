@@ -1,6 +1,7 @@
 <?php
 session_start();
 // $username = $_SESSION['lastname'];
+require('../includes/DatabaseConnexion.php');
 
 if (empty($_SESSION['user'])) {
     header('location:sign-in.php');
@@ -74,6 +75,20 @@ if (isset($_GET['professeur_id'])) {
 $conn3 = new mysqli('localhost', 'root', '', 'dummy_db');
 $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list");
 
+$sql = "SELECT id_enseignant, nom_enseignant FROM enseignant ORDER BY nom_enseignant";
+$prfs = $dbh->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+
+$sql_classes = "SELECT id_classe, nom_classe FROM classe ORDER BY nom_classe";
+$clss = $dbh->query($sql_classes)->fetchAll(PDO::FETCH_ASSOC);
+
+$sql_salles = "SELECT id_salle, nom_salle FROM salle ORDER BY nom_salle";
+$slls = $dbh->query($sql_salles)->fetchAll(PDO::FETCH_ASSOC);
+
+$sql_modls = "SELECT id_matiere, code_matiere FROM matiere ORDER BY code_matiere";
+$modls = $dbh->query($sql_modls)->fetchAll(PDO::FETCH_ASSOC);
+
+$conn3 = new mysqli('localhost', 'root', '', 'dummy_db');
+$prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list ");
 ?>
 
 <!DOCTYPE html>
@@ -504,7 +519,7 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list");
                             <select class="form-select" id="teacher-select">
                                 <option value="">Tous les professeurs</option>
                                 <?php foreach ($prfs as $prof) : ?>
-                                    <option value="<?= htmlspecialchars($prof['nom']) ?>"><?= htmlspecialchars($prof['nom']) ?></option>
+                                    <option value="<?= htmlspecialchars($prof['nom_enseignant']) ?>"><?= htmlspecialchars($prof['nom_enseignant']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -514,8 +529,8 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list");
                             <label for="group-select" class="text-light">Groupe:</label>
                             <select class="form-select" id="group-select">
                                 <option value="">Tous les groupes</option>
-                                <?php foreach ($grps as $groupe) : ?>
-                                    <option value="<?= htmlspecialchars($groupe['nom']) ?>"><?= htmlspecialchars($groupe['nom']) ?></option>
+                                <?php foreach ($clss as $groupe) : ?>
+                                    <option value="<?= htmlspecialchars($groupe['nom_classe']) ?>"><?= htmlspecialchars($groupe['nom_classe']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -526,7 +541,7 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list");
                             <select class="form-select" id="room-select">
                                 <option value="">Toutes les salles</option>
                                 <?php foreach ($slls as $salle) : ?>
-                                    <option value="<?= htmlspecialchars($salle['nom']) ?>"><?= htmlspecialchars($salle['nom']) ?></option>
+                                    <option value="<?= htmlspecialchars($salle['nom_salle']) ?>"><?= htmlspecialchars($salle['nom_salle']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -553,7 +568,7 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list");
                                     <form action="" method="get" id="matiere-form">
                                         <div class="form-group mb-2">
                                             <label for="matiere-select" class="control-label">Matière</label>
-                                            <select class="text-sm" name="matiere_id" id="matiere-select">
+                                            <select class="form-select form-select-sm text-sm" name="matiere_id" id="matiere-select">
                                                 <option value="">Sélectionnez une matière</option>
                                                 <?php foreach ($matieres as $matiere) : ?>
                                                     <option value="<?= $matiere['id'] ?>"><?= $matiere['nom'] ?></option>
@@ -562,13 +577,13 @@ $prof3 = $conn3->query("SELECT DISTINCT professeur FROM schedule_list");
                                         </div>
                                         <div class="form-group mb-2">
                                             <label for="professeur-select" class="control-label">Enseignant</label>
-                                            <select class="text-sm" name="professeur_id" id="professeur-select">
+                                            <select class="form-select form-select-sm text-sm" name="professeur_id" id="professeur-select">
                                                 <option value="">Choisissez un enseignant</option>
                                             </select>
                                         </div>
                                         <div class="form-group mb-2">
                                             <label for="classe-select" class="control-label">Classes</label><br>
-                                            <select class="text-sm" name="classe-select" id="classe-select">
+                                            <select class="form-select form-select-sm text-sm" name="classe-select" id="classe-select">
                                                 <option value="">Choisissez une Classes</option>
                                             </select>
                                         </div>

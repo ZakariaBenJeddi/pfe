@@ -1,6 +1,4 @@
-<!-- insert data into schedule_list2  -->
 <?php
-
 require 'TimeTable.php';
 
 class ScheduleDBInserter {
@@ -29,12 +27,11 @@ class ScheduleDBInserter {
     }
     
     public function insertSchedules($allSchedules) {
-        // Le code reste le même que dans votre exemple précédent
-        $query = "INSERT INTO timetable (title, description, professeur, start_datetime, end_datetime,classe ,salle) 
-                VALUES (:title, :description, :professeur, :start_datetime, :end_datetime,:classe, :salle)";
+        $query = "INSERT INTO timetable (description, professeur, matiere, classe, salle, start_datetime, end_datetime) 
+                VALUES (:description, :professeur, :matiere, :classe, :salle, :start_datetime, :end_datetime)";
         $stmt = $this->pdo->prepare($query);
         
-        // Vider d'abord la table
+        // Clear the table first
         $this->pdo->exec("TRUNCATE TABLE timetable");
         
         $insertedCount = 0;
@@ -47,7 +44,7 @@ class ScheduleDBInserter {
             foreach ($classData['schedule'] as $day => $slots) {
                 foreach ($slots as $timeSlot => $lesson) {
                     if ($lesson !== null) {
-                        // Convertir le jour en date
+                        // Convert day to date
                         $dayMap = [
                             'Lundi' => 'Monday',
                             'Mardi' => 'Tuesday',
@@ -57,47 +54,35 @@ class ScheduleDBInserter {
                             'Samedi' => 'Saturday'
                         ];
                         
-                        // Obtenir la prochaine occurrence de ce jour de la semaine
                         $englishDay = $dayMap[$day];
                         $date = date('Y-m-d', strtotime("next $englishDay"));
                         
-                        // Extraire les heures de début et de fin
+                        // Extract start and end times
                         list($startTime, $endTime) = explode('-', $timeSlot);
                         
-                        // Créer les datetime complets
+                        // Create complete datetime
                         $startDateTime = "$date $startTime:00";
                         $endDateTime = "$date $endTime:00";
                         
-                        // Préparer la description
-                        $lesson['matiere'] = $lesson['professeur']
-                            ? str_replace('Prof ', '', $lesson['professeur'])
-                            : $lesson['matiere'];
+                        // Prepare description with the new format
                         $description = sprintf(
-                            "Classe: %s\nMatière: %s\nProfesseur: %s\nSalle: %s",
+                            "Classe: %s\nMatiere: %s\nEnseignant: %s\nSalle: %s",
                             $className,
                             $lesson['matiere'],
                             $lesson['professeur'],
                             $lesson['salle']
                         );
-                        $classe = $className;
                         
-                        // Préparer le titre
-                        $title = sprintf(
-                            "%s - %s",
-                            $className,
-                            $lesson['matiere']
-                        );
-                        
-                        // Insérer dans la base de données
+                        // Insert into database
                         try {
                             $stmt->execute([
-                                ':title' => $title,
                                 ':description' => $description,
                                 ':professeur' => $lesson['professeur'],
+                                ':matiere' => $lesson['matiere'],
+                                ':classe' => $className,
+                                ':salle' => $lesson['salle'],
                                 ':start_datetime' => $startDateTime,
-                                ':end_datetime' => $endDateTime,
-                                ':classe' => $classe,
-                                ':salle' => $lesson['salle']
+                                ':end_datetime' => $endDateTime
                             ]);
                             $insertedCount++;
                         } catch (PDOException $e) {
@@ -112,13 +97,13 @@ class ScheduleDBInserter {
     }
 }
 
-// Utilisation
+// Usage
 try {
-    // Générer les emplois du temps
+    // Generate schedules
     $generator = new MultiClassScheduleGenerator();
     $allSchedules = $generator->generateAllSchedules();
     
-    // Insérer les emplois du temps dans la base de données
+    // Insert schedules into database
     $inserter = new ScheduleDBInserter();
     $insertedCount = $inserter->insertSchedules($allSchedules);
     

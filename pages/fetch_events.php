@@ -45,7 +45,7 @@
     // error_log("Professeur reçu : " . $professeur);
 
     if ($professeur) {
-        $sql = "SELECT id, title, description, professeur, start_datetime AS start, end_datetime AS end, salle 
+        $sql = "SELECT id, title, professeur, start_datetime AS start, end_datetime AS end, salle 
                 FROM schedule_list 
                 WHERE professeur = :professeur";
         $stmt = $pdo->prepare($sql);
@@ -53,7 +53,7 @@
         $stmt->execute();
         $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } else {
-        $sql = "SELECT id, title, description, professeur, start_datetime AS start, end_datetime AS end, salle 
+        $sql = "SELECT id, title, professeur, start_datetime AS start, end_datetime AS end, salle 
                 FROM schedule_list";
         $stmt = $pdo->query($sql);
         $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
