@@ -1,21 +1,31 @@
-<?php 
-require_once('db-connect.php');
-if(!isset($_GET['id'])){
-    echo "<script> alert('Undefined Schedule ID.'); location.replace('./') </script>";
-    $conn->close();
+<?php
+require_once('../includes/DatabaseConnexion.php');
+if (!isset($_GET['id'])) {
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'ID non défini.'
+    ]);
     exit;
 }
-
-$delete = $conn->query("DELETE FROM `schedule_list` where id = '{$_GET['id']}'");
-if($delete){
-    echo "<script> alert('Event has deleted successfully.'); location.replace('./') </script>";
-}else{
-    echo "<pre>";
-    echo "An Error occured.<br>";
-    echo "Error: ".$conn->error."<br>";
-    echo "SQL: ".$sql."<br>";
-    echo "</pre>";
+try {
+    $stmt = $dbh->prepare("DELETE FROM timetable WHERE id = ?");
+    $stmt->execute([$_GET['id']]);
+    
+    if ($stmt->rowCount() > 0) {
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Séance supprimée avec succès.'
+        ]);
+    } else {
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Séance non trouvée.'
+        ]);
+    }
+} catch (PDOException $e) {
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Erreur lors de la suppression : ' . $e->getMessage()
+    ]);
 }
-$conn->close();
-
 ?>

@@ -178,7 +178,7 @@ class MultiClassScheduleGenerator
       return [
         ['start' => '08:30', 'end' => '10:30', 'duration' => $this->session_duration],
         ['start' => '10:30', 'end' => '12:30', 'duration' => $this->session_duration],
-        ['start' => '12:30', 'end' => '16:30', 'duration' => $this->session_duration],
+        ['start' => '14:30', 'end' => '16:30', 'duration' => $this->session_duration],
         ['start' => '16:30', 'end' => '18:30', 'duration' => $this->session_duration]
       ];
     }

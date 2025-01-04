@@ -117,7 +117,7 @@ if (isset($_POST['valid'])) {
   exit;
 }
 
-// Suppression 
+//* Suppression 
 if (isset($_GET['id']) && isset($_GET['del'])) {
   try {
     $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
