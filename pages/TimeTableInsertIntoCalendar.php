@@ -51,7 +51,7 @@ class ScheduleDBInserter {
                             'Mercredi' => 'Wednesday',
                             'Jeudi' => 'Thursday',
                             'Vendredi' => 'Friday',
-                            'Samedi' => 'Saturday'
+                            // 'Samedi' => 'Saturday'
                         ];
                         
                         $englishDay = $dayMap[$day];

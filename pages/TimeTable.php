@@ -133,7 +133,8 @@ class MultiClassScheduleGenerator
   //! second loadTeachersTimetable
   private function loadTeachersTimetable()
   {
-    $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    // $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
     $timeSlots = $this->getDailyTimeSlots();
 
     // Initialisation du planning des professeurs
@@ -271,7 +272,8 @@ class MultiClassScheduleGenerator
     $allSchedules = [];
     $usedRooms = [];
     $timeSlots = $this->getDailyTimeSlots();
-    $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    // $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
 
     foreach ($this->classes as $class) {
       $schedule = [];
