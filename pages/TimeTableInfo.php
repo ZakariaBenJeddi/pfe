@@ -152,10 +152,12 @@ if (isset($_GET['id']) && isset($_GET['del'])) {
     <?php require('../includes/navbar_admin.php') ?>
     <div class="container">
       <?php if (isset($_SESSION['success'])) : ?>
-        <div class="alert alert-success py-1"><?= $_SESSION['success'];unset($_SESSION['success']); ?></div>
+        <div class="alert alert-success py-1"><?= $_SESSION['success'];
+                                              unset($_SESSION['success']); ?></div>
       <?php endif; ?>
       <?php if (isset($_SESSION['error'])) : ?>
-        <div class="alert alert-danger py-1"><?= $_SESSION['error'];unset($_SESSION['error']); ?></div>
+        <div class="alert alert-danger py-1"><?= $_SESSION['error'];
+                                              unset($_SESSION['error']); ?></div>
       <?php endif; ?>
     </div>
     <div class=" pb-0 mt-5 me-5 text-end text-primary">
@@ -280,7 +282,7 @@ if (isset($_GET['id']) && isset($_GET['del'])) {
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
 
   <!-- exporter -->
-  <script src="../includes/exporter/export.js"></script>
+  <script src="../assets/js/export.js"></script>
 
   <!-- formateur groupe modules ajax et datatable -->
   <script>

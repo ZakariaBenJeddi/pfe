@@ -1,7 +1,7 @@
-<?php 
+<?php
 require_once('../includes/DatabaseConnexion.php');
 
-if($_SERVER['REQUEST_METHOD'] != 'POST') {
+if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     echo "<script> alert('Error: No data to save.'); location.replace('./') </script>";
     exit;
 }
@@ -9,8 +9,8 @@ if($_SERVER['REQUEST_METHOD'] != 'POST') {
 try {
     // Vérifier si les champs requis sont présents
     $required_fields = ['professeur_id', 'matiere_id', 'classe-select', 'salle', 'start_datetime', 'end_datetime'];
-    foreach($required_fields as $field) {
-        if(!isset($_POST[$field]) || empty($_POST[$field])) {
+    foreach ($required_fields as $field) {
+        if (!isset($_POST[$field]) || empty($_POST[$field])) {
             throw new Exception("Le champ $field est requis");
         }
     }
@@ -22,7 +22,7 @@ try {
                   OR (end_datetime BETWEEN :start AND :end)
                   OR (:start BETWEEN start_datetime AND end_datetime))
                   AND id != :current_id";
-    
+
     $check_stmt = $dbh->prepare($check_sql);
     $check_stmt->execute([
         'salle' => $_POST['salle'],
@@ -30,8 +30,8 @@ try {
         'end' => $_POST['end_datetime'],
         'current_id' => $_POST['id'] ?? 0
     ]);
-    
-    if($check_stmt->fetchColumn() > 0) {
+
+    if ($check_stmt->fetchColumn() > 0) {
         throw new Exception("La salle est déjà occupée pendant cette période");
     }
 
@@ -42,7 +42,7 @@ try {
                        OR (end_datetime BETWEEN :start AND :end)
                        OR (:start BETWEEN start_datetime AND end_datetime))
                        AND id != :current_id";
-    
+
     $check_prof_stmt = $dbh->prepare($check_prof_sql);
     $check_prof_stmt->execute([
         'prof_id' => $_POST['professeur_id'],
@@ -50,8 +50,8 @@ try {
         'end' => $_POST['end_datetime'],
         'current_id' => $_POST['id'] ?? 0
     ]);
-    
-    if($check_prof_stmt->fetchColumn() > 0) {
+
+    if ($check_prof_stmt->fetchColumn() > 0) {
         throw new Exception("L'enseignant a déjà un cours pendant cette période");
     }
 
@@ -62,7 +62,7 @@ try {
                         OR (end_datetime BETWEEN :start AND :end)
                         OR (:start BETWEEN start_datetime AND end_datetime))
                         AND id != :current_id";
-    
+
     $check_classe_stmt = $dbh->prepare($check_classe_sql);
     $check_classe_stmt->execute([
         'classe_id' => $_POST['classe-select'],
@@ -70,12 +70,12 @@ try {
         'end' => $_POST['end_datetime'],
         'current_id' => $_POST['id'] ?? 0
     ]);
-    
-    if($check_classe_stmt->fetchColumn() > 0) {
+
+    if ($check_classe_stmt->fetchColumn() > 0) {
         throw new Exception("La classe a déjà un cours pendant cette période");
     }
 
-    if(empty($_POST['id'])) {
+    if (empty($_POST['id'])) {
         // Insert
         $sql = "INSERT INTO timetable (
             title,
@@ -96,7 +96,7 @@ try {
             :start_datetime,
             :end_datetime
         )";
-        
+
         $stmt = $dbh->prepare($sql);
         $stmt->execute([
             'title' => $_POST['title'],
@@ -108,7 +108,6 @@ try {
             'start_datetime' => $_POST['start_datetime'],
             'end_datetime' => $_POST['end_datetime']
         ]);
-        
     } else {
         // Update
         $sql = "UPDATE timetable SET 
@@ -121,7 +120,7 @@ try {
             start_datetime = :start_datetime,
             end_datetime = :end_datetime
             WHERE id = :id";
-            
+
         $stmt = $dbh->prepare($sql);
         $stmt->execute([
             'title' => $_POST['title'],
@@ -135,12 +134,10 @@ try {
             'id' => $_POST['id']
         ]);
     }
-    
+
     echo "<script> alert('Séance enregistrée avec succès.'); location.replace('calendrier.php') </script>";
-    
-} catch(Exception $e) {
+} catch (Exception $e) {
     echo "<script> alert('Erreur: " . addslashes($e->getMessage()) . "'); history.back(); </script>";
-} catch(PDOException $e) {
+} catch (PDOException $e) {
     echo "<script> alert('Erreur de base de données: " . addslashes($e->getMessage()) . "'); history.back(); </script>";
 }
-?>
