@@ -2,7 +2,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="../assets/img/icons/flags/AU.png"><?php //! changer lien   
+    <link rel="icon" type="image/png" href="../../assets/img/icons/flags/AU.png"><?php //! changer lien   
                                                                                 ?>
     <title>
         Emplois du temps
@@ -10,27 +10,27 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../assets/css/bootstrap.min.css">
     <!-- FullCalendar CSS -->
-    <link rel="stylesheet" href="../assets/fullcalendar/lib/main.min.css">
+    <link rel="stylesheet" href="../../assets/fullcalendar/lib/main.min.css">
     <!-- jQuery -->
-    <script src="../assets/js/jquery-3.6.0.min.js"></script>
+    <script src="../../assets/js/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap JS -->
-    <script src="../assets/js/bootstrap.min.js"></script>
+    <script src="../../assets/js/bootstrap.min.js"></script>
     <!-- FullCalendar JS -->
-    <script src="../assets/fullcalendar/lib/main.min.js"></script>
+    <script src="../../assets/fullcalendar/lib/main.min.js"></script>
 
     <!-- argon -->
     <!--     Fonts and icons     -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
     <!-- Nucleo Icons -->
-    <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
-    <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
+    <link href="../../assets/css/nucleo-icons.css" rel="stylesheet" />
+    <link href="../../assets/css/nucleo-svg.css" rel="stylesheet" />
     <!-- Font Awesome Icons -->
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
-    <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
+    <link href="../../assets/css/nucleo-svg.css" rel="stylesheet" />
     <!-- CSS Files -->
-    <link id="pagestyle" href="../assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
+    <link id="pagestyle" href="../../assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

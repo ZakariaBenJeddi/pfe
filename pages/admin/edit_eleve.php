@@ -1,0 +1,307 @@
+<?php
+include('../../includes/admin/controller/controller.php');
+session_start();
+
+if (empty($_SESSION['user'])) {
+  header('location:sign-in.php');
+}
+
+//* deconnexion
+require('../../includes/deconnexion_5s.php');
+
+//* update
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
+  $resultat = modifierEleve($dbh, $_POST, $_FILES['image_eleve'] ?? null);
+  
+  if ($resultat['success']) {
+      echo "<script>
+          alert('Les informations de l\'élève ont été mises à jour avec succès.');
+          window.location.href = 'eleves.php';
+      </script>";
+  } else {
+      echo "<script>
+          alert('Erreur: " . addslashes($resultat['message']) . "');
+      </script>";
+  }
+}
+
+//* get eleve by id
+if (isset($_GET['id_eleve'])) {
+  $resultat = getEleveById($dbh, $_GET['id_eleve']);
+  
+  if (!$resultat['success']) {
+      echo $resultat['message'];
+      exit;
+  }
+  
+  $eleve = $resultat['data'];
+}
+?>
+
+<!-- HEAD -->
+<?php include '../../includes/admin/head_admin.php' ?>
+
+<body class="g-sidenav-show bg-gray-100">
+  <div class="position-absolute w-100 min-height-300 top-0" style="background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/profile-layout-header.jpg'); background-position-y: 50%;">
+    <span class="mask bg-primary opacity-6"></span>
+  </div>
+  <?php require('../../includes/admin/aside_admin.php') ?>
+  <div class="main-content position-relative max-height-vh-100 h-100">
+    <!-- Navbar -->
+    <?php require('../../includes/admin/navbar_admin.php') ?>
+    <!-- End Navbar -->
+    <div class="card shadow-lg mx-4 card-profile-bottom">
+
+    </div>
+    <div class="container-fluid py-4">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-header pb-0">
+              <div class="d-flex align-items-center">
+                <p class="mb-0">Modifier Eleve</p>
+              </div>
+            </div>
+            <hr class="horizontal dark">
+            <form method="post">
+              <div class="card-body">
+                <p class="text-uppercase text-sm">Eleve Information</p>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="id_eleve" class="form-control-label">ID Élève</label>
+                      <input class="form-control" type="text" readonly name="id_eleve" id="id_eleve" value="<?= $eleve->id_eleve ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="nom_eleve" class="form-control-label">Nom Élève</label>
+                      <input class="form-control" type="text" name="nom_eleve" id="nom_eleve" value="<?= $eleve->nom ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="prenom_eleve" class="form-control-label">Prénom Élève</label>
+                      <input class="form-control" type="text" name="prenom_eleve" id="prenom_eleve" value="<?= $eleve->prenom ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="date_naissance_eleve" class="form-control-label">Date de Naissance</label>
+                      <input class="form-control" type="date" name="date_naissance_eleve" id="date_naissance_eleve" value="<?= $eleve->date_naissance ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="genre_eleve" class="form-control-label">Genre</label>
+                      <input class="form-control" type="text" name="genre_eleve" id="genre_eleve" value="<?= $eleve->genre ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="nationalite_eleve" class="form-control-label">Nationalité</label>
+                      <input class="form-control" type="text" name="nationalite_eleve" id="nationalite_eleve" value="<?= $eleve->nationalite ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="adresse_eleve" class="form-control-label">Adresse</label>
+                      <input class="form-control" type="text" name="adresse_eleve" id="adresse_eleve" value="<?= $eleve->adresse ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="telephone_eleve" class="form-control-label">Téléphone</label>
+                      <input class="form-control" type="text" name="telephone_eleve" id="telephone_eleve" value="<?= $eleve->telephone ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="email_eleve" class="form-control-label">Email</label>
+                      <input class="form-control" type="email" name="email_eleve" id="email_eleve" value="<?= $eleve->email ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="date_inscription_eleve" class="form-control-label">Date d'Inscription</label>
+                      <input class="form-control" type="date" name="date_inscription_eleve" id="date_inscription_eleve" value="<?= $eleve->date_inscription ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="statut_eleve" class="form-control-label">Statut</label>
+                      <input class="form-control" type="text" name="statut_eleve" id="statut_eleve" value="<?= $eleve->statut ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="historique_scolaire_eleve" class="form-control-label">Historique Scolaire</label>
+                      <input class="form-control" type="text" name="historique_scolaire_eleve" id="historique_scolaire_eleve" value="<?= $eleve->historique_scolaire ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="langues_parlees_eleve" class="form-control-label">Langues Parlées</label>
+                      <input class="form-control" type="text" name="langues_parlees_eleve" id="langues_parlees_eleve" value="<?= $eleve->langues_parlees ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="nom_tuteur_eleve" class="form-control-label">Nom Tuteur</label>
+                      <input class="form-control" type="text" name="nom_tuteur_eleve" id="nom_tuteur_eleve" value="<?= $eleve->nom_tuteur ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="telephone_tuteur_eleve" class="form-control-label">Téléphone Tuteur</label>
+                      <input class="form-control" type="text" name="telephone_tuteur_eleve" id="telephone_tuteur_eleve" value="<?= $eleve->telephone_tuteur ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="email_tuteur_eleve" class="form-control-label">Email Tuteur</label>
+                      <input class="form-control" type="email" name="email_tuteur_eleve" id="email_tuteur_eleve" value="<?= $eleve->email_tuteur ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="profession_tuteur_eleve" class="form-control-label">Profession Tuteur</label>
+                      <input class="form-control" type="text" name="profession_tuteur_eleve" id="profession_tuteur_eleve" value="<?= $eleve->profession_tuteur ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="niveau_scolaire_eleve" class="form-control-label">Niveau Scolaire</label>
+                      <input class="form-control" type="text" name="niveau_scolaire_eleve" id="niveau_scolaire_eleve" value="<?= $eleve->niveau_scolaire ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="besoins_speciaux_eleve" class="form-control-label">Besoins Spéciaux</label>
+                      <input class="form-control" type="text" name="besoins_speciaux_eleve" id="besoins_speciaux_eleve" value="<?= $eleve->besoins_speciaux ?>" required>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="langue_etrangere_eleve" class="form-control-label">Langue Étrangère</label>
+                      <input class="form-control" type="text" name="langue_etrangere_eleve" id="langue_etrangere_eleve" value="<?= $eleve->langue_etrangere ?>" required>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="niveau_de_satisfaction_eleve" class="form-control-label">Niveau de Satisfaction</label>
+                      <input class="form-control" type="text" name="niveau_de_satisfaction_eleve" id="niveau_de_satisfaction_eleve" value="<?= $eleve->niveau_de_satisfaction ?>" required>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="image_eleve" class="form-control-label">Image</label>
+                      <input class="form-control" type="file" name="image_eleve" id="image_eleve" value="<?= $eleve->photo ?>" >
+                    </div>
+                  </div>
+
+                </div>
+                <!-- Ajoutez d'autres champs ici -->
+                <div class="row">
+                  <input class="btn btn-primary" type="submit" value="Modifier" name="edit">
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card card-profile">
+            <img src="../../assets/img/bg-profile.jpg" alt="Image placeholder" class="card-img-top">
+            <div class="row justify-content-center">
+              <div class="col-4 col-lg-4 order-lg-2">
+                <div class="mt-n4 mt-lg-n6 mb-4 mb-lg-0">
+                  <a href="javascript:;">
+                    <img src="../../assets/img/team-2.jpg" class="rounded-circle img-fluid border border-2 border-white">
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="card-body pt-0 mb-5">
+              <div class="row">
+                <div class="col">
+                  <div class="d-flex justify-content-center">
+                    <div class="d-grid text-center">
+                      <span class="text-lg font-weight-bolder" id="chaise_value"></span>
+                      <span class="text-sm opacity-8">Chaise </span>
+                    </div>
+                    <div class="d-grid text-center mx-4">
+                      <span class="text-lg font-weight-bolder" id="bureau_value"></span>
+                      <span class="text-sm opacity-8">Bureau </span>
+                    </div>
+                    <div class="d-grid text-center">
+                      <span class="text-lg font-weight-bolder" id="tableau_value"></span>
+                      <span class="text-sm opacity-8">Tableau</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="text-center mt-4">
+                <h5>
+                  Nom Salle :<span class="font-weight-light" id="nom_salle_value"></span>
+                </h5>
+                <div class="h6 font-weight-300">
+                  <i class="ni location_pin mr-2"></i>Etage : <span class="font-weight-light" id="etage_value"></span>
+                </div>
+                <div class="h6 font-weight-300">
+                  <i class="ni location_pin mr-2"></i>
+                  Equipement : <span class="font-weight-light" id="equipement_value"></span>
+                </div>
+                <div class="h6 font-weight-300">
+                  <i class="ni location_pin mr-2"></i>
+                  Capacite Eleve : <span class="font-weight-light" id="capacite_value"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- FOOTER -->
+      <?php include '../../includes/footer.php' ?>
+
+    </div>
+  </div>
+  <!-- FIXED PLUGIN  -->
+  <?php include '../../includes/fixedplugin.php' ?>
+  <!--   Core JS Files   -->
+  <script src="../../assets/js/core/popper.min.js"></script>
+  <script src="../../assets/js/core/bootstrap.min.js"></script>
+  <script src="../../assets/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="../../assets/js/plugins/smooth-scrollbar.min.js"></script>
+  <script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+      var options = {
+        damping: '0.5'
+      }
+      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+  </script>
+
+  <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
+  <script src="../../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
+</body>
+
+</html>

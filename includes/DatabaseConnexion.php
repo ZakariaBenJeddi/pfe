@@ -1,19 +1,4 @@
 <?php
-	// define('DB_SERVER','localhost');
-	// define('DB_USER','root');
-	// define('DB_PASS' ,'');
-	// // define('DB_NAME', 'erpdr');
-	// define('DB_NAME', 'pfe1');
-	// try
-	// {
-	// $dbh = new PDO("mysql:host=".DB_SERVER.";dbname=".DB_NAME,DB_USER, DB_PASS,array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"));
-	// }
-	// catch (PDOException $e)
-	// {
-	// exit("Error: " . $e->getMessage());
-	// }
-?>
-<?php
 	define('DB_SERVER', 'localhost');
 	define('DB_USER', 'root');
 	define('DB_PASS', '');
@@ -32,4 +17,3 @@
 	    // En production, vous pouvez commenter la ligne ci-dessous et enregistrer les erreurs dans un fichier log
 	    exit("Erreur de connexion à la base de données : " . $e->getMessage());
 	}
-?>

@@ -34,69 +34,44 @@ $(function() {
 
         // Vérifier s'il y a des résultats
         if (response.status === 'success' && response.count > 0) {
-          // Parcourir et ajouter chaque enseignant
-          response.data.forEach(function(enseignant) {
-            const etatBadge = enseignant.est_connecte === 0 
-                  ? `<span class="badge badge-sm bg-gradient-secondary">Offline</span>` 
-                  : `<span class="badge badge-sm bg-gradient-success">Online</span>`;
-
-            let progressBarClass = '';
-              if (enseignant.degree <= 30) {
-                progressBarClass = 'bg-gradient-danger';
-              } else if (enseignant.degree <= 50 && enseignant.degree > 30) {
-                progressBarClass = 'bg-gradient-warning';
-              } else if (enseignant.degree >= 30 && enseignant.degree < 90) {
-                progressBarClass = 'bg-gradient-info';
-              } else if (enseignant.degree >= 90) {
-                progressBarClass = 'bg-gradient-success';
-              }
+          // Parcourir et ajouter chaque filiere
+          response.data.forEach(function(filiere) {
             tableBody.append(`
                     <tr>
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div>
-                            <img src="../../assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
+                            <img src="../../assets/img/small-logos/logo-invision.svg" class="avatar avatar-sm me-3" alt="filiere">
                           </div>
                           <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">${enseignant.nom_enseignant}  ${enseignant.prenom_enseignant}</h6>
-                            <p class="text-xs text-secondary mb-0">${enseignant.email_enseignant}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <p class="text-xs font-weight-bold mb-0">Enseignant</p>
-                        <p class="text-xs text-secondary mb-0">${enseignant.specialite}</p>
-                      </td>
-                      <td class="align-middle text-center">
-                        <div class="progress">
-                          <div class="progress-bar ${progressBarClass}" 
-                            role="progressbar" 
-                            aria-valuenow="${enseignant.degree}" 
-                            aria-valuemin="0" 
-                            aria-valuemax="100" 
-                            style="width: ${enseignant.degree}%;">
+                            <h6 class="mb-0 text-sm">${filiere.nom_filiere}</h6>
                           </div>
                         </div>
                       </td>
                       <td class="align-middle text-center text-sm">
-                        ${etatBadge}
+                        <p class="text-xs font-weight-bold mb-0">${filiere.code_filiere}</p>
+                      </td>
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">${filiere.nom_niveau}</p>
                       </td>
                       <td class="align-middle text-center">
-                        <span class="text-secondary text-xs font-weight-bold">${enseignant.date_naissance}</span>
+                        <p class="text-xs font-weight-bold mb-0">${filiere.nombre_heures_max}</p>
                       </td>
                       <td class="align-middle text-center">
-                        <span class="text-secondary text-xs font-weight-bold">${enseignant.salaire} DH</span>
+                        <p class="text-xs font-weight-bold mb-0">
+                          ${filiere.date_creation}
+                        </p>
                       </td>
                       <td class="align-middle text-center">
                         <div class="d-flex">
-                          <a href="edit_ensaignant.php?id=${enseignant.id_enseignant}" class="dropdown-item">
+                          <a href="edit_filiere.php?id=${filiere.id_filiere}${filiere.id_filiere}" class="dropdown-item">
                             <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                           </a>
-                          <a href="description_enseignant.php?id=${enseignant.id_enseignant}" class="dropdown-item">
+                          <a href="description_filiere.php?id=${filiere.id_filiere}" class="dropdown-item">
                             <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                           </a>
-                          <a href="enseignant.php?id=${enseignant.id_enseignant}&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                            <i class="fas fa-trash fa-sm text-danger opacity-8" id="${enseignant.id_enseignant}"></i>
+                          <a href="filiere.php?id=${filiere.id_filiere}&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                            <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
                           </a>
                         </div>
                       </td>
@@ -107,7 +82,7 @@ $(function() {
           // Aucun résultat
           tableBody.append(`
                         <tr>
-                            <td colspan="8" class="text-center">Aucune enseignant trouvée pour cette période</td>
+                            <td colspan="8" class="text-center">Aucune Filiere trouvée pour cette période</td>
                         </tr>
                     `);
         }

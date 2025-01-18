@@ -69,7 +69,7 @@ if (isset($_POST['login'])) {
           $query->execute();
           $host = $_SERVER['HTTP_HOST'];
           $uri = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-          header("location:dashboard.php");
+          header("location:admin/dashboard.php");
           exit();
         } else {
           echo "<script>alert('Votre compte a été bloqué, veuillez contacter l'administrateur');document.location ='index.php';</script>";

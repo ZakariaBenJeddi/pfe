@@ -33,23 +33,15 @@ $(function() {
         tableBody.empty();
 
         // Vérifier s'il y a des résultats
+        // Parcourir et ajouter chaque eleve
         if (response.status === 'success' && response.count > 0) {
-          // Parcourir et ajouter chaque enseignant
-          response.data.forEach(function(enseignant) {
-            const etatBadge = enseignant.est_connecte === 0 
-                  ? `<span class="badge badge-sm bg-gradient-secondary">Offline</span>` 
-                  : `<span class="badge badge-sm bg-gradient-success">Online</span>`;
-
-            let progressBarClass = '';
-              if (enseignant.degree <= 30) {
-                progressBarClass = 'bg-gradient-danger';
-              } else if (enseignant.degree <= 50 && enseignant.degree > 30) {
-                progressBarClass = 'bg-gradient-warning';
-              } else if (enseignant.degree >= 30 && enseignant.degree < 90) {
-                progressBarClass = 'bg-gradient-info';
-              } else if (enseignant.degree >= 90) {
-                progressBarClass = 'bg-gradient-success';
-              }
+          response.data.forEach(function(classe) {
+            let statut = ''
+            if (classe.statut === 'Active') {
+              statut = '<span class="badge badge-sm bg-gradient-success">Active</span>'
+            }else{
+              statut = '<span class="badge badge-sm bg-gradient-success">Inactive</span>'
+            }
             tableBody.append(`
                     <tr>
                       <td>
@@ -58,45 +50,35 @@ $(function() {
                             <img src="../../assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
                           </div>
                           <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">${enseignant.nom_enseignant}  ${enseignant.prenom_enseignant}</h6>
-                            <p class="text-xs text-secondary mb-0">${enseignant.email_enseignant}</p>
+                            <p class="text-secondary text-xs font-weight-bold">${classe.nom_classe}</p>
                           </div>
                         </div>
+                      </td>
+                      <td  class="align-middle text-center">
+                        <p class="text-secondary text-xs font-weight-bold">${classe.nom_niveau}</p>
                       </td>
                       <td>
-                        <p class="text-xs font-weight-bold mb-0">Enseignant</p>
-                        <p class="text-xs text-secondary mb-0">${enseignant.specialite}</p>
-                      </td>
-                      <td class="align-middle text-center">
-                        <div class="progress">
-                          <div class="progress-bar ${progressBarClass}" 
-                            role="progressbar" 
-                            aria-valuenow="${enseignant.degree}" 
-                            aria-valuemin="0" 
-                            aria-valuemax="100" 
-                            style="width: ${enseignant.degree}%;">
-                          </div>
-                        </div>
+                        <p class="text-secondary text-xs font-weight-bold">${classe.nom_filiere}</p>
                       </td>
                       <td class="align-middle text-center text-sm">
-                        ${etatBadge}
+                        ${statut}
                       </td>
                       <td class="align-middle text-center">
-                        <span class="text-secondary text-xs font-weight-bold">${enseignant.date_naissance}</span>
+                        <span class="text-secondary text-xs font-weight-bold">${classe.capacite}</span>
                       </td>
                       <td class="align-middle text-center">
-                        <span class="text-secondary text-xs font-weight-bold">${enseignant.salaire} DH</span>
+                        <span class="text-secondary text-xs font-weight-bold">${classe.date_creation}</span>
                       </td>
                       <td class="align-middle text-center">
                         <div class="d-flex">
-                          <a href="edit_ensaignant.php?id=${enseignant.id_enseignant}" class="dropdown-item">
+                          <a href="edit_classe.php?id=${classe.id_classe}" class="dropdown-item">
                             <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                           </a>
-                          <a href="description_enseignant.php?id=${enseignant.id_enseignant}" class="dropdown-item">
+                          <a href="description_classe.php?id=${classe.id_classe}" class="dropdown-item">
                             <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                           </a>
-                          <a href="enseignant.php?id=${enseignant.id_enseignant}&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
-                            <i class="fas fa-trash fa-sm text-danger opacity-8" id="${enseignant.id_enseignant}"></i>
+                          <a href="classes.php?id=${classe.id_classe}&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                            <i class="fas fa-trash fa-sm text-danger opacity-8" id="${classe.id_classe}"></i>
                           </a>
                         </div>
                       </td>
@@ -107,7 +89,7 @@ $(function() {
           // Aucun résultat
           tableBody.append(`
                         <tr>
-                            <td colspan="8" class="text-center">Aucune enseignant trouvée pour cette période</td>
+                            <td colspan="8" class="text-center">Aucune Classe trouvée pour cette période</td>
                         </tr>
                     `);
         }
