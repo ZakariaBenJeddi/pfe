@@ -1,5 +1,13 @@
 <?php
 session_start();
+
+if (empty($_SESSION['user'])) {
+  header('location:../../sign-in.php');
+}
+
+//* deconnexion
+require('../../includes/deconnexion_5s.php');
+
 require_once __DIR__ . '/../../includes/admin/controller/controller_timeTable.php';
 
 $timeTableData = new TimeTableData();

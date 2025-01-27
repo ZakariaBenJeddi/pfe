@@ -89,6 +89,14 @@
 			<li class="nav-item">
 				<a class="nav-link" href="../admin/calendrier.php">
 					<div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+						<i class="fa-solid fa-calendar text-warning" style="opacity: 0.6; font-size: 1rem;"></i>
+					</div>
+					<span class="nav-link-text ms-1">Calendrier</span>
+				</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="../admin/timetableview.php">
+					<div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
 						<i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
 					</div>
 					<span class="nav-link-text ms-1">Emplois du Temps</span>
