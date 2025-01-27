@@ -107,6 +107,14 @@ if (isset($_GET['action'])) {
                         </div>
                     </div>
                 </div>
+                <div class="row mb-5 mt-4">
+                    <div class="col-lg-4">
+                        <button class="btn btn-info w-auto copier">Copier emploi du temps</button>
+                    </div>
+                    <div class="col-lg-4">
+                        <button class="btn btn-warning w-auto coller">Coller emploi du temps</button>
+                    </div>
+                </div>
                 <div class="row ">
                     <div class="col-md-9">
                         <div id="loading-screen" style="display: none;">

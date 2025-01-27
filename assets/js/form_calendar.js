@@ -118,3 +118,9 @@ document.getElementById('schedule-form').addEventListener('submit', function(e) 
     // If all validations pass, submit the form
     this.submit();
 });
+
+
+// copie and paste timetable
+document.addEventListener('DOMContentLoaded', function() {
+    
+});
