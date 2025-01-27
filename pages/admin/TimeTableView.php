@@ -1,8 +1,6 @@
 <?php
 session_start();
-
 require_once __DIR__ . '/../../includes/admin/controller/controller_timeTable.php';
-
 
 $timeTableData = new TimeTableData();
 // Récupérer tous les emplois du temps
@@ -14,118 +12,14 @@ $roomsSchedule = $timeTableData->getRoomsSchedule();
 // Accéder aux jours et créneaux horaires
 $days = $timeTableData->getDays();
 $timeSlots = $timeTableData->getTimeSlots();
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
 <!-- HEAD -->
 <?php include '../../includes/admin/head_admin.php' ?>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-  }
-
-  .schedule-container {
-    margin-bottom: 50px;
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  h1 {
-    color: #2c5282;
-    text-align: center;
-    margin-bottom: 30px;
-  }
-
-  h2 {
-    color: #4a5568;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #e2e8f0;
-  }
-
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-bottom: 20px;
-    background-color: white;
-  }
-
-  th,
-  td {
-    border: 1px solid #e2e8f0;
-    padding: 12px;
-    text-align: center;
-  }
-
-  th {
-    background-color: #2c5282;
-    color: white;
-    font-weight: bold;
-  }
-
-  tr:nth-child(even) {
-    background-color: #f8fafc;
-  }
-
-  .time-slot {
-    font-weight: bold;
-    color: #2d3748;
-    background-color: #edf2f7;
-  }
-
-  .class-info {
-    margin-bottom: 5px;
-  }
-
-  .matiere {
-    color: #2c5282;
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
-
-  .professeur {
-    color: #805ad5;
-    margin-bottom: 3px;
-  }
-
-  .salle {
-    color: #38a169;
-    font-style: italic;
-  }
-
-  .empty-slot {
-    color: #a0aec0;
-    font-style: italic;
-  }
-
-  .total-hours {
-    text-align: right;
-    margin-top: 10px;
-    color: #2d3748;
-    font-size: 0.9em;
-  }
-
-  @media print {
-    .schedule-container {
-      page-break-after: always;
-    }
-  }
-
-  button {
-    color: white;
-    border-radius: 5px;
-    border: 0px solid white;
-    background-color: #2c5282;
-    width: 6rem;
-    height: 3rem;
-    cursor: pointer;
-  }
-</style>
+<!-- css -->
+<link rel="stylesheet" href="../../assets/css/timetableview.css">
 
 <body class="g-sidenav-show  bg-gray-100">
   <div class="min-height-300 bg-primary position-absolute w-100"></div>
