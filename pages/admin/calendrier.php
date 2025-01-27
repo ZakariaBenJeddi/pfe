@@ -7,11 +7,9 @@ if (empty($_SESSION['user'])) {
 }
 
 //* deconnexion 5s
-// require('../../includes/deconnexion_5s.php');
+require('../../includes/deconnexion_5s.php');
 
 use function PHPSTORM_META\type;
-
-// require_once('db-connect.php');
 
 
 $sql = "SELECT id_enseignant, nom_enseignant FROM enseignant ORDER BY nom_enseignant";
@@ -127,7 +125,7 @@ if (isset($_GET['action'])) {
                             </div>
                             <div class="card-body">
                                 <div class="container-fluid">
-                                    <form action="" method="get" id="matiere-form">
+                                    <form action="save_schedule.php" method="post" id="schedule-form">
                                         <div class="form-group mb-2">
                                             <label for="classe-select" class="control-label">Classes</label><br>
                                             <select class="form-select form-select-sm text-sm" name="classe-select" id="classe-select">
@@ -158,21 +156,19 @@ if (isset($_GET['action'])) {
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
-                                    </form>
-
-                                    <form action="save_schedule.php" method="post" id="schedule-form">
                                         <input type="hidden" name="id" value="">
-                                        <input type="hidden" name="professeur_id" id="professeur-value">
-                                        <input type="hidden" name="matiere_id" id="matiere-value">
-                                        <input type="hidden" name="classe-select" id="classe-value">
+                                        <input type="hidden" name="professeur_value" id="professeur-value">
+                                        <input type="hidden" name="matiere_value" id="matiere-value">
+                                        <input type="hidden" name="classe_value" id="classe-value">
+                                        <input type="hidden" name="salle_value" id="salle-value">
 
                                         <div class="form-group mb-2">
                                             <label for="title" class="control-label">Title</label>
-                                            <input type="text" class="form-control form-control-sm rounded-0" name="title" id="title" required>
+                                            <input type="text" class="form-control form-control-sm rounded-0" name="title" id="title">
                                         </div>
                                         <div class="form-group mb-2">
                                             <label for="description" class="control-label">Description</label>
-                                            <textarea rows="3" class="form-control form-control-sm rounded-0" name="description" id="description" required></textarea>
+                                            <textarea rows="3" class="form-control form-control-sm rounded-0" name="description" id="description"></textarea>
                                         </div>
                                         <div class="form-group mb-2">
                                             <label for="start_datetime" class="control-label">Start</label>
@@ -182,13 +178,13 @@ if (isset($_GET['action'])) {
                                             <label for="end_datetime" class="control-label">End</label>
                                             <input type="datetime-local" class="form-control form-control-sm rounded-0" name="end_datetime" id="end_datetime" required>
                                         </div>
+                                        <div class="card-footer">
+                                            <div class="text-center">
+                                                <button class="btn btn-primary btn-sm rounded-0" type="submit" form="schedule-form"><i class="fa fa-save"></i> Save</button>
+                                                <button class="btn btn-default border btn-sm rounded-0" type="reset" form="schedule-form"><i class="fa fa-reset"></i> Cancel</button>
+                                            </div>
+                                        </div>
                                     </form>
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <div class="text-center">
-                                    <button class="btn btn-primary btn-sm rounded-0" type="submit" form="schedule-form"><i class="fa fa-save"></i> Save</button>
-                                    <button class="btn btn-default border btn-sm rounded-0" type="reset" form="schedule-form"><i class="fa fa-reset"></i> Cancel</button>
                                 </div>
                             </div>
                         </div>
@@ -203,106 +199,8 @@ if (isset($_GET['action'])) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <script src="../../assets/js/import_excel_calendrier.js"></script>
 
-    <script>
-        const classeSelect = document.getElementById('classe-select');
-        const matiereSelect = document.getElementById('matiere-select');
-        const professeurSelect = document.getElementById('professeur-select');
-        const salleSelect = document.getElementById('salle-select');
-
-        // Hidden input fields
-        const professeurValue = document.getElementById('professeur-value');
-        const matiereValue = document.getElementById('matiere-value');
-        const classeValue = document.getElementById('classe-value');
-
-        function resetSelect(select, defaultText = "", disabled = true) {
-            select.innerHTML = `<option value="">${defaultText}</option>`;
-            select.disabled = disabled;
-        }
-
-        // Handle classe selection
-        classeSelect.addEventListener('change', function() {
-            const classeId = this.value;
-            classeValue.value = classeId;
-
-            // Reset subsequent selects
-            resetSelect(matiereSelect, "Sélectionnez une matière");
-            resetSelect(professeurSelect, "Choisissez un enseignant");
-
-            if (classeId) {
-                fetch(`?action=get_matieres&classe_id=${classeId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        matiereSelect.disabled = false;
-                        data.forEach(matiere => {
-                            const option = document.createElement('option');
-                            option.value = matiere.id_matiere;
-                            option.textContent = matiere.nom;
-                            matiereSelect.appendChild(option);
-                        });
-                    })
-                    .catch(error => console.error('Erreur:', error));
-            }
-        });
-
-        // Handle matière selection
-        matiereSelect.addEventListener('change', function() {
-            const matiereId = this.value;
-            matiereValue.value = matiereId;
-
-            // Reset professeur select
-            resetSelect(professeurSelect, "Choisissez un enseignant");
-
-            if (matiereId) {
-                fetch(`?action=get_professeurs&matiere_id=${matiereId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        professeurSelect.disabled = false;
-                        data.forEach(prof => {
-                            const option = document.createElement('option');
-                            option.value = prof.id;
-                            option.textContent = prof.nom;
-                            professeurSelect.appendChild(option);
-                        });
-                    })
-                    .catch(error => console.error('Erreur:', error));
-            }
-        });
-
-        // Update hidden values when selections change
-        professeurSelect.addEventListener('change', function() {
-            professeurValue.value = this.value;
-        });
-
-        // Form validation before submit
-        document.getElementById('schedule-form').addEventListener('submit', function(e) {
-            const requiredSelects = {
-                'classe-select': 'Veuillez sélectionner une classe',
-                'matiere-select': 'Veuillez sélectionner une matière',
-                'professeur-select': 'Veuillez sélectionner un enseignant',
-                'salle-select': 'Veuillez sélectionner une salle'
-            };
-
-            for (const [id, message] of Object.entries(requiredSelects)) {
-                const select = document.getElementById(id);
-                if (!select.value) {
-                    e.preventDefault();
-                    alert(message);
-                    return;
-                }
-            }
-
-            // Validate datetime
-            const start = new Date(document.getElementById('start_datetime').value);
-            const end = new Date(document.getElementById('end_datetime').value);
-
-            if (start >= end) {
-                e.preventDefault();
-                alert('La date de fin doit être postérieure à la date de début');
-                return;
-            }
-        });
-    </script>
-
+    <!-- affichage des selectbox des composant d'emploi du temps -->
+    <script src="../../assets/js/form_calendar.js"></script>
     <!-- reload page pour 5s premiere chargement de page -->
     <script src="../../assets/js/loading.js"></script>
     <!-- dezoumer la page si le type d'ecran est portable -->

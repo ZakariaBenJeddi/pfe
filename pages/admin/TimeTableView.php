@@ -11,6 +11,47 @@ require('../../includes/deconnexion_5s.php');
 require_once __DIR__ . '/../../includes/DatabaseConnexion.php';
 require_once __DIR__ . '/../../includes/admin/controller/controller_timeTable.php';
 
+// if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+//   $timeTableData = new TimeTableData();
+//   // Get week dates if provided
+//   $weekStart = null;
+//   $weekEnd = null;
+//   if (isset($_GET['week'])) {
+//       list($weekStart, $weekEnd) = explode(',', $_GET['week']);
+//   }
+//   if (isset($_GET['teacher'])) {
+//       echo $timeTableData->getSpecificTeacherSchedule($_GET['teacher'], $weekStart, $weekEnd);
+//   } elseif (isset($_GET['group'])) {
+//       echo $timeTableData->getSpecificGroupSchedule($_GET['group'], $weekStart, $weekEnd);
+//   } elseif (isset($_GET['room'])) {
+//       echo $timeTableData->getSpecificRoomSchedule($_GET['room'], $weekStart, $weekEnd);
+//   }
+//   exit;
+// }
+
+if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+  try {
+      $timeTableData = new TimeTableData();
+      
+      if (isset($_GET['teacher'])) {
+          $html = $timeTableData->getSpecificTeacherSchedule($_GET['teacher']);
+          echo $html ?: '<div class="alert alert-info">Aucun emploi du temps trouvé pour cet enseignant</div>';
+      } elseif (isset($_GET['group'])) {
+          $html = $timeTableData->getClassSchedule($_GET['group']);
+          echo $html ?: '<div class="alert alert-info">Aucun emploi du temps trouvé pour ce groupe</div>';
+      } elseif (isset($_GET['room'])) {
+          $html = $timeTableData->getSpecificRoomSchedule($_GET['room']);
+          echo $html ?: '<div class="alert alert-info">Aucun emploi du temps trouvé pour cette salle</div>';
+      }
+      
+  } catch (Exception $e) {
+      http_response_code(500);
+      echo '<div class="alert alert-danger">Erreur: ' . htmlspecialchars($e->getMessage()) . '</div>';
+  }
+  exit;
+}
+
+
 $timeTableData = new TimeTableData();
 // Récupérer tous les emplois du temps
 $allSchedules = $timeTableData->getAllSchedules();
@@ -64,65 +105,67 @@ try {
     <div class=" pb-0 mt-5 me-5 text-end text-primary">
       <a href="TimeTableConfig.php" class="btn btn-light px-3">configurer donnes</a>
     </div>
-    <div class="row mb-5">
-      <div class="col-lg-4">
-        <div class="filter-group mb-3">
-          <h5 for="teacher-select" class="text-dark">Professeur:</h5>
-          <select class="form-select" id="teacher-select">
-            <option value="">Selectionner professeurs</option>
-            <?php foreach ($professeurs as $prof) : ?>
-              <option value="<?= htmlspecialchars($prof['nom_enseignant']) ?>">
-                <?= htmlspecialchars($prof['nom_enseignant'])." ".htmlspecialchars($prof['prenom_enseignant']) ?>
-              </option>
-            <?php endforeach; ?>
-          </select>
+    <div class="container">
+      <div class="row mb-5">
+        <div class="col-lg-4">
+          <div class="filter-group mb-3">
+            <h5 for="teacher-select" class="text-dark">Professeur:</h5>
+            <select class="form-select" id="teacher-select">
+              <option value="">Selectionner professeurs</option>
+              <?php foreach ($professeurs as $prof) : ?>
+                <option value="<?= htmlspecialchars($prof['nom_enseignant']) ?>">
+                  <?= htmlspecialchars($prof['nom_enseignant'])." ".htmlspecialchars($prof['prenom_enseignant']) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
         </div>
-      </div>
-      <div class="col-lg-4">
-        <div class="filter-group mb-3">
-          <h5 for="group-select" class="text-dark">Groupe:</h5>
-          <select class="form-select" id="group-select">
-            <option value="">Selectionner groupes</option>
-            <?php foreach ($groupes as $groupe) : ?>
-              <option value="<?= htmlspecialchars($groupe['nom_classe']) ?>">
-                <?= htmlspecialchars($groupe['nom_classe']) ?>
-              </option>
-            <?php endforeach; ?>
-          </select>
+        <div class="col-lg-4">
+          <div class="filter-group mb-3">
+            <h5 for="group-select" class="text-dark">Groupe:</h5>
+            <select class="form-select" id="group-select">
+              <option value="">Selectionner groupes</option>
+              <?php foreach ($groupes as $groupe) : ?>
+                <option value="<?= htmlspecialchars($groupe['nom_classe']) ?>">
+                  <?= htmlspecialchars($groupe['nom_classe']) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
         </div>
-      </div>
-      <div class="col-lg-4">
-        <div class="filter-group mb-3">
-          <h5 for="room-select" class="text-dark">Salle:</h5>
-          <select class="form-select" id="room-select">
-            <option value="">Selectionner salles</option>
-            <?php foreach ($salles as $salle) : ?>
-              <option value="<?= htmlspecialchars($salle['nom_salle']) ?>">
-                <?= htmlspecialchars($salle['nom_salle']) ?>
-              </option>
-            <?php endforeach; ?>
-          </select>
+        <div class="col-lg-4">
+          <div class="filter-group mb-3">
+            <h5 for="room-select" class="text-dark">Salle:</h5>
+            <select class="form-select" id="room-select">
+              <option value="">Selectionner salles</option>
+              <?php foreach ($salles as $salle) : ?>
+                <option value="<?= htmlspecialchars($salle['nom_salle']) ?>">
+                  <?= htmlspecialchars($salle['nom_salle']) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
         </div>
+        <!-- Dans la partie HTML où se trouve le select des semaines -->
+        <!-- <div class="col-lg-3">
+          <div class="filter-group mb-3">
+            <h5 for="week-select" class="text-dark">Semaine:</h5>
+            <select class="form-select" id="week-select">
+              <option value="">Selectionner Une Semaine</option>
+              <?php
+              // $weeks = $displayer->getWeeksList();
+              // foreach ($weeks as $week) :
+              //   $value = $week['start'] . ',' . $week['end'];
+              ?>
+                <option value="<?php //echo htmlspecialchars($value) ?>">
+                  <?php //echo htmlspecialchars($week['display']) ?>
+                </option>
+              <?php //endforeach; ?>
+            </select>
+          </div>
+        </div> -->
       </div>
-      <!-- Dans la partie HTML où se trouve le select des semaines -->
-      <!-- <div class="col-lg-3">
-        <div class="filter-group mb-3">
-          <h5 for="week-select" class="text-dark">Semaine:</h5>
-          <select class="form-select" id="week-select">
-            <option value="">Selectionner Une Semaine</option>
-            <?php
-            // $weeks = $displayer->getWeeksList();
-            // foreach ($weeks as $week) :
-            //   $value = $week['start'] . ',' . $week['end'];
-            ?>
-              <option value="<?php //echo htmlspecialchars($value) ?>">
-                <?php //echo htmlspecialchars($week['display']) ?>
-              </option>
-            <?php //endforeach; ?>
-          </select>
-        </div>
-      </div>
-    </div> -->
+    </div>
     <div class="px-0 pt-0 ">
       <!-- section pour les classes -->
       <div id="classes-section" class="schedule-section active p-0">
@@ -158,7 +201,6 @@ try {
                 </tr>
               <?php endforeach; ?>
             </table>
-
           </div>
         <?php endforeach; ?>
       </div>
@@ -202,7 +244,6 @@ try {
                           }
                         }
                       }
-
                       if (!$sessionFound) {
                         echo 'Disponible';
                       }
@@ -255,7 +296,6 @@ try {
                           }
                         }
                       }
-
                       if (!$sessionFound) {
                         echo 'Disponible';
                       }
@@ -269,7 +309,6 @@ try {
         <?php endforeach; ?>
       </div>
     </div>
-
     <!-- FOOTER -->
     <?php include '../../includes/footer.php' ?>
 
@@ -278,24 +317,19 @@ try {
   <!-- FIXED PLUGIN  -->
   <?php // include '../../includes/fixedplugin.php' 
   ?>
+
+  <!-- filtration d'emploi du temps -->
+   <script src="../../assets/js/timetablefilter.js"></script>
+
+  <!-- dezoumer la page si le type d'ecran est portable -->
+  <script src="../../assets/js/dezoomer.js"></script>
+
   <!--   Core JS Files   -->
   <script src="../../assets/js/core/popper.min.js"></script>
   <script src="../../assets/js/core/bootstrap.min.js"></script>
   <script src="../../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../../assets/js/plugins/smooth-scrollbar.min.js"></script>
-  <script>
-    // Dézoomer l'écran à 80% (0.8)
-    function zoomOutScreen(scale) {
-      document.body.style.transform = `scale(${scale})`; // Applique le zoom-out
-      document.body.style.transformOrigin = 'top left'; // Définit le point d'origine pour le zoom
-      document.body.style.width = `${100 / scale}%`; // Ajuste la largeur pour éviter les barres de défilement
-    }
 
-    if (window.innerWidth <= 768) {
-      // Appeler la fonction pour dézoomer à 50%
-      zoomOutScreen(0.5);
-    }
-  </script>
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
