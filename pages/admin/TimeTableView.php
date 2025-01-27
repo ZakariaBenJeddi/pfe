@@ -8,6 +8,7 @@ if (empty($_SESSION['user'])) {
 //* deconnexion
 require('../../includes/deconnexion_5s.php');
 
+require_once __DIR__ . '/../../includes/DatabaseConnexion.php';
 require_once __DIR__ . '/../../includes/admin/controller/controller_timeTable.php';
 
 $timeTableData = new TimeTableData();
@@ -20,6 +21,30 @@ $roomsSchedule = $timeTableData->getRoomsSchedule();
 // Accéder aux jours et créneaux horaires
 $days = $timeTableData->getDays();
 $timeSlots = $timeTableData->getTimeSlots();
+
+
+// Get lists for select dropdowns
+try {
+  $stmt = $dbh->prepare("CALL get_all_enseignant()");
+  $stmt->execute();
+  $professeurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  $stmt->closeCursor();
+
+  // var_dump($professeurs);
+
+  $stmt_groupes = $dbh->prepare("CALL get_all_classes()");
+  $stmt_groupes->execute();
+  $groupes = $stmt_groupes->fetchAll(PDO::FETCH_ASSOC);
+  $stmt_groupes->closeCursor();
+
+  $stmt_salles = $dbh->prepare("CALL get_all_salle()");
+  $stmt_salles->execute();
+  $salles = $stmt_salles->fetchAll(PDO::FETCH_ASSOC);
+  $stmt_salles->closeCursor();
+} catch (PDOException $e) {
+  error_log("Database error: " . $e->getMessage());
+  echo "Une erreur est survenue. Veuillez réessayer plus tard.";
+}
 ?>
 
 <!DOCTYPE html>
@@ -39,7 +64,65 @@ $timeSlots = $timeTableData->getTimeSlots();
     <div class=" pb-0 mt-5 me-5 text-end text-primary">
       <a href="TimeTableConfig.php" class="btn btn-light px-3">configurer donnes</a>
     </div>
-    
+    <div class="row mb-5">
+      <div class="col-lg-4">
+        <div class="filter-group mb-3">
+          <h5 for="teacher-select" class="text-dark">Professeur:</h5>
+          <select class="form-select" id="teacher-select">
+            <option value="">Selectionner professeurs</option>
+            <?php foreach ($professeurs as $prof) : ?>
+              <option value="<?= htmlspecialchars($prof['nom_enseignant']) ?>">
+                <?= htmlspecialchars($prof['nom_enseignant'])." ".htmlspecialchars($prof['prenom_enseignant']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="filter-group mb-3">
+          <h5 for="group-select" class="text-dark">Groupe:</h5>
+          <select class="form-select" id="group-select">
+            <option value="">Selectionner groupes</option>
+            <?php foreach ($groupes as $groupe) : ?>
+              <option value="<?= htmlspecialchars($groupe['nom_classe']) ?>">
+                <?= htmlspecialchars($groupe['nom_classe']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="filter-group mb-3">
+          <h5 for="room-select" class="text-dark">Salle:</h5>
+          <select class="form-select" id="room-select">
+            <option value="">Selectionner salles</option>
+            <?php foreach ($salles as $salle) : ?>
+              <option value="<?= htmlspecialchars($salle['nom_salle']) ?>">
+                <?= htmlspecialchars($salle['nom_salle']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      </div>
+      <!-- Dans la partie HTML où se trouve le select des semaines -->
+      <!-- <div class="col-lg-3">
+        <div class="filter-group mb-3">
+          <h5 for="week-select" class="text-dark">Semaine:</h5>
+          <select class="form-select" id="week-select">
+            <option value="">Selectionner Une Semaine</option>
+            <?php
+            // $weeks = $displayer->getWeeksList();
+            // foreach ($weeks as $week) :
+            //   $value = $week['start'] . ',' . $week['end'];
+            ?>
+              <option value="<?php //echo htmlspecialchars($value) ?>">
+                <?php //echo htmlspecialchars($week['display']) ?>
+              </option>
+            <?php //endforeach; ?>
+          </select>
+        </div>
+      </div>
+    </div> -->
     <div class="px-0 pt-0 ">
       <!-- section pour les classes -->
       <div id="classes-section" class="schedule-section active p-0">
