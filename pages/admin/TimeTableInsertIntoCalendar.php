@@ -109,8 +109,8 @@ try {
     // Insert schedules into database
     $inserter = new ScheduleDBInserter();
     $insertedCount = $inserter->insertSchedules($allSchedules);
-
     echo "Succès! $insertedCount événements ont été insérés dans la base de données.";
+    header('Location:TimeTableView.php');
 } catch (Exception $e) {
     echo "Une erreur est survenue: " . $e->getMessage();
 }
