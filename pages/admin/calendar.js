@@ -166,6 +166,14 @@ function getColorForMatiere(matiere) {
 
 // Fonction mise à jour pour l'affichage des détails
 function showEventDetails(info) {
+    console.log('Event Data:', {
+        id: info.event.id,
+        title: info.event.title,
+        extendedProps: info.event.extendedProps,
+        start: info.event.start,
+        end: info.event.end
+    });
+
     document.querySelector('#event-details-modal #title').textContent = info.event.title;
     document.querySelector('#event-details-modal #description').textContent = 
         info.event.extendedProps.description || 'Non spécifié';
@@ -196,5 +204,152 @@ function showEventDetails(info) {
         }
     };
 
+    let editButton = document.querySelector('#event-details-modal #edit');
+    editButton.onclick = async function() {
+        // Fermer le modal des détails
+        bootstrap.Modal.getInstance(document.getElementById('event-details-modal')).hide();
+        
+        // Remplir le formulaire avec les données de l'événement
+        document.querySelector('input[name="id"]').value = info.event.id;
+        
+        // Remplir les champs cachés avec gestion des valeurs undefined
+        const professeur = info.event.extendedProps.professeur || '';
+        const matiere = info.event.extendedProps.matiere || '';
+        const classe = info.event.extendedProps.classe || '';
+        const salle = info.event.extendedProps.salle || '';
+
+        document.getElementById('professeur-value').value = professeur;
+        document.getElementById('matiere-value').value = matiere;
+        document.getElementById('classe-value').value = classe;
+        document.getElementById('salle-value').value = salle;
+        
+        // Remplir le titre et la description
+        document.getElementById('title').value = info.event.title || '';
+        document.getElementById('description').value = info.event.extendedProps.description || '';
+        
+        // Formater les dates
+        const startDate = new Date(info.event.start);
+        const endDate = info.event.end ? new Date(info.event.end) : startDate;
+        
+        document.getElementById('start_datetime').value = formatDateTimeForInput(startDate);
+        document.getElementById('end_datetime').value = formatDateTimeForInput(endDate);
+        
+        try {
+            // Sélectionner la classe
+            const classeSelect = document.getElementById('classe-select');
+            console.log('Recherche classe:', classe);
+            console.log('Options classe disponibles:', Array.from(classeSelect.options).map(opt => ({text: opt.text, value: opt.value})));
+            
+            // Trouver l'option de classe soit par texte exact soit par ID
+            await findAndSelectOption(classeSelect, classe);
+            
+            // Attendre le chargement des matières
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Sélectionner la matière
+            const matiereSelect = document.getElementById('matiere-select');
+            console.log('Recherche matière:', matiere);
+            console.log('Options matière disponibles:', Array.from(matiereSelect.options).map(opt => ({text: opt.text, value: opt.value})));
+            
+            await findAndSelectOption(matiereSelect, matiere);
+            
+            // Attendre le chargement des professeurs
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Sélectionner le professeur
+            const professeurSelect = document.getElementById('professeur-select');
+            console.log('Recherche professeur:', professeur);
+            console.log('Options professeur disponibles:', Array.from(professeurSelect.options).map(opt => ({text: opt.text, value: opt.value})));
+            
+            await findAndSelectOption(professeurSelect, professeur);
+            
+            // Sélectionner la salle
+            const salleSelect = document.getElementById('salle-select');
+            console.log('Recherche salle:', salle);
+            console.log('Options salle disponibles:', Array.from(salleSelect.options).map(opt => ({text: opt.text, value: opt.value})));
+            
+            await findAndSelectOption(salleSelect, salle);
+            
+        } catch (error) {
+            console.error('Erreur lors de la sélection des options:', error);
+        }
+    };
+
     new bootstrap.Modal(document.getElementById('event-details-modal')).show();
+}
+
+async function findAndSelectOption(selectElement, searchValue) {
+    if (!selectElement || !searchValue) return;
+    
+    // Attendre que le select soit enabled
+    let attempts = 0;
+    while (selectElement.disabled && attempts < 10) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+    }
+    
+    // Chercher d'abord par texte exact
+    let found = Array.from(selectElement.options).find(opt => opt.text === searchValue);
+    
+    // Si non trouvé, chercher par valeur
+    if (!found) {
+        found = Array.from(selectElement.options).find(opt => opt.value === searchValue);
+    }
+    
+    // Si non trouvé, chercher par texte partiel
+    if (!found) {
+        found = Array.from(selectElement.options).find(opt => 
+            opt.text.toLowerCase().includes(searchValue.toLowerCase())
+        );
+    }
+    
+    if (found) {
+        selectElement.value = found.value;
+        selectElement.dispatchEvent(new Event('change'));
+        console.log(`Option sélectionnée pour ${selectElement.id}:`, found.text);
+    } else {
+        console.warn(`Aucune option trouvée pour ${searchValue} dans ${selectElement.id}`);
+    }
+}
+
+function formatDateTimeForInput(date) {
+    if (!date) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+async function selectOptionByText(selectElement, text) {
+    if (!selectElement) return;
+    
+    // Attendre que le select soit enabled
+    let attempts = 0;
+    while (selectElement.disabled && attempts < 10) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+    }
+    
+    // Parcourir les options pour trouver celle qui correspond
+    for (let option of selectElement.options) {
+        if (option.text === text) {
+            selectElement.value = option.value;
+            // Déclencher l'événement change
+            selectElement.dispatchEvent(new Event('change'));
+            break;
+        }
+    }
+}
+
+// Fonction utilitaire pour formater la date pour l'input datetime-local
+function formatDateTimeForInput(date) {
+    if (!date) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
