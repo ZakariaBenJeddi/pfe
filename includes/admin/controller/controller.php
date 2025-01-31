@@ -1500,5 +1500,42 @@ if (file_exists($filePath)) {
 // =============== Matiere ================
 
 // =============== calendar ================
+    function delete_seance($dbh, $id) {
+        try {
+            // Validation de l'ID
+            $id = filter_var($id, FILTER_VALIDATE_INT);
+            if ($id === false) {
+                return [
+                    'status' => 'error',
+                    'message' => 'ID invalide'
+                ];
+            }
 
+            // Appel de la procédure stockée
+            $stmt = $dbh->prepare("CALL delete_seance(:id)");
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($result['success']) {
+                return [
+                    'status' => 'success',
+                    'message' => $result['message']
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => $result['message']
+                ];
+            }
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return [
+                'status' => 'error',
+                'message' => 'Une erreur est survenue lors de la suppression'
+            ];
+        }
+    }
 // =============== calendar ================
