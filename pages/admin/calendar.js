@@ -227,14 +227,25 @@ document.addEventListener('DOMContentLoaded', function () {
         deleteButton.onclick = function() {
             if (confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
                 fetch(`delete_schedule.php?id=${info.event.id}`)
-                    .then(response => response.text())
+                    .then(response => response.json())
                     .then(data => {
-                        alert('Événement supprimé avec succès !');
-                        calendar.refetchEvents();
+                        if (data.status === 'success') {
+                            alert(data.message);
+                            // Assurez-vous que calendar est accessible dans ce contexte
+                            if (info.view && info.view.calendar) {
+                                info.view.calendar.refetchEvents();
+                            }
+                            // Fermer le modal après la suppression si nécessaire
+                            if (document.querySelector('#event-details-modal')) {
+                                // Ajoutez ici le code pour fermer votre modal
+                            }
+                        } else {
+                            throw new Error(data.message);
+                        }
                     })
                     .catch(error => {
                         console.error('Erreur lors de la suppression :', error);
-                        alert('Une erreur est survenue lors de la suppression.');
+                        alert('Une erreur est survenue lors de la suppression : ' + error.message);
                     });
             }
         };
