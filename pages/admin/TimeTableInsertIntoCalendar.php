@@ -1,4 +1,6 @@
 <?php
+ob_start();
+
 require 'TimeTable.php';
 
 class ScheduleDBInserter
@@ -40,6 +42,10 @@ class ScheduleDBInserter
         $insertedCount = 0;
         $currentYear = date('Y');
         $currentMonth = date('m');
+
+
+        $insertedCount = 0;
+        $errorCount = 0;
 
         foreach ($allSchedules as $classId => $classData) {
             $className = $classData['class_name'];
@@ -89,22 +95,62 @@ class ScheduleDBInserter
                             ]);
                             $insertedCount++;
                         } catch (PDOException $e) {
-                            echo "Erreur lors de l'insertion: " . $e->getMessage() . "\n";
+                            $errorCount++;
+                            // echo "Erreur lors de l'insertion: " . $e->getMessage() . "\n";
+                            error_log("Insertion error for class {$className}: " . $e->getMessage());
                         }
                     }
                 }
             }
         }
-
+        echo "Inserted: $insertedCount, Errors: $errorCount\n";
         return $insertedCount;
+        // return $insertedCount;
     }
 }
 
 // Usage
+// try {
+//     // Generate schedules
+//     $generator = new MultiClassScheduleGenerator();
+//     $allSchedules = $generator->generateAllSchedules();
+
+//     // Insert schedules into database
+//     $inserter = new ScheduleDBInserter();
+//     $insertedCount = $inserter->insertSchedules($allSchedules);
+//     echo "Succès! $insertedCount événements ont été insérés dans la base de données.";
+//     header('Location:TimeTableView.php');
+// } catch (Exception $e) {
+//     echo "Une erreur est survenue: " . $e->getMessage();
+// }
+
+// In TimeTableInsertIntoCalendar.php
 try {
     // Generate schedules
     $generator = new MultiClassScheduleGenerator();
     $allSchedules = $generator->generateAllSchedules();
+
+    // Debug: Check if schedules are generated
+    if (empty($allSchedules)) {
+        echo "No schedules were generated. Check constraints and generation logic.";
+        exit;
+    }
+
+    // Print out some debug information
+    foreach ($allSchedules as $classId => $classSchedule) {
+        echo "Class: " . $classSchedule['class_name'] . "\n";
+        echo "Target Hours: " . $classSchedule['target_hours'] . "\n";
+        echo "Actual Hours: " . $classSchedule['actual_hours'] . "\n";
+        
+        // Print detailed schedule
+        foreach ($classSchedule['schedule'] as $day => $slots) {
+            foreach ($slots as $timeSlot => $lesson) {
+                if ($lesson !== null) {
+                    print_r($lesson);
+                }
+            }
+        }
+    }
 
     // Insert schedules into database
     $inserter = new ScheduleDBInserter();
