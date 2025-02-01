@@ -189,11 +189,28 @@ try {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="niveau_scolaire_eleve" class="form-control-label">Niveau Scolaire</label>
-                        <select class="form-select" name="niveau_scolaire_eleve" required>
+                        <select class="form-select" name="niveau_scolaire_eleve" id="niveau_scolaire_eleve" required>
                           <?php foreach($niveaux as $niveau): ?>
                             <option value="<?= $niveau->id_niveau ?>"><?= $niveau->nom_niveau ?></option>
                           <?php endforeach ?>
                         </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="filiere_eleve" class="form-control-label">Filière</label>
+                      <select class="form-select" name="filiere_eleve" id="filiere_eleve" disabled>
+                        <option value="">Sélectionner une filière</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="classe_eleve" class="form-control-label">Classe</label>
+                      <select class="form-select" name="classe_eleve" id="classe_eleve" disabled>
+                        <option value="">Sélectionner une classe</option>
+                      </select>
                     </div>
                   </div>
 
@@ -289,6 +306,8 @@ try {
   </div>
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
+    <!-- FILIRE ET CLASSE SELON LE NIVEAU -->
+    <script src="../../assets/js/niveau_filiere_classe.js"></script>
   <!--   Core JS Files   -->
   <script src="../../assets/js/core/popper.min.js"></script>
   <script src="../../assets/js/core/bootstrap.min.js"></script>

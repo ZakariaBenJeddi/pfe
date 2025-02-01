@@ -334,7 +334,7 @@ if (file_exists($filePath)) {
     
             // Appel de la procédure stockée
             $sql = "CALL ajouter_eleve(
-                :id_niveau, :nom, :prenom, :date_naissance, :genre, :nationalite,
+                :id_niveau, :id_classe, :nom, :prenom, :date_naissance, :genre, :nationalite,
                 :adresse, :telephone, :email, :date_inscription, :statut,
                 :historique_scolaire, :langues_parlees, :nom_tuteur,
                 :telephone_tuteur, :email_tuteur, :profession_tuteur,
@@ -345,6 +345,7 @@ if (file_exists($filePath)) {
             $stmt = $dbh->prepare($sql);
             $stmt->execute([
                 ':id_niveau' => $donnees_eleve['niveau_scolaire_eleve'],
+                ':id_classe' => $donnees_eleve['classe_eleve'],
                 ':nom' => $donnees_eleve['nom_eleve'],
                 ':prenom' => $donnees_eleve['prenom_eleve'],
                 ':date_naissance' => $donnees_eleve['date_naissance_eleve'],
