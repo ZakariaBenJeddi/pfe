@@ -15,6 +15,16 @@ if (isset($_GET['id'])) {
     $results = getEleveById($dbh, $_GET['id']);
     if ($results['success']) {
       $results = $results['data'];
+      // nom niveau
+      if (isset($results->id_niveau)) {
+        $niveau = get_niveau_by_id($dbh,$results->id_niveau);
+        if ($niveau['success']) {
+          $niveauSelected = $niveau['data'];
+        } else {
+          echo "<script>alert('" . $niveau['message'] . "');</script>";
+          exit();
+        }
+      }
     } else {
       echo "No data found or operation failed.";
     }
@@ -24,6 +34,8 @@ if (isset($_GET['id'])) {
 } else {
   header('location:eleves.php');
 }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -83,7 +95,7 @@ if (isset($_GET['id'])) {
                       <h6 class="text-center mb-0">Niveau</h6>
                       <span class="text-xs">Niveau Scolaire</span>
                       <hr class="horizontal dark my-3">
-                      <h5 class="mb-0"><?= $results->niveau_scolaire  ?> </h5>
+                      <h5 class="mb-0"><?= $niveauSelected->nom_niveau ?> </h5>
                     </div>
                   </div>
                 </div>
