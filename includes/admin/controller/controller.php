@@ -323,7 +323,7 @@ if (file_exists($filePath)) {
                     ];
                 }
             }
-
+    
             // Validation de l'email
             if (!filter_var($donnees_eleve['email_eleve'], FILTER_VALIDATE_EMAIL)) {
                 return [
@@ -331,19 +331,20 @@ if (file_exists($filePath)) {
                     'message' => "L'adresse email n'est pas valide."
                 ];
             }
-
+    
             // Appel de la procédure stockée
             $sql = "CALL ajouter_eleve(
-                :nom, :prenom, :date_naissance, :genre, :nationalite,
+                :id_niveau, :nom, :prenom, :date_naissance, :genre, :nationalite,
                 :adresse, :telephone, :email, :date_inscription, :statut,
                 :historique_scolaire, :langues_parlees, :nom_tuteur,
                 :telephone_tuteur, :email_tuteur, :profession_tuteur,
-                :niveau_scolaire, :besoins_speciaux, :langue_etrangere,
+                :besoins_speciaux, :langue_etrangere,
                 :niveau_de_satisfaction
             )";
-
+    
             $stmt = $dbh->prepare($sql);
             $stmt->execute([
+                ':id_niveau' => $donnees_eleve['niveau_scolaire_eleve'],
                 ':nom' => $donnees_eleve['nom_eleve'],
                 ':prenom' => $donnees_eleve['prenom_eleve'],
                 ':date_naissance' => $donnees_eleve['date_naissance_eleve'],
@@ -360,22 +361,21 @@ if (file_exists($filePath)) {
                 ':telephone_tuteur' => $donnees_eleve['telephone_tuteur_eleve'],
                 ':email_tuteur' => $donnees_eleve['email_tuteur_eleve'],
                 ':profession_tuteur' => $donnees_eleve['profession_tuteur_eleve'],
-                ':niveau_scolaire' => $donnees_eleve['niveau_scolaire_eleve'],
                 ':besoins_speciaux' => $donnees_eleve['besoins_speciaux_eleve'],
                 ':langue_etrangere' => $donnees_eleve['langue_etrangere_eleve'],
                 ':niveau_de_satisfaction' => $donnees_eleve['niveau_de_satisfaction_eleve']
             ]);
-
+    
             // Récupérer l'ID du nouvel élève
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             $id_eleve = $result['id_eleve'];
-
+    
             return [
                 'success' => true,
                 'message' => 'Élève ajouté avec succès',
                 'id_eleve' => $id_eleve
             ];
-
+    
         } catch (PDOException $e) {
             error_log($e->getMessage());
             return [

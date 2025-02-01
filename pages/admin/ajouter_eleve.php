@@ -7,7 +7,7 @@ if (empty($_SESSION['user'])) {
 // require '../../includes/DatabaseConnexion.php';
 include('../../includes/admin/controller/controller.php');
 //* deconnexion
-require('../../includes/deconnexion_5s.php');
+// require('../../includes/deconnexion_5s.php');
 
 //* CREATE
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
@@ -23,6 +23,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
           alert('Erreur: " . addslashes($resultat['message']) . "');
       </script>";
   }
+}
+
+// niveau
+try {
+  $niveaux = get_all_niveau($dbh);
+} catch (PDOException $e) {
+  error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+  die("Erreur lors de la récupération des données.");
 }
 ?>
 
@@ -82,7 +90,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="genre_eleve" class="form-control-label">Genre</label>
-                      <input class="form-control" type="text" name="genre_eleve" id="genre_eleve" required>
+                      <!-- <input class="form-control" type="text" name="genre_eleve" id="genre_eleve" required> -->
+                      <select class="form-select"  name="genre_eleve" id="genre_eleve">
+                        <option value="Masculin">Masculin</option>  
+                        <option value="Féminin">Féminin</option>  
+                      </select>
                     </div>
                   </div>
 
@@ -103,7 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="telephone_eleve" class="form-control-label">Téléphone</label>
-                      <input class="form-control" type="text" name="telephone_eleve" id="telephone_eleve" required>
+                      <input class="form-control" type="text" value="+212" name="telephone_eleve" id="telephone_eleve" required>
                     </div>
                   </div>
 
@@ -124,7 +136,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="statut_eleve" class="form-control-label">Statut</label>
-                      <input class="form-control" type="text" name="statut_eleve" id="statut_eleve" required>
+                      <select class="form-select"  name="statut_eleve" id="statut_eleve" required>
+                        <option value="Actif">Actif</option>
+                        <option value="Inactif">Inactif</option>
+                        <option value="Retraité">Retraité</option>
+                      </select>
                     </div>
                   </div>
 
@@ -173,7 +189,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="niveau_scolaire_eleve" class="form-control-label">Niveau Scolaire</label>
-                      <input class="form-control" type="text" name="niveau_scolaire_eleve" id="niveau_scolaire_eleve" required>
+                        <select class="form-select" name="niveau_scolaire_eleve" required>
+                          <?php foreach($niveaux as $niveau): ?>
+                            <option value="<?= $niveau->id_niveau ?>"><?= $niveau->nom_niveau ?></option>
+                          <?php endforeach ?>
+                        </select>
                     </div>
                   </div>
 
@@ -187,7 +207,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="langue_etrangere_eleve" class="form-control-label">Langue Étrangère</label>
-                      <input class="form-control" type="text" name="langue_etrangere_eleve" id="langue_etrangere_eleve" required>
+                      <select class="form-select" name="langue_etrangere_eleve" id="langue_etrangere_eleve" required>
+                        <option value="français">français</option>
+                        <option value="anglais">anglais</option>
+                        <option value="allemand">allemand</option>
+                      </select>
                     </div>
                   </div>
 
