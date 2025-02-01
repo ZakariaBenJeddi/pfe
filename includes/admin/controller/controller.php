@@ -334,7 +334,7 @@ if (file_exists($filePath)) {
     
             // Appel de la procédure stockée
             $sql = "CALL ajouter_eleve(
-                :id_niveau, :id_classe, :nom, :prenom, :date_naissance, :genre, :nationalite,
+                :id_niveau, :id_classe, :id_filiere, :code_massare, :nom, :prenom, :date_naissance, :genre, :nationalite,
                 :adresse, :telephone, :email, :date_inscription, :statut,
                 :historique_scolaire, :langues_parlees, :nom_tuteur,
                 :telephone_tuteur, :email_tuteur, :profession_tuteur,
@@ -346,6 +346,8 @@ if (file_exists($filePath)) {
             $stmt->execute([
                 ':id_niveau' => $donnees_eleve['niveau_scolaire_eleve'],
                 ':id_classe' => $donnees_eleve['classe_eleve'],
+                ':id_filiere' => $donnees_eleve['filiere_eleve'],
+                ':code_massare' => $donnees_eleve['code_massare'],
                 ':nom' => $donnees_eleve['nom_eleve'],
                 ':prenom' => $donnees_eleve['prenom_eleve'],
                 ':date_naissance' => $donnees_eleve['date_naissance_eleve'],
@@ -809,6 +811,43 @@ if (file_exists($filePath)) {
             ];
         }
     }
+
+    function get_classe_by_id($dbh, $id) {
+        try {
+            $id = filter_var($id, FILTER_VALIDATE_INT);
+            if ($id === false) {
+                return [
+                    'success' => false,
+                    'message' => 'ID invalide'
+                ];
+            }
+    
+            $sql = "CALL get_classe_by_id(:id)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute([':id' => $id]);
+    
+            $classe = $stmt->fetch(PDO::FETCH_OBJ);
+    
+            if ($classe) {
+                return [
+                    'success' => true,
+                    'data' => $classe
+                ];
+            } else {
+                return [
+                    'success' => false,
+                    'message' => 'Classe non trouvée'
+                ];
+            }
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+            return [
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de la récupération'
+            ];
+        }
+    }
+    
 
     function get_classes_by_date_range($dbh, $start_date, $end_date) {
         try {

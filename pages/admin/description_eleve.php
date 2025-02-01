@@ -25,6 +25,22 @@ if (isset($_GET['id'])) {
           exit();
         }
       }
+      // nom filiere
+      $filiere_info_par_id = get_filiere_by_id($dbh, $results->id_filiere);
+      if ($filiere_info_par_id['success']) {
+          $nom_filiere = $filiere_info_par_id['data'];
+      } else {
+          echo htmlspecialchars($filiere_info_par_id['message']);
+          exit();
+      }
+      //nom classe
+      $classe_info_par_id = get_classe_by_id($dbh, $results->id_classe);
+      if ($classe_info_par_id['success']) {
+          $nom_classe = $classe_info_par_id['data'];
+      } else {
+          echo htmlspecialchars($classe_info_par_id['message']);
+          exit();
+      }
     } else {
       echo "No data found or operation failed.";
     }
@@ -72,8 +88,8 @@ if (isset($_GET['id'])) {
                           <h6 class="text-white mb-0">Filiere</h6>
                         </div>
                         <div>
-                          <p class="text-white mb-0">Classe201 &nbsp;&nbsp;&nbsp;<i class="fas fa-map"></i></p>
-                          <h6 class="text-white mb-0">Filiere1 &nbsp;<i class="fas fa-users"></i></h6>
+                          <p class="text-white mb-0"><?= $nom_classe->nom_classe ?> &nbsp;&nbsp;&nbsp;<i class="fas fa-map"></i></p>
+                          <h6 class="text-white mb-0"><?= $nom_filiere->nom_filiere ?> &nbsp;<i class="fas fa-users"></i></h6>
                         </div>
                       </div>
                     </div>

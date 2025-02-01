@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-  alert("jjjjjjjjjj")
     const niveauSelect = document.getElementById('niveau_scolaire_eleve');
     const filiereSelect = document.getElementById('filiere_eleve');
     const classeSelect = document.getElementById('classe_eleve');

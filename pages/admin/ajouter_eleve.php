@@ -82,6 +82,13 @@ try {
 
                   <div class="col-md-6">
                     <div class="form-group">
+                      <label for="code_massare" class="form-control-label">Code Massare</label>
+                      <input class="form-control" type="text" name="code_massare" id="code_massare" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
                       <label for="date_naissance_eleve" class="form-control-label">Date de Naissance</label>
                       <input class="form-control" type="date" name="date_naissance_eleve" id="date_naissance_eleve" required>
                     </div>
@@ -90,7 +97,6 @@ try {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="genre_eleve" class="form-control-label">Genre</label>
-                      <!-- <input class="form-control" type="text" name="genre_eleve" id="genre_eleve" required> -->
                       <select class="form-select"  name="genre_eleve" id="genre_eleve">
                         <option value="Masculin">Masculin</option>  
                         <option value="Féminin">Féminin</option>  

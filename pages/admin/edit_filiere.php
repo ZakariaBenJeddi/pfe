@@ -9,7 +9,6 @@ include('../../includes/admin/controller/controller.php');
 if (isset($_GET['id'])) {
   try {
       $result = get_filiere_by_id($dbh, $_GET['id']);
-      
       if ($result['success']) {
           $filiere = $result['data'];
       } else {
