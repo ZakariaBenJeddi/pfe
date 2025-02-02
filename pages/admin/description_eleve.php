@@ -17,7 +17,7 @@ if (isset($_GET['id'])) {
       $results = $results['data'];
       // nom niveau
       if (isset($results->id_niveau)) {
-        $niveau = get_niveau_by_id($dbh,$results->id_niveau);
+        $niveau = get_niveau_by_id($dbh, $results->id_niveau);
         if ($niveau['success']) {
           $niveauSelected = $niveau['data'];
         } else {
@@ -28,18 +28,18 @@ if (isset($_GET['id'])) {
       // nom filiere
       $filiere_info_par_id = get_filiere_by_id($dbh, $results->id_filiere);
       if ($filiere_info_par_id['success']) {
-          $nom_filiere = $filiere_info_par_id['data'];
+        $nom_filiere = $filiere_info_par_id['data'];
       } else {
-          echo htmlspecialchars($filiere_info_par_id['message']);
-          exit();
+        echo htmlspecialchars($filiere_info_par_id['message']);
+        exit();
       }
       //nom classe
       $classe_info_par_id = get_classe_by_id($dbh, $results->id_classe);
       if ($classe_info_par_id['success']) {
-          $nom_classe = $classe_info_par_id['data'];
+        $nom_classe = $classe_info_par_id['data'];
       } else {
-          echo htmlspecialchars($classe_info_par_id['message']);
-          exit();
+        echo htmlspecialchars($classe_info_par_id['message']);
+        exit();
       }
     } else {
       echo "No data found or operation failed.";
@@ -288,49 +288,52 @@ if (isset($_GET['id'])) {
       <div class="row">
         <div class="col-md-8 mt-4">
           <div class="card">
-
             <div class="card-header pb-0 px-3">
-              <button class="btn btn-primary brn-rounded">Afficher l'emploi du temps de ce Composant</button>
+              <!-- <div class="col-12">
+                <button class="btn btn-primary brn-rounded">l'emploi du temps</button>
+              </div> -->
+              <div class="mb-4 mb-md-0 flex-grow-1 text-center text-md-start">
+                <h4 class="text-primary">Payement</h4>
+              </div>
+              <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <div class="d-flex flex-row justify-content-center justify-content-md-start align-items-center gap-2 w-100 w-md-auto mt-0 mt-md-4">
+                  <a class="btn btn-primary btn-sm" href="ajouter_classe.php">Ajouter Payement</a>
+                  <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
+                </div>
+                <div class="w-100 w-md-auto text-center text-md-end mt-2 mt-md-0">
+                  <input type="text" class="form-control w-100 w-md-auto" id="daterange" name="daterange" value="" />
+                </div>
+              </div>
             </div>
             <div class="card-body pt-4 p-3">
-              <ul class="list-group">
-                <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
-                  <div class="d-flex flex-column">
-                    <h6 class="mb-3 text-sm">Oliver Liam</h6>
-                    <span class="mb-2 text-xs">Company Name: <span class="text-dark font-weight-bold ms-sm-2">Viking Burrito</span></span>
-                    <span class="mb-2 text-xs">Email Address: <span class="text-dark ms-sm-2 font-weight-bold">oliver@burrito.com</span></span>
-                    <span class="text-xs">VAT Number: <span class="text-dark ms-sm-2 font-weight-bold">FRB1235476</span></span>
-                  </div>
-                  <div class="ms-auto text-end">
-                    <a class="btn btn-link text-danger text-gradient px-3 mb-0" href="javascript:;"><i class="far fa-trash-alt me-2"></i>Delete</a>
-                    <a class="btn btn-link text-dark px-3 mb-0" href="javascript:;"><i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit</a>
-                  </div>
-                </li>
-                <li class="list-group-item border-0 d-flex p-4 mb-2 mt-3 bg-gray-100 border-radius-lg">
-                  <div class="d-flex flex-column">
-                    <h6 class="mb-3 text-sm">Lucas Harper</h6>
-                    <span class="mb-2 text-xs">Company Name: <span class="text-dark font-weight-bold ms-sm-2">Stone Tech Zone</span></span>
-                    <span class="mb-2 text-xs">Email Address: <span class="text-dark ms-sm-2 font-weight-bold">lucas@stone-tech.com</span></span>
-                    <span class="text-xs">VAT Number: <span class="text-dark ms-sm-2 font-weight-bold">FRB1235476</span></span>
-                  </div>
-                  <div class="ms-auto text-end">
-                    <a class="btn btn-link text-danger text-gradient px-3 mb-0" href="javascript:;"><i class="far fa-trash-alt me-2"></i>Delete</a>
-                    <a class="btn btn-link text-dark px-3 mb-0" href="javascript:;"><i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit</a>
-                  </div>
-                </li>
-                <li class="list-group-item border-0 d-flex p-4 mb-2 mt-3 bg-gray-100 border-radius-lg">
-                  <div class="d-flex flex-column">
-                    <h6 class="mb-3 text-sm">Ethan James</h6>
-                    <span class="mb-2 text-xs">Company Name: <span class="text-dark font-weight-bold ms-sm-2">Fiber Notion</span></span>
-                    <span class="mb-2 text-xs">Email Address: <span class="text-dark ms-sm-2 font-weight-bold">ethan@fiber.com</span></span>
-                    <span class="text-xs">VAT Number: <span class="text-dark ms-sm-2 font-weight-bold">FRB1235476</span></span>
-                  </div>
-                  <div class="ms-auto text-end">
-                    <a class="btn btn-link text-danger text-gradient px-3 mb-0" href="javascript:;"><i class="far fa-trash-alt me-2"></i>Delete</a>
-                    <a class="btn btn-link text-dark px-3 mb-0" href="javascript:;"><i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit</a>
-                  </div>
-                </li>
-              </ul>
+              <table class="table align-items-center mb-0" id="table_payement">
+                <thead>
+                  <tr>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Classe</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Niveau</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Niveau</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Niveau</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Payment Methode</th>
+                  </tr>
+                </thead>
+                <tbody id="tableBody">
+                  <td class="align-middle text-center">
+                    <p class="text-secondary text-xs font-weight-bold"></p>
+                  </td>
+                  <td class="align-middle text-center">
+                    <p class="text-secondary text-xs font-weight-bold"></p>
+                  </td>
+                  <td class="align-middle text-center">
+                    <p class="text-secondary text-xs font-weight-bold"></p>
+                  </td>
+                  <td class="align-middle text-center">
+                    <p class="text-secondary text-xs font-weight-bold"></p>
+                  </td>
+                  <td class="align-middle text-center">
+                    <p class="text-secondary text-xs font-weight-bold"></p>
+                  </td>
+                </tbody>
+              </table>
             </div>
 
           </div>
@@ -340,7 +343,7 @@ if (isset($_GET['id'])) {
             <div class="card-header pb-0 px-3">
               <div class="row">
                 <div class="col-md-6">
-                  <h6 class="mb-0">informatio teur</h6>
+                  <h6 class="mb-0">Notes</h6>
                 </div>
                 <div class="col-md-6 d-flex justify-content-end align-items-center">
                   <i class="far fa-calendar-alt me-2"></i>
@@ -349,7 +352,6 @@ if (isset($_GET['id'])) {
               </div>
             </div>
             <div class="card-body pt-4 p-3">
-              <h6 class="text-uppercase text-body text-xs font-weight-bolder mb-3">Annees</h6>
               <ul class="list-group">
                 <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
                   <div class="d-flex align-items-center">
@@ -363,56 +365,6 @@ if (isset($_GET['id'])) {
                     - 4%
                   </div>
                 </li>
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                  <div class="d-flex align-items-center">
-                    <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
-                    <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">2023</h6>
-                      <span class="text-xs">271 Sceance</span>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
-                    + 17%
-                  </div>
-                </li>
-              </ul>
-              <ul class="list-group">
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                  <div class="d-flex align-items-center">
-                    <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
-                    <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">2022</h6>
-                      <span class="text-xs">200 Sceance</span>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
-                    + 1%
-                  </div>
-                </li>
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                  <div class="d-flex align-items-center">
-                    <button class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-down"></i></button>
-                    <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">2021</h6>
-                      <span class="text-xs">191 Sceance</span>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
-                    + 7%
-                  </div>
-                </li>
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                  <div class="d-flex align-items-center">
-                    <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
-                    <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">2020</h6>
-                      <span class="text-xs">151 Sceance</span>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
-                    + 100%
-                  </div>
-                </li>
               </ul>
             </div>
           </div>
@@ -424,6 +376,13 @@ if (isset($_GET['id'])) {
   </main>
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
+  <!-- Data table -->
+  <script src="../../assets/js/datatable.js"></script>
+  <!-- Export Functio -->
+  <script src="../../assets/js/export.js"></script>
+  <!-- //* Date Picker + AJAX eleves intervalle date  -->
+  <script src="../../assets/dateP_dateP/dateP_dataP_classe.js"></script>
+
   <!--   Core JS Files   -->
   <script src="../../assets/js/core/popper.min.js"></script>
   <script src="../../assets/js/core/bootstrap.min.js"></script>
