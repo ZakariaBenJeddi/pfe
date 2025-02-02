@@ -1631,4 +1631,45 @@ if (file_exists($filePath)) {
             ];
         }
     }
+
+    // 🤰🏿
+    function addPeriodePaiement($dbh, $nom_periode, $nombre_mois, $pourcentage_reduction, $description, $est_actif) {
+        try {
+            // Validation des entrées
+            if (empty($nom_periode) || $nombre_mois <= 0 || $pourcentage_reduction < 0) {
+                return [
+                    'success' => false,
+                    'message' => 'Veuillez remplir tous les champs correctement.'
+                ];
+            }
+    
+            // Requête SQL pour appeler la procédure stockée
+            $sql = "CALL add_periode_paiement(:nom_periode, :nombre_mois, :pourcentage_reduction, :description, :est_actif)";
+            $stmt = $dbh->prepare($sql);
+    
+            // Exécution avec les paramètres sécurisés
+            $stmt->execute([
+                ':nom_periode' => $nom_periode,
+                ':nombre_mois' => $nombre_mois,
+                ':pourcentage_reduction' => $pourcentage_reduction,
+                ':description' => $description,
+                ':est_actif' => $est_actif
+            ]);
+    
+            return [
+                'success' => true,
+                'message' => 'Période de paiement ajoutée avec succès !',
+                'redirect' => true,
+                'redirect_url' => 'periodes_paiement.php'
+            ];
+    
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, '/path/to/secure_log_file.log'); // Log pour le debug
+            return [
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de l\'ajout.'
+            ];
+        }
+    }
+    
 // =============== periode payement ================
