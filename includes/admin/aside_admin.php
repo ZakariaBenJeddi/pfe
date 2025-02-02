@@ -174,7 +174,7 @@
 				</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link" href="../admin/frais-scolarite.php">
+				<a class="nav-link" href="../admin/tarif_scolarite.php">
 					<div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
 						<i class="ni ni-tag text-success text-sm opacity-10"></i>
 					</div>
