@@ -1,10 +1,9 @@
 <?php
 session_start();
 if (empty($_SESSION['user'])) {
-  header('location:sign-in.php');
+  header('../location:sign-in.php');
 }
 include('../../includes/admin/controller/controller.php');
-// require '../../includes/DatabaseConnexion.php';
 
 //* Gestion de l'inactivité
 require('../../includes/deconnexion_5s.php');

@@ -3,7 +3,7 @@ include_once '../../includes/DatabaseConnexion.php';
 session_start();
 
 if (empty($_SESSION['user'])) {
-  header('location:sign-in.php');
+  header('location:../sign-in.php');
 }
 
 $_SESSION['last_activity'] = time();
