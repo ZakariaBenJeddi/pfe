@@ -201,7 +201,7 @@ foreach ($jours as $jour) {
                   <div class="numbers">
                     <p class="text-sm mb-0 text-uppercase font-weight-bold">Nombre eleve</p>
                     <h5 class="font-weight-bolder">
-                      <?= $nbr_eleves ?>
+                      <?=  $nbr_eleves ?>
                     </h5>
                     <?php if ($pourcentage !== null) { ?>
                       <p class="mb-0">

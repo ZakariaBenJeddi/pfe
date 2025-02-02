@@ -6,7 +6,7 @@ require '../../includes/DatabaseConnexion.php';
 date_default_timezone_set('Africa/Kampala');
 
 // Récupérer la date et l'email de l'utilisateur
-$ldate = date('d-m-Y h:i:s A');
+$ldate = date('Y-m-d H:i:s'); // Format MySQL correct
 $email = $_SESSION['email_admin'];
 
 try {
@@ -20,24 +20,25 @@ try {
   if ($result) {
     // Étape 2 : Mettre à jour la date de déconnexion
     $id = $result['id'];
+    
     $sqlUpdate = "UPDATE userlog SET date_uselogout = :ldate WHERE id = :id";
     $updateQuery = $dbh->prepare($sqlUpdate);
     $updateQuery->bindParam(':ldate', $ldate, PDO::PARAM_STR);
     $updateQuery->bindParam(':id', $id, PDO::PARAM_INT);
     $updateQuery->execute();
 
-    echo "Date de déconnexion mise à jour avec succès.";
   } else {
-    echo "Aucun enregistrement trouvé pour cet utilisateur.";
+    echo "<script>alert('Aucun enregistrement trouvé pour cet utilisateur !');</script>";
   }
 } catch (PDOException $e) {
-  echo "Erreur : " . $e->getMessage();
+  echo "<script>alert('Erreur: " . $e->getMessage() . "');</script>";
 }
 
-
-
-
-$_SESSION['errmsg'] = "You have successfully logout";
+// Supprimer la session et rediriger
+$_SESSION['errmsg'] = "You have successfully logged out";
 unset($_SESSION['user']);
-session_destroy(); // destroy session
+session_destroy();
+
+// Attendre un peu pour voir l'alert avant redirection
+// echo "<script>setTimeout(function(){ window.location.href='../../index.php'; }, 2000);</script>";
 header("location:../../index.php");
