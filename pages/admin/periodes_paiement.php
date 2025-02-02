@@ -9,70 +9,9 @@ if (empty($_SESSION['user'])) {
 //* deconnexion
 require('../../includes/deconnexion_5s.php');
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  header('Content-Type: application/json');
-  try {
-    // Validation des dates
-    if (!isset($_POST['start_date']) || !isset($_POST['end_date'])) {
-      throw new Exception("Les dates sont requises");
-    }
-
-    // Nettoyage et validation des dates
-    $start_date = filter_var($_POST['start_date'], FILTER_SANITIZE_STRING);
-    $end_date = filter_var($_POST['end_date'], FILTER_SANITIZE_STRING);
-
-    if (!$start_date || !$end_date) {
-      throw new Exception("Format de date invalide");
-    }
-
-    // Conversion des dates au format MySQL
-    $start_date = date("Y-m-d", strtotime($start_date));
-    $end_date = date("Y-m-d", strtotime($end_date));
-
-    // Requête SQL avec préparation
-    $sql = "SELECT matiere.* , filiere.nom_filiere FROM matiere JOIN filiere ON  filiere.id_filiere = matiere.id_filiere
-              WHERE annee_creation BETWEEN :start_date AND :end_date
-              ORDER BY annee_creation DESC";
-
-    $stmt = $dbh->prepare($sql);
-    $stmt->execute([
-      ':start_date' => $start_date,
-      ':end_date' => $end_date
-    ]);
-
-    $results = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-    echo json_encode([
-      'status' => 'success',
-      'data' => $results,
-      'count' => count($results)
-    ]);
-  } catch (Exception $e) {
-    http_response_code(400);
-    echo json_encode([
-      'status' => 'error',
-      'message' => $e->getMessage()
-    ]);
-  }
-  exit;
-}
-
-// if ($_SERVER["REQUEST_METHOD"] === "POST") {
-//   header('Content-Type: application/json');
-//   $result = get_matiere_by_date_range(
-//       $dbh,
-//       $_POST['start_date'] ?? null,
-//       $_POST['end_date'] ?? null
-//   );
-//   http_response_code($result['code']);
-//   unset($result['code']);
-//   echo json_encode($result);
-//   exit;
-// }
-
 //* Read
 try {
-  $results = get_all_matieres($dbh);
+  $results = get_all_periodes_paiement($dbh);
 } catch (Exception $e) {
   echo "<script>alert('" . htmlspecialchars($e->getMessage()) . "');</script>";
   $results = [];
@@ -122,14 +61,11 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
                 <table class="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nom Matiere</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">code Matiere</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Filiere</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">coeficient</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre sceance semaine </th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre heure semaine </th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nom Periode</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre mois</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Pourcentage Reduction</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Description</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actif</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
                     </tr>
                   </thead>
@@ -140,31 +76,22 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
                           <td>
                             <div class="d-flex px-2 py-1">
                               <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->nom_matiere ?></h6>
+                                <h6 class="mb-0 text-sm"><?= $result->nom_periode ?></h6>
                               </div>
                             </div>
                           </td>
                           <td class="align-middle text-center text-sm">
-                            <p class="text-xs font-weight-bold mb-0"><?= $result->code_matiere; ?></p>
+                            <p class="text-xs font-weight-bold mb-0"><?= $result->nombre_mois; ?></p>
                           </td>
                           <td class="align-middle text-center text-sm">
-                            <p class="text-xs font-weight-bold mb-0"><?= $result->nom_filiere; ?></p>
-                          </td>
-                          <td class="align-middle text-center text-sm">
-                            <p class="text-xs font-weight-bold mb-0"><?= intval($result->coefficient); ?></p>
+                            <p class="text-xs font-weight-bold mb-0"><?= intval($result->pourcentage_reduction) ; ?></p>
                           </td>
                           <td>
-                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->statut; ?></p>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->description; ?></p>
                           </td>
                           <td>
-                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->nombre_seance_semaine; ?></p>
-                          </td>
-                          <td>
-                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->nombre_heures_semaine; ?></p>
-                          </td>
-                          <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0" title="<?= $result->description ?>">
-                              <?= substr($result->description, 0, 20) . (strlen($result->description) > 20 ? '...' : ''); ?>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?php
+                              echo $result->est_actif == 1 ? "Actif" : "Inactif"   ?>
                             </p>
                           </td>
                           <td class="align-middle text-center">
@@ -206,10 +133,6 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
   <script src="../../assets/js/datatable.js"></script>
   <!-- Export Functio -->
   <script src="../../assets/js/export.js"></script>
-
-  <!-- //* Date Picker -->
-  <!-- //* AJAX matiere intervalle date  -->
-  <script src="../../assets/dateP_dateP/dateP_dataP_matiere.js"></script>
 
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>

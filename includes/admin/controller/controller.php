@@ -1579,3 +1579,18 @@ if (file_exists($filePath)) {
         }
     }
 // =============== calendar ================
+
+// =============== periode payement ================
+    function get_all_periodes_paiement($dbh) {
+        try {
+            $sql = "CALL get_all_periodes_paiement()";
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute();
+            
+            return $stmt->fetchAll(PDO::FETCH_OBJ);
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+            throw new Exception('Erreur lors de la récupération des matières');
+        }
+    }
+// =============== periode payement ================
