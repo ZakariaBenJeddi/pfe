@@ -19,15 +19,19 @@ try {
 
 //* Delete
 if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
-  $result = delete_matiere($dbh, $_GET['id']);
-  
-  echo "<script>alert('" . htmlspecialchars($result['message']) . "');</script>";
-  
-  if ($result['success'] && $result['redirect']) {
-      header("Location: " . $result['redirect_url']);
-      exit;
+  $result = delete_periode_paiement($dbh, $_GET['id']);
+
+  if ($result['success']) {
+      echo "<script>
+          alert('" . htmlspecialchars($result['message']) . "');
+          window.location.href = '" . $result['redirect_url'] . "';
+      </script>";
+      exit; // Stop script execution after sending JavaScript
+  } else {
+      echo "<script>alert('" . htmlspecialchars($result['message']) . "');</script>";
   }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,7 +55,6 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
                 <h6 class="text-primary">Filière</h6>
               </div>
               <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
-                <input type="text" class="form-control w-100 w-md-auto mb-3" id="daterange" name="daterange" value="" />
                 <a class="btn btn-primary btn-sm" href="ajouter_filiere.php">Ajouter Filière</a>
                 <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
               </div>
@@ -102,7 +105,7 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
                               <a href="description_matiere.php?id=<?= $result->id_matiere ?>" class="dropdown-item">
                                 <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                               </a>
-                              <a href="matiere.php?id=<?= $result->id_matiere ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                              <a href="periodes_paiement.php?id=<?= $result->id_periode ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
                                 <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
                             </div>
                             </a>

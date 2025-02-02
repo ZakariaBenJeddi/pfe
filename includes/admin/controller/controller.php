@@ -1593,4 +1593,42 @@ if (file_exists($filePath)) {
             throw new Exception('Erreur lors de la récupération des matières');
         }
     }
+    function delete_periode_paiement($dbh, $id) {
+        try {
+            // Validation de l'ID
+            $id = filter_var($id, FILTER_VALIDATE_INT);
+            if ($id === false) {
+                return [
+                    'success' => false,
+                    'message' => 'ID invalide. Opération annulée.'
+                ];
+            }
+
+            // Appel de la procédure stockée
+            $sql = "CALL delete_periode_paiement(:id)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+            if ($stmt->execute()) {
+                return [
+                    'success' => true,
+                    'message' => 'Periode Paiement bien supprimée',
+                    'redirect' => true,
+                    'redirect_url' => 'periodes_paiement.php'
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Erreur lors de la suppression'
+            ];
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+            return [
+                'success' => false,
+                'message' => 'Une erreur est survenue. Veuillez réessayer plus tard.'
+            ];
+        }
+    }
 // =============== periode payement ================
