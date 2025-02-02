@@ -176,9 +176,25 @@
 			<li class="nav-item">
 				<a class="nav-link" href="../admin/frais-scolarite.php">
 					<div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+						<i class="ni ni-tag text-success text-sm opacity-10"></i>
+					</div>
+					<span class="nav-link-text ms-1">Tarifs de scolarité</span>
+				</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="../admin/frais-scolarite.php">
+					<div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
 						<i class="ni ni-money-coins text-warning text-sm opacity-10"></i>
 					</div>
 					<span class="nav-link-text ms-1">Frais de scolarité</span>
+				</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="../admin/frais-scolarite.php">
+					<div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+						<i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
+					</div>
+					<span class="nav-link-text ms-1">periodes paiement</span>
 				</a>
 			</li>
 
