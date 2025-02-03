@@ -22,14 +22,35 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
   $result = delete_periode_paiement($dbh, $_GET['id']);
 
   if ($result['success']) {
-      echo "<script>
+    echo "<script>
           alert('" . htmlspecialchars($result['message']) . "');
           window.location.href = '" . $result['redirect_url'] . "';
       </script>";
-      exit; // Stop script execution after sending JavaScript
+    // exit;
   } else {
-      echo "<script>alert('" . htmlspecialchars($result['message']) . "');</script>";
+    echo "<script>alert('" . htmlspecialchars($result['message']) . "');</script>";
   }
+}
+
+if (isset($_POST['save'])) {
+    // Capture form data
+    $nom_periode = $_POST['nom_periode'];
+    $nombre_mois = $_POST['nombre_mois'];
+    $pourcentage_reduction = $_POST['pourcentage_reduction'];
+    $description = $_POST['description'];
+    $est_actif = $_POST['est_actif'];
+
+    // Call the addPeriodePaiement function
+    $result = addPeriodePaiement($dbh, $nom_periode, $nombre_mois, $pourcentage_reduction, $description, $est_actif);
+
+    if ($result['success']) {
+        // Redirect on success
+        header("Location: " . $result['redirect_url']);
+        exit();
+    } else {
+        // Handle failure
+        echo "<p>" . $result['message'] . "</p>";
+    }
 }
 
 ?>
@@ -55,7 +76,7 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
                 <h6 class="text-primary">Filière</h6>
               </div>
               <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
-                <a class="btn btn-primary btn-sm" href="ajouter_filiere.php">Ajouter Filière</a>
+                <a class="btn btn-primary btn-sm" href="ajouter_filiere.php" data-bs-toggle="modal" data-bs-target="#exampleModal">Ajouter Filière</a>
                 <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
               </div>
             </div>
@@ -87,22 +108,22 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
                             <p class="text-xs font-weight-bold mb-0"><?= $result->nombre_mois; ?></p>
                           </td>
                           <td class="align-middle text-center text-sm">
-                            <p class="text-xs font-weight-bold mb-0"><?= intval($result->pourcentage_reduction) ; ?></p>
+                            <p class="text-xs font-weight-bold mb-0"><?= intval($result->pourcentage_reduction); ?></p>
                           </td>
                           <td>
                             <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->description; ?></p>
                           </td>
                           <td>
                             <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?php
-                              echo $result->est_actif == 1 ? "Actif" : "Inactif"   ?>
+                                                                                  echo $result->est_actif == 1 ? "Actif" : "Inactif"   ?>
                             </p>
                           </td>
                           <td class="align-middle text-center">
                             <div class="d-flex">
-                              <a href="edit_matiere.php?id=<?= $result->id_matiere ?>" class="dropdown-item">
+                              <a href=".php?id=<?= $result->id_matiere ?>" class="dropdown-item">
                                 <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                               </a>
-                              <a href="description_matiere.php?id=<?= $result->id_matiere ?>" class="dropdown-item">
+                              <a href=".php?id=<?= $result->id_matiere ?>" class="dropdown-item">
                                 <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                               </a>
                               <a href="periodes_paiement.php?id=<?= $result->id_periode ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
@@ -121,6 +142,67 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
                     <?php  } ?>
                   </tbody>
                 </table>
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Gestion des Périodes de Paiement</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <form id="periodeForm" method="post">
+                          <!-- Première ligne avec deux champs -->
+                          <div class="row mb-3">
+                            <div class="col-6">
+                              <label for="id_periode" class="form-label">ID de la Période</label>
+                              <input type="text" class="form-control" id="id_periode" name="id_periode" readonly>
+                            </div>
+                            <div class="col-6">
+                              <label for="nom_periode" class="form-label">Nom de la Période</label>
+                              <input type="text" class="form-control" id="nom_periode" name="nom_periode" required>
+                            </div>
+                          </div>
+
+                          <!-- Deuxième ligne avec deux champs -->
+                          <div class="row mb-3">
+                            <div class="col-6">
+                              <label for="nombre_mois" class="form-label">Nombre de Mois</label>
+                              <input type="number" class="form-control" id="nombre_mois" name="nombre_mois" required>
+                            </div>
+                            <div class="col-6">
+                              <label for="pourcentage_reduction" class="form-label">Pourcentage de Réduction</label>
+                              <input type="number" class="form-control" id="pourcentage_reduction" name="pourcentage_reduction" step="0.01" required>
+                            </div>
+                          </div>
+
+                          <!-- Troisième ligne avec un champ de texte -->
+                          <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" required></textarea>
+                          </div>
+
+                          <!-- Quatrième ligne avec un seul champ (actif ou non) -->
+                          <div class="row mb-3">
+                            <div class="col-6">
+                              <label for="est_actif" class="form-label">Actif</label>
+                              <select class="form-select" id="est_actif" name="est_actif">
+                                <option value="1">Oui</option>
+                                <option value="0">Non</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!-- Ajouter le bouton de soumission à l'intérieur du formulaire -->
+                          <input type="submit" name="save" class="btn btn-primary mt-3 float-end" id="saveChanges" value="Enregistrer les changements">
+                        </form>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>

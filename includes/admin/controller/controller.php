@@ -1632,7 +1632,6 @@ if (file_exists($filePath)) {
         }
     }
 
-    // 🤰🏿
     function addPeriodePaiement($dbh, $nom_periode, $nombre_mois, $pourcentage_reduction, $description, $est_actif) {
         try {
             // Validation des entrées
