@@ -33,25 +33,49 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
 }
 
 if (isset($_POST['save'])) {
-    // Capture form data
+  // Check if this is an update operation
+  if (isset($_POST['id_periode']) && !empty($_POST['id_periode'])) {
+    // Capture form data for update
+    $id_periode = $_POST['id_periode'];
     $nom_periode = $_POST['nom_periode'];
     $nombre_mois = $_POST['nombre_mois'];
     $pourcentage_reduction = $_POST['pourcentage_reduction'];
     $description = $_POST['description'];
     $est_actif = $_POST['est_actif'];
 
-    // Call the addPeriodePaiement function
+    // Call the function to update the payment period
+    $result = updatePeriodePaiement($dbh, $id_periode, $nom_periode, $nombre_mois, $pourcentage_reduction, $description, $est_actif);
+
+    if ($result['success']) {
+      // Redirect on success
+      header("Location: " . $result['redirect_url']);
+      exit();
+    } else {
+      // Handle failure
+      echo "<p>" . $result['message'] . "</p>";
+    }
+  } else {
+    // This is a new record insertion
+    $nom_periode = $_POST['nom_periode'];
+    $nombre_mois = $_POST['nombre_mois'];
+    $pourcentage_reduction = $_POST['pourcentage_reduction'];
+    $description = $_POST['description'];
+    $est_actif = $_POST['est_actif'];
+
+    // Call the function to add a new payment period
     $result = addPeriodePaiement($dbh, $nom_periode, $nombre_mois, $pourcentage_reduction, $description, $est_actif);
 
     if ($result['success']) {
-        // Redirect on success
-        header("Location: " . $result['redirect_url']);
-        exit();
+      // Redirect on success
+      header("Location: " . $result['redirect_url']);
+      exit();
     } else {
-        // Handle failure
-        echo "<p>" . $result['message'] . "</p>";
+      // Handle failure
+      echo "<p>" . $result['message'] . "</p>";
     }
+  }
 }
+
 
 ?>
 <!DOCTYPE html>
@@ -120,11 +144,8 @@ if (isset($_POST['save'])) {
                           </td>
                           <td class="align-middle text-center">
                             <div class="d-flex">
-                              <a href=".php?id=<?= $result->id_matiere ?>" class="dropdown-item">
+                              <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="<?= $result->id_periode ?>" data-nom="<?= $result->nom_periode ?>" data-mois="<?= $result->nombre_mois ?>" data-reduction="<?= $result->pourcentage_reduction ?>" data-description="<?= $result->description ?>" data-actif="<?= $result->est_actif ?>">
                                 <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
-                              </a>
-                              <a href=".php?id=<?= $result->id_matiere ?>" class="dropdown-item">
-                                <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                               </a>
                               <a href="periodes_paiement.php?id=<?= $result->id_periode ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
                                 <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
@@ -159,6 +180,9 @@ if (isset($_POST['save'])) {
   <script src="../../assets/js/datatable.js"></script>
   <!-- Export Functio -->
   <script src="../../assets/js/export.js"></script>
+
+  <!-- periode paiement passer les info a modal -->
+  <script src="../../assets/js/periode_paiement.js"></script>
 
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
