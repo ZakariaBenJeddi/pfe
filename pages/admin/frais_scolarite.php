@@ -19,59 +19,58 @@ try {
 
 
 //* Delete
-if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
-  $result = delete_periode_paiement($dbh, $_GET['id']);
+if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] == 1) {
+  $id_type_frais = $_GET['id'];
+
+  $result = deleteTypeFrais($dbh, $id_type_frais);
+  echo $result['message'];
 
   if ($result['success']) {
-    echo "<script>
-          alert('" . htmlspecialchars($result['message']) . "');
-          window.location.href = '" . $result['redirect_url'] . "';
-      </script>";
-    // exit;
-  } else {
-    echo "<script>alert('" . htmlspecialchars($result['message']) . "');</script>";
+    header('Location: frais_scolarite.php');
+    exit();
   }
 }
 
+
 if (isset($_POST['save'])) {
-  // Check if this is an update operation
-  if (isset($_POST['id_periode']) && !empty($_POST['id_periode'])) {
-    // Capture form data for update
-    $id_periode = $_POST['id_periode'];
-    $nom_periode = $_POST['nom_periode'];
-    $nombre_mois = $_POST['nombre_mois'];
-    $pourcentage_reduction = $_POST['pourcentage_reduction'];
+  // Vérifier s'il s'agit d'une mise à jour
+  if (isset($_POST['id_type_frais']) && !empty($_POST['id_type_frais'])) {
+    // Capture des données du formulaire pour mise à jour
+    $id_type_frais = $_POST['id_type_frais'];
+    $nom_frais = $_POST['nom_frais'];
     $description = $_POST['description'];
+    $est_obligatoire = isset($_POST['est_obligatoire']) ? 1 : 0;
+    $est_mensuel = isset($_POST['est_mensuel']) ? 1 : 0;
     $est_actif = $_POST['est_actif'];
 
-    // Call the function to update the payment period
-    $result = updatePeriodePaiement($dbh, $id_periode, $nom_periode, $nombre_mois, $pourcentage_reduction, $description, $est_actif);
+    // Appel de la fonction pour mettre à jour le type de frais
+    $result = updateTypeFrais($dbh, $id_type_frais, $nom_frais, $description, $est_obligatoire, $est_mensuel, $est_actif);
 
     if ($result['success']) {
-      // Redirect on success
+      // Redirection en cas de succès
       header("Location: " . $result['redirect_url']);
       exit();
     } else {
-      // Handle failure
+      // Gestion de l'échec
       echo "<p>" . $result['message'] . "</p>";
     }
   } else {
-    // This is a new record insertion
-    $nom_periode = $_POST['nom_periode'];
-    $nombre_mois = $_POST['nombre_mois'];
-    $pourcentage_reduction = $_POST['pourcentage_reduction'];
+    // Nouvelle insertion
+    $nom_frais = $_POST['nom_frais'];
     $description = $_POST['description'];
+    $est_obligatoire = isset($_POST['est_obligatoire']) ? 1 : 0;
+    $est_mensuel = isset($_POST['est_mensuel']) ? 1 : 0;
     $est_actif = $_POST['est_actif'];
 
-    // Call the function to add a new payment period
-    $result = addPeriodePaiement($dbh, $nom_periode, $nombre_mois, $pourcentage_reduction, $description, $est_actif);
+    // Appel de la fonction pour ajouter un nouveau type de frais
+    $result = addTypeFrais($dbh, $nom_frais, $description, $est_obligatoire, $est_mensuel, $est_actif);
 
     if ($result['success']) {
-      // Redirect on success
+      // Redirection en cas de succès
       header("Location: " . $result['redirect_url']);
       exit();
     } else {
-      // Handle failure
+      // Gestion de l'échec
       echo "<p>" . $result['message'] . "</p>";
     }
   }
@@ -142,10 +141,10 @@ if (isset($_POST['save'])) {
                           </td>
                           <td class="align-middle text-center">
                             <div class="d-flex">
-                              <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="<?= $result->id_periode ?>" data-nom="<?= $result->nom_periode ?>" data-mois="<?= $result->nombre_mois ?>" data-reduction="<?= $result->pourcentage_reduction ?>" data-description="<?= $result->description ?>" data-actif="<?= $result->est_actif ?>">
+                              <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="<?= $result->id_type_frais ?>" data-nom="<?= htmlspecialchars($result->nom_frais) ?>" data-description="<?= htmlspecialchars($result->description) ?>" data-obligatoire="<?= $result->est_obligatoire ?>" data-mensuel="<?= $result->est_mensuel ?>" data-actif="<?= $result->est_actif ?>">
                                 <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                               </a>
-                              <a href="periodes_paiement.php?id=<?= $result->id_periode ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                              <a href="frais_scolarite.php?id=<?= $result->id_type_frais ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
                                 <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
                             </div>
                             </a>
@@ -162,7 +161,7 @@ if (isset($_POST['save'])) {
                   </tbody>
                 </table>
                 <!-- Modal -->
-                <?php require_once("form/periode_paiement_modal.php") ?>
+                <?php require_once("form/types_frais_modal.php") ?>
               </div>
             </div>
           </div>
@@ -180,7 +179,7 @@ if (isset($_POST['save'])) {
   <script src="../../assets/js/export.js"></script>
 
   <!-- periode paiement passer les info a modal -->
-  <script src="../../assets/js/periode_paiement.js"></script>
+  <script src="../../assets/js/frais_scolarite.js"></script>
 
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>

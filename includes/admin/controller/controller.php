@@ -1725,5 +1725,110 @@ if (file_exists($filePath)) {
             throw new Exception('Erreur lors de la récupération des types de frais');
         }
     }
+    function deleteTypeFrais($dbh, $id_type_frais) {
+        try {
+            // Prepare the SQL to call the stored procedure
+            $sql = "CALL delete_type_frais(:type_frais_id)";
+            $stmt = $dbh->prepare($sql);
+    
+            // Bind the parameter to the stored procedure
+            $stmt->bindParam(':type_frais_id', $id_type_frais, PDO::PARAM_INT);
+    
+            // Execute the statement
+            $stmt->execute();
+    
+            // Return success
+            return [
+                'success' => true,
+                'message' => 'Le type de frais a été supprimé avec succès.'
+            ];
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+            return [
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de la suppression.'
+            ];
+        }
+    }
+
+    function addTypeFrais($dbh, $nom_frais, $description, $est_obligatoire, $est_mensuel, $est_actif) {
+        try {
+            // Validation des entrées
+            if (empty($nom_frais)) {
+                return [
+                    'success' => false,
+                    'message' => 'Veuillez remplir tous les champs correctement.'
+                ];
+            }
+    
+            // Requête SQL pour appeler la procédure stockée
+            $sql = "CALL add_type_frais(:nom_frais, :description, :est_obligatoire, :est_mensuel, :est_actif)";
+            $stmt = $dbh->prepare($sql);
+    
+            // Exécution avec les paramètres sécurisés
+            $stmt->execute([
+                ':nom_frais' => $nom_frais,
+                ':description' => $description,
+                ':est_obligatoire' => $est_obligatoire,
+                ':est_mensuel' => $est_mensuel,
+                ':est_actif' => $est_actif
+            ]);
+    
+            return [
+                'success' => true,
+                'message' => 'Type de frais ajouté avec succès !',
+                'redirect' => true,
+                'redirect_url' => 'frais_scolarite.php'
+            ];
+    
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, '/path/to/secure_log_file.log'); // Log pour le debug
+            return [
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de l\'ajout : ' . $e->getMessage()
+            ];
+        }
+    }
+    
+    function updateTypeFrais($dbh, $id_type_frais, $nom_frais, $description, $est_obligatoire, $est_mensuel, $est_actif) {
+        try {
+            // Validation des entrées
+            if (empty($id_type_frais) || empty($nom_frais)) {
+                return [
+                    'success' => false,
+                    'message' => 'Veuillez remplir tous les champs correctement.'
+                ];
+            }
+    
+            // Requête SQL pour appeler la procédure stockée
+            $sql = "CALL update_type_frais(:id_type_frais, :nom_frais, :description, :est_obligatoire, :est_mensuel, :est_actif)";
+            $stmt = $dbh->prepare($sql);
+    
+            // Exécution avec les paramètres sécurisés
+            $stmt->execute([
+                ':id_type_frais' => $id_type_frais,
+                ':nom_frais' => $nom_frais,
+                ':description' => $description,
+                ':est_obligatoire' => $est_obligatoire,
+                ':est_mensuel' => $est_mensuel,
+                ':est_actif' => $est_actif
+            ]);
+    
+            return [
+                'success' => true,
+                'message' => 'Type de frais mis à jour avec succès !',
+                'redirect' => true,
+                'redirect_url' => 'frais_scolarite.php'
+            ];
+    
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, '/path/to/secure_log_file.log'); // Log pour le debug
+            return [
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de la mise à jour : ' . $e->getMessage()
+            ];
+        }
+    }
+    
 
 // =============== periode payement ================

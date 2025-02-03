@@ -1,3 +1,4 @@
+<!-- form/type_frais_modal.php -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -6,14 +7,14 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="typeFraisForm" method="post">
+        <form id="typesFraisForm" method="post">
           <div class="row mb-3">
             <div class="col-6">
               <label for="id_type_frais" class="form-label">ID du Type de Frais</label>
               <input type="text" class="form-control" id="id_type_frais" name="id_type_frais" readonly>
             </div>
             <div class="col-6">
-              <label for="nom_frais" class="form-label">Nom du Frais</label>
+              <label for="nom_frais" class="form-label">Nom des Frais</label>
               <input type="text" class="form-control" id="nom_frais" name="nom_frais" required>
             </div>
           </div>
@@ -24,28 +25,27 @@
           </div>
 
           <div class="row mb-3">
-            <div class="col-6">
-              <label for="est_obligatoire" class="form-label">Obligatoire</label>
-              <select class="form-select" id="est_obligatoire" name="est_obligatoire">
-                <option value="1">Oui</option>
-                <option value="0">Non</option>
-              </select>
+            <div class="col-4">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="est_obligatoire" name="est_obligatoire">
+                <label class="form-check-label" for="est_obligatoire">
+                  Obligatoire
+                </label>
+              </div>
             </div>
-            <div class="col-6">
-              <label for="est_mensuel" class="form-label">Mensuel</label>
-              <select class="form-select" id="est_mensuel" name="est_mensuel">
-                <option value="1">Oui</option>
-                <option value="0">Non</option>
-              </select>
+            <div class="col-4">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="est_mensuel" name="est_mensuel">
+                <label class="form-check-label" for="est_mensuel">
+                  Mensuel
+                </label>
+              </div>
             </div>
-          </div>
-
-          <div class="row mb-3">
-            <div class="col-6">
-              <label for="est_actif" class="form-label">Actif</label>
+            <div class="col-4">
+              <label for="est_actif" class="form-label">Statut</label>
               <select class="form-select" id="est_actif" name="est_actif">
-                <option value="1">Oui</option>
-                <option value="0">Non</option>
+                <option value="1">Actif</option>
+                <option value="0">Inactif</option>
               </select>
             </div>
           </div>
