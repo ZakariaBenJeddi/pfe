@@ -76,7 +76,6 @@ if (isset($_POST['save'])) {
   }
 }
 
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -97,10 +96,10 @@ if (isset($_POST['save'])) {
           <div class="card mb-4">
             <div class="card-header pb-0 d-flex flex-wrap justify-content-between align-items-center text-center text-md-start">
               <div class="mb-2 mb-md-0 flex-grow-1 text-center text-md-start">
-                <h6 class="text-primary">Filière</h6>
+                <h6 class="text-primary">Periode Paiement</h6>
               </div>
               <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
-                <a class="btn btn-primary btn-sm" href="ajouter_filiere.php" data-bs-toggle="modal" data-bs-target="#exampleModal">Ajouter Filière</a>
+                <a class="btn btn-primary btn-sm" href="ajouter_filiere.php" data-bs-toggle="modal" data-bs-target="#exampleModal">Ajouter periode</a>
                 <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
               </div>
             </div>
@@ -138,8 +137,8 @@ if (isset($_POST['save'])) {
                             <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->description; ?></p>
                           </td>
                           <td>
-                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?php
-                                                                                  echo $result->est_actif == 1 ? "Actif" : "Inactif"   ?>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                              <?php echo $result->est_actif == 1 ? "Actif" : "Inactif"   ?>
                             </p>
                           </td>
                           <td class="align-middle text-center">

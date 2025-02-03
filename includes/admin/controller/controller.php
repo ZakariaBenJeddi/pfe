@@ -1711,3 +1711,19 @@ if (file_exists($filePath)) {
         }
     }
 // =============== periode payement ================
+
+// =============== periode payement ================
+    function get_all_types_frais($dbh) {
+        try {
+            $sql = "CALL get_all_types_frais()"; // Calling the stored procedure
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute();
+            
+            return $stmt->fetchAll(PDO::FETCH_OBJ); // Return result as an array of objects
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+            throw new Exception('Erreur lors de la récupération des types de frais');
+        }
+    }
+
+// =============== periode payement ================

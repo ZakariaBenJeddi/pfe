@@ -1,4 +1,3 @@
-    // JavaScript to populate modal with existing data when edit is clicked
     document.addEventListener('DOMContentLoaded', function() {
       var editLinks = document.querySelectorAll('[data-bs-target="#exampleModal"]');
 
