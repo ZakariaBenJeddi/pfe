@@ -1712,7 +1712,7 @@ if (file_exists($filePath)) {
     }
 // =============== periode payement ================
 
-// =============== periode payement ================
+// =============== frais payement ================
     function get_all_types_frais($dbh) {
         try {
             $sql = "CALL get_all_types_frais()"; // Calling the stored procedure
@@ -1829,6 +1829,65 @@ if (file_exists($filePath)) {
             ];
         }
     }
+// =============== frais payement ================
+
+// =============== tarif payement ================
+    function addTarif($dbh, $id_type_frais, $id_niveau, $id_filiere, $montant_base, $annee_scolaire) {
+        try {
+            $sql = "CALL add_tarif(:id_type_frais, :id_niveau, :id_filiere, :montant_base, :annee_scolaire)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute([
+                ':id_type_frais' => $id_type_frais,
+                ':id_niveau' => $id_niveau,
+                ':id_filiere' => $id_filiere,
+                ':montant_base' => $montant_base,
+                ':annee_scolaire' => $annee_scolaire
+            ]);
+            return ['success' => true, 'message' => 'Tarif ajouté avec succès !'];
+        } catch (PDOException $e) {
+            return ['success' => false, 'message' => 'Erreur lors de l\'ajout du tarif: ' . $e->getMessage()];
+        }
+    }
+
+    function updateTarif($dbh, $id_tarif, $id_type_frais, $id_niveau, $id_filiere, $montant_base, $annee_scolaire) {
+        try {
+            $sql = "CALL update_tarif(:id_tarif, :id_type_frais, :id_niveau, :id_filiere, :montant_base, :annee_scolaire)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute([
+                ':id_tarif' => $id_tarif,
+                ':id_type_frais' => $id_type_frais,
+                ':id_niveau' => $id_niveau,
+                ':id_filiere' => $id_filiere,
+                ':montant_base' => $montant_base,
+                ':annee_scolaire' => $annee_scolaire
+            ]);
+            return ['success' => true, 'message' => 'Tarif mis à jour avec succès !'];
+        } catch (PDOException $e) {
+            return ['success' => false, 'message' => 'Erreur lors de la mise à jour du tarif: ' . $e->getMessage()];
+        }
+    }
+
+    function deleteTarif($dbh, $id_tarif) {
+        try {
+            $sql = "CALL delete_tarif(:id_tarif)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute([':id_tarif' => $id_tarif]);
+            return ['success' => true, 'message' => 'Tarif supprimé avec succès !'];
+        } catch (PDOException $e) {
+            return ['success' => false, 'message' => 'Erreur lors de la suppression du tarif: ' . $e->getMessage()];
+        }
+    }
+
+    function getAllTarifs($dbh) {
+        try {
+            $sql = "CALL get_all_tarifs()";
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_OBJ);
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
     
 
-// =============== periode payement ================
+// =============== tarif payement ================
