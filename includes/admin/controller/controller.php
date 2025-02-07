@@ -1891,3 +1891,80 @@ if (file_exists($filePath)) {
     
 
 // =============== tarif payement ================
+
+// =============== payement eleves ================
+    function addPaiement($dbh, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, $date_debut_periode, $date_fin_periode, $mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement) {
+        try {
+            $sql = "CALL add_paiement(:id_eleve, :id_tarif, :id_periode, :montant_base, :reduction_appliquee, :montant_final, :date_paiement, :date_debut_periode, :date_fin_periode, :mode_paiement, :reference_paiement, :commentaire, :id_admin, :statut_paiement)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute([
+                ':id_eleve' => $id_eleve,
+                ':id_tarif' => $id_tarif,
+                ':id_periode' => $id_periode,
+                ':montant_base' => $montant_base,
+                ':reduction_appliquee' => $reduction_appliquee,
+                ':montant_final' => $montant_final,
+                ':date_paiement' => $date_paiement,
+                ':date_debut_periode' => $date_debut_periode,
+                ':date_fin_periode' => $date_fin_periode,
+                ':mode_paiement' => $mode_paiement,
+                ':reference_paiement' => $reference_paiement,
+                ':commentaire' => $commentaire,
+                ':id_admin' => $id_admin,
+                ':statut_paiement' => $statut_paiement
+            ]);
+            return ['success' => true, 'message' => 'Paiement ajouté avec succès !'];
+        } catch (PDOException $e) {
+            return ['success' => false, 'message' => 'Erreur lors de l\'ajout du paiement: ' . $e->getMessage()];
+        }
+    }
+
+    function updatePaiement($dbh, $id_paiement, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, $date_debut_periode, $date_fin_periode, $mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement) {
+        try {
+            $sql = "CALL update_paiement(:id_paiement, :id_eleve, :id_tarif, :id_periode, :montant_base, :reduction_appliquee, :montant_final, :date_paiement, :date_debut_periode, :date_fin_periode, :mode_paiement, :reference_paiement, :commentaire, :id_admin, :statut_paiement)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute([
+                ':id_paiement' => $id_paiement,
+                ':id_eleve' => $id_eleve,
+                ':id_tarif' => $id_tarif,
+                ':id_periode' => $id_periode,
+                ':montant_base' => $montant_base,
+                ':reduction_appliquee' => $reduction_appliquee,
+                ':montant_final' => $montant_final,
+                ':date_paiement' => $date_paiement,
+                ':date_debut_periode' => $date_debut_periode,
+                ':date_fin_periode' => $date_fin_periode,
+                ':mode_paiement' => $mode_paiement,
+                ':reference_paiement' => $reference_paiement,
+                ':commentaire' => $commentaire,
+                ':id_admin' => $id_admin,
+                ':statut_paiement' => $statut_paiement
+            ]);
+            return ['success' => true, 'message' => 'Paiement mis à jour avec succès !'];
+        } catch (PDOException $e) {
+            return ['success' => false, 'message' => 'Erreur lors de la mise à jour du paiement: ' . $e->getMessage()];
+        }
+    }
+
+    function deletePaiement($dbh, $id_paiement) {
+        try {
+            $sql = "CALL delete_paiement(:id_paiement)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute([':id_paiement' => $id_paiement]);
+            return ['success' => true, 'message' => 'Paiement supprimé avec succès !'];
+        } catch (PDOException $e) {
+            return ['success' => false, 'message' => 'Erreur lors de la suppression du paiement: ' . $e->getMessage()];
+        }
+    }
+
+    function getAllPaiements($dbh) {
+        try {
+            $sql = "CALL get_all_paiements()";
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_OBJ);
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+// =============== payement eleves ================

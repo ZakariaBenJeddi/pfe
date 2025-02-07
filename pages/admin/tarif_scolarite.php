@@ -30,7 +30,6 @@ if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] == 1) {
   }
 }
 
-
 if (isset($_POST['save'])) {
     $id_tarif = isset($_POST['id_tarif']) ? $_POST['id_tarif'] : null;
     $id_type_frais = $_POST['id_type_frais'];

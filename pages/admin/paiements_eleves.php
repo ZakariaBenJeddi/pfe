@@ -1,0 +1,253 @@
+<?php
+include('../../includes/admin/controller/controller.php');
+session_start();
+
+if (empty($_SESSION['user'])) {
+  header('location:../../sign-in.php');
+}
+
+//* deconnexion
+// require('../../includes/deconnexion_5s.php');
+
+//* Read
+try {
+  $results = getAllPaiements($dbh); // Call the function to fetch the data
+} catch (Exception $e) {
+  echo "<script>alert('" . htmlspecialchars($e->getMessage()) . "');</script>";
+  $results = []; // In case of error, set the results to an empty array
+}
+
+// var_dump($results);
+
+//* Delete
+if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] == 1) {
+  $id_tarif = $_GET['id'];
+
+  $result = deleteTarif($dbh, $id_tarif);
+  echo $result['message'];
+
+  if ($result['success']) {
+    header('Location: tarif_scolarite.php');
+    exit();
+  }
+}
+
+if (isset($_POST['save'])) {
+  $id_tarif = isset($_POST['id_tarif']) ? $_POST['id_tarif'] : null;
+  $id_type_frais = $_POST['id_type_frais'];
+  $id_niveau = $_POST['id_niveau'];
+  $id_filiere = $_POST['id_filiere'];
+  $montant_base = $_POST['montant_base'];
+  $annee_scolaire = $_POST['annee_scolaire'];
+
+  if (!empty($id_tarif)) {
+    // Mise à jour si l'ID du tarif existe
+    $result = updateTarif($dbh, $id_tarif, $id_type_frais, $id_niveau, $id_filiere, $montant_base, $annee_scolaire);
+  } else {
+    // Ajout d'un nouveau tarif
+    $result = addTarif($dbh, $id_type_frais, $id_niveau, $id_filiere, $montant_base, $annee_scolaire);
+  }
+
+  if ($result['success']) {
+    header("Location: tarif_scolarite.php");
+    exit();
+  } else {
+    echo "<p class='text-danger'>" . $result['message'] . "</p>";
+  }
+}
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- HEAD -->
+<?php include '../../includes/admin/head_admin.php' ?>
+
+<body class="g-sidenav-show  bg-gray-100">
+  <div class="min-height-300 bg-primary position-absolute w-100"></div>
+  <?php require('../../includes/admin/aside_admin.php') ?>
+  <main class="main-content position-relative border-radius-lg ">
+    <!-- Navbar -->
+    <?php require('../../includes/admin/navbar_admin.php') ?>
+    <!-- End Navbar -->
+    <div class="container-fluid py-4">
+      <div class="row">
+        <div class="col-12">
+          <div class="card mb-4">
+            <div class="card-header pb-0 d-flex flex-wrap justify-content-between align-items-center text-center text-md-start">
+              <div class="mb-2 mb-md-0 flex-grow-1 text-center text-md-start">
+                <h6 class="text-primary">Filière</h6>
+              </div>
+              <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
+                <a class="btn btn-primary btn-sm" href="ajouter_filiere.php" data-bs-toggle="modal" data-bs-target="#exampleModal">Ajouter Filière</a>
+                <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
+              </div>
+            </div>
+            <div class="card-body px-0 pt-0 pb-2">
+              <div class="table-responsive p-0">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Eleve</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Filiere & Niveau</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Type Frais</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nom Periode</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tarif Montant Base</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Paiment Montant Base</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Reduction Applique</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Montant Final</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Mode Paiement</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Reference Paiement</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">date paiement</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">date debut periode</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">date fin periode</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tableBody">
+                    <?php if (count($results) > 0) { ?>
+                      <?php foreach ($results as $result) : ?>
+                        <tr>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm"><?= $result->id_paiement ?></h6>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                              <?= $result->nom_eleve . " " . $result->prenom_eleve . "<br>" . $result->code_massare; ?>
+                            </p>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                              <?= $result->nom_filiere . "<br>" . $result->nom_niveau ?>
+                            </p>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->type_frais; ?></p>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                              <?= $result->nom_periode . "<br>" . $result->nombre_mois; ?>
+                            </p>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->tarif_montant_base; ?></p>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->paiement_montant_base; ?></p>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5" title="<?= $result->description_periode ?>">
+                              <?= $result->reduction_appliquee; ?>
+                            </p>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->montant_final; ?></p>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->mode_paiement; ?></p>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->reference_paiement; ?></p>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->statut_paiement; ?></p>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->date_paiement; ?></p>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->date_debut_periode; ?></p>
+                          </td>
+                          <td>
+                            <?php
+                            $date_fin = new DateTime($result->date_fin_periode);
+                            $date_aujourdhui = new DateTime();
+                            $diff = $date_aujourdhui->diff($date_fin);
+                            $jours_restants = $diff->days;
+                            if ($date_fin < $date_aujourdhui) {
+                              $message = "Date dépassée !";
+                            } else {
+                              $message = "Il reste $jours_restants jour(s)";
+                            }
+                            ?>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5" title="<?= $message ?>">
+                              <?= $result->date_fin_periode; ?>
+                            </p>
+                          </td>
+                          <td class="align-middle text-center">
+                            <div class="d-flex">
+                              <a href="#" class="dropdown-item" 
+                                data-bs-toggle="modal"
+                                data-bs-target="#exampleModal"
+                                data-id="<?php //echo  $result->id_tarif?>"
+                                data-type-frais="<?php //echo  $result->id_type_frais ?>"
+                                data-niveau="<?php //echo  $result->id_niveau ?>"
+                                data-filiere="<?php //echo  $result->id_filiere ?>"
+                                data-montant="<?php //echo  $result->montant_base ?>"
+                                data-annee="<?php //echo  $result->annee_scolaire ?>">
+                                <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
+                              </a>
+                              <a href="tarif_scolarite.php?id=<?= $result->id_paiement ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr de vouloir supprimer?')">
+                                <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
+                              </a>
+                            </div>
+                          </td>
+                        </tr>
+                      <?php endforeach; ?>
+                    <?php } else { ?>
+                      <tr rowspan="7" class="text-center">
+                        <td class="text-center">
+                          No Content
+                        </td>
+                      </tr>
+                    <?php  } ?>
+                  </tbody>
+                </table>
+                <!-- Modal -->
+                <?php require_once("form/tarif_modal.php") ?>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- FOOTER -->
+      <?php include '../../includes/footer.php' ?>
+
+    </div>
+  </main>
+
+  <!-- Data table -->
+  <script src="../../assets/js/datatable.js"></script>
+  <!-- Export Functio -->
+  <script src="../../assets/js/export.js"></script>
+
+  <!-- Tarif passer les info a modal -->
+  <script src="../../assets/js/tarif_scolarite.js"></script>
+
+  <!-- FIXED PLUGIN  -->
+  <?php include '../../includes/fixedplugin.php' ?>
+  <!--   Core JS Files   -->
+  <script src="../../assets/js/core/popper.min.js"></script>
+  <script src="../../assets/js/core/bootstrap.min.js"></script>
+  <script src="../../assets/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="../../assets/js/plugins/smooth-scrollbar.min.js"></script>
+  <script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+      var options = {
+        damping: '0.5'
+      }
+      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+  </script>
+  <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
+  <script src="../../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
+</body>
+
+</html>
