@@ -31,66 +31,28 @@ if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] == 1) {
 }
 
 
-// if (isset($_POST['save'])) {
-//   // Vérifier s'il s'agit d'une mise à jour
-//   if (isset($_POST['id_type_frais']) && !empty($_POST['id_type_frais'])) {
-//     // Capture des données du formulaire pour mise à jour
-//     $id_type_frais = $_POST['id_type_frais'];
-//     $nom_frais = $_POST['nom_frais'];
-//     $description = $_POST['description'];
-//     $est_obligatoire = isset($_POST['est_obligatoire']) ? 1 : 0;
-//     $est_mensuel = isset($_POST['est_mensuel']) ? 1 : 0;
-//     $est_actif = $_POST['est_actif'];
-
-//     // Appel de la fonction pour mettre à jour le type de frais
-//     $result = updateTypeFrais($dbh, $id_type_frais, $nom_frais, $description, $est_obligatoire, $est_mensuel, $est_actif);
-
-//     if ($result['success']) {
-//       // Redirection en cas de succès
-//       header("Location: " . $result['redirect_url']);
-//       exit();
-//     } else {
-//       // Gestion de l'échec
-//       echo "<p>" . $result['message'] . "</p>";
-//     }
-//   } else {
-//     // Nouvelle insertion
-//     $nom_frais = $_POST['nom_frais'];
-//     $description = $_POST['description'];
-//     $est_obligatoire = isset($_POST['est_obligatoire']) ? 1 : 0;
-//     $est_mensuel = isset($_POST['est_mensuel']) ? 1 : 0;
-//     $est_actif = $_POST['est_actif'];
-
-//     // Appel de la fonction pour ajouter un nouveau type de frais
-//     $result = addTypeFrais($dbh, $nom_frais, $description, $est_obligatoire, $est_mensuel, $est_actif);
-
-//     if ($result['success']) {
-//       // Redirection en cas de succès
-//       header("Location: " . $result['redirect_url']);
-//       exit();
-//     } else {
-//       // Gestion de l'échec
-//       echo "<p>" . $result['message'] . "</p>";
-//     }
-//   }
-// }
 if (isset($_POST['save'])) {
-  $id_type_frais = $_POST['id_type_frais'];
-  $id_niveau = $_POST['id_niveau'];
-  $id_filiere = $_POST['id_filiere'];
-  $montant_base = $_POST['montant_base'];
-  $annee_scolaire = $_POST['annee_scolaire'];
+    $id_tarif = isset($_POST['id_tarif']) ? $_POST['id_tarif'] : null;
+    $id_type_frais = $_POST['id_type_frais'];
+    $id_niveau = $_POST['id_niveau'];
+    $id_filiere = $_POST['id_filiere'];
+    $montant_base = $_POST['montant_base'];
+    $annee_scolaire = $_POST['annee_scolaire'];
 
-  // Appel de la fonction d'ajout
-  $result = addTarif($dbh, $id_type_frais, $id_niveau, $id_filiere, $montant_base, $annee_scolaire);
+    if (!empty($id_tarif)) {
+        // Mise à jour si l'ID du tarif existe
+        $result = updateTarif($dbh, $id_tarif, $id_type_frais, $id_niveau, $id_filiere, $montant_base, $annee_scolaire);
+    } else {
+        // Ajout d'un nouveau tarif
+        $result = addTarif($dbh, $id_type_frais, $id_niveau, $id_filiere, $montant_base, $annee_scolaire);
+    }
 
-  if ($result['success']) {
-      // Redirection après succès
-      header("Location: tarif_scolarite.php");
-      exit();
-  } else {
-      echo "<p class='text-danger'>" . $result['message'] . "</p>";
-  }
+    if ($result['success']) {
+        header("Location: tarif_scolarite.php");
+        exit();
+    } else {
+        echo "<p class='text-danger'>" . $result['message'] . "</p>";
+    }
 }
 
 ?>
