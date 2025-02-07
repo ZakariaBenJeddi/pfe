@@ -1967,4 +1967,41 @@ if (file_exists($filePath)) {
             return [];
         }
     }
+    function getAllPaiementsByID($dbh,$id) {
+        try {
+            // Validation de l'ID
+            $id_paiement = filter_var($id, FILTER_VALIDATE_INT);
+            if ($id_paiement === false) {
+                return [
+                    'success' => false,
+                    'message' => 'Identifiant de salle invalide'
+                ];
+            }
+    
+            // Appel de la procédure stockée
+            $sql = "CALL get_paiement_by_id(:id_paiement)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->bindParam(':id_paiement', $id_paiement, PDO::PARAM_INT);
+            $stmt->execute();
+    
+            if ($stmt->rowCount() > 0) {
+                return [
+                    'success' => true,
+                    'data' => $stmt->fetch(PDO::FETCH_ASSOC)
+                ];
+            }
+    
+            return [
+                'success' => false,
+                'message' => 'Aucune Paiement trouvée avec cet identifiant'
+            ];
+    
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+            return [
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de la récupération des données'
+            ];
+        }
+    }
 // =============== payement eleves ================

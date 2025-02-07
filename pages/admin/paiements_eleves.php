@@ -3,11 +3,11 @@ include('../../includes/admin/controller/controller.php');
 session_start();
 
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-in.php');
+  header('location:../sign-in.php');
 }
 
 //* deconnexion
-// require('../../includes/deconnexion_5s.php');
+require('../../includes/deconnexion_5s.php');
 
 //* Read
 try {
@@ -110,7 +110,7 @@ if (isset($_POST['save'])) {
                     <?php if (count($results) > 0) { ?>
                       <?php foreach ($results as $result) : ?>
                         <tr>
-                          <td>
+                          <td onclick="genererPDFPaiement(<?= $result->id_paiement ?>)" style="cursor:pointer">
                             <div class="d-flex px-2 py-1">
                               <div class="d-flex flex-column justify-content-center">
                                 <h6 class="mb-0 text-sm"><?= $result->id_paiement ?></h6>
@@ -182,15 +182,13 @@ if (isset($_POST['save'])) {
                           </td>
                           <td class="align-middle text-center">
                             <div class="d-flex">
-                              <a href="#" class="dropdown-item" 
-                                data-bs-toggle="modal"
-                                data-bs-target="#exampleModal"
-                                data-id="<?php //echo  $result->id_tarif?>"
-                                data-type-frais="<?php //echo  $result->id_type_frais ?>"
-                                data-niveau="<?php //echo  $result->id_niveau ?>"
-                                data-filiere="<?php //echo  $result->id_filiere ?>"
-                                data-montant="<?php //echo  $result->montant_base ?>"
-                                data-annee="<?php //echo  $result->annee_scolaire ?>">
+                              <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="<?php //echo  $result->id_tarif
+                                                                                                                                ?>" data-type-frais="<?php //echo  $result->id_type_frais 
+                                                                                                                                                      ?>" data-niveau="<?php //echo  $result->id_niveau 
+                                                                                                                                                                        ?>" data-filiere="<?php //echo  $result->id_filiere 
+                                                                                                                                                                                          ?>" data-montant="<?php //echo  $result->montant_base 
+                                                                                                                                                                                                                                          ?>" data-annee="<?php //echo  $result->annee_scolaire 
+                                                                                                                                                                                                                                                                                              ?>">
                                 <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                               </a>
                               <a href="tarif_scolarite.php?id=<?= $result->id_paiement ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr de vouloir supprimer?')">
@@ -229,6 +227,10 @@ if (isset($_POST['save'])) {
 
   <!-- Tarif passer les info a modal -->
   <script src="../../assets/js/tarif_scolarite.js"></script>
+
+  <!-- pdf generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="../../assets/js/generation_pdf.js"></script>
 
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
