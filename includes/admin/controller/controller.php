@@ -1937,7 +1937,7 @@ if (file_exists($filePath)) {
                 ':mode_paiement' => $mode_paiement,
                 ':reference_paiement' => $reference_paiement,
                 ':commentaire' => $commentaire,
-                ':id_admin' => $id_admin,
+                ':id_admin' => $_SESSION['user'],
                 ':statut_paiement' => $statut_paiement
             ]);
             return ['success' => true, 'message' => 'Paiement mis à jour avec succès !'];

@@ -17,7 +17,20 @@ try {
   $results = []; // In case of error, set the results to an empty array
 }
 
-// var_dump($results);
+if (isset($_GET['action'])) {
+  if ($_GET['action'] === "getElevesInfo") {
+    $eleves = getElevesInfo($dbh);
+    echo json_encode($eleves);
+  }
+  if ($_GET['action'] === "getAllTarifs") {
+    $tarifs = getAllTarifs($dbh);
+    echo json_encode($tarifs);
+  }
+  if ($_GET['action'] === "getAllPeriodesPaiement") {
+    $periodes = get_all_periodes_paiement($dbh);
+    echo json_encode($periodes);
+  }
+}
 
 //* Delete
 if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] == 1) {
@@ -33,23 +46,30 @@ if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] == 1) {
 }
 
 if (isset($_POST['save'])) {
-  $id_tarif = isset($_POST['id_tarif']) ? $_POST['id_tarif'] : null;
-  $id_type_frais = $_POST['id_type_frais'];
-  $id_niveau = $_POST['id_niveau'];
-  $id_filiere = $_POST['id_filiere'];
-  $montant_base = $_POST['montant_base'];
-  $annee_scolaire = $_POST['annee_scolaire'];
+  $id_paiement = isset($_POST['id_paiement']) ? $_POST['id_paiement'] : null;
+  $id_eleve = $_POST['id_eleve'];
+  $id_tarif = $_POST['id_tarif'];
+  $id_periode = $_POST['id_periode'];
+  $montant_base = $_POST['montant_base'] || 0;
+  $reduction_appliquee = $_POST['reduction_appliquee'] || 0;
+  $montant_final = $_POST['montant_final'] || 0;
+  $date_paiement = $_POST['date_paiement'];
+  $mode_paiement = $_POST['mode_paiement'];
+  $reference_paiement = $_POST['reference_paiement'];
+  $commentaire = $_POST['commentaire'];
+  $id_admin = $_SESSION['user'] || NULL; // id_admin
+  $statut_paiement = $_POST['statut_paiement'];
 
-  if (!empty($id_tarif)) {
-    // Mise à jour si l'ID du tarif existe
-    $result = updateTarif($dbh, $id_tarif, $id_type_frais, $id_niveau, $id_filiere, $montant_base, $annee_scolaire);
+  if (!empty($id_paiement)) {
+    // Mise à jour
+    $result = updatePaiement($dbh, $id_paiement, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, null, null, $mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement);
   } else {
-    // Ajout d'un nouveau tarif
-    $result = addTarif($dbh, $id_type_frais, $id_niveau, $id_filiere, $montant_base, $annee_scolaire);
+    // Ajout
+    $result = addPaiement($dbh, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, null, null, $mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement);
   }
 
   if ($result['success']) {
-    header("Location: tarif_scolarite.php");
+    header("Location: paiements_eleves.php");
     exit();
   } else {
     echo "<p class='text-danger'>" . $result['message'] . "</p>";
@@ -79,7 +99,7 @@ if (isset($_POST['save'])) {
                 <h6 class="text-primary">Filière</h6>
               </div>
               <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
-                <a class="btn btn-primary btn-sm" href="ajouter_filiere.php" data-bs-toggle="modal" data-bs-target="#exampleModal">Ajouter Filière</a>
+                <a class="btn btn-primary btn-sm" href="ajouter_filiere.php" data-bs-toggle="modal" data-bs-target="#paiementModal">Ajouter Filière</a>
                 <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
               </div>
             </div>
@@ -119,7 +139,7 @@ if (isset($_POST['save'])) {
                           </td>
                           <td>
                             <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
-                              <?= $result->nom_eleve . " " . $result->prenom_eleve . "<br>" . $result->code_massare; ?>
+                              <?= strtoupper($result->nom_eleve . " " . $result->prenom_eleve) . "<br>" . $result->code_massare; ?>
                             </p>
                           </td>
                           <td>
@@ -182,16 +202,10 @@ if (isset($_POST['save'])) {
                           </td>
                           <td class="align-middle text-center">
                             <div class="d-flex">
-                              <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="<?php //echo  $result->id_tarif
-                                                                                                                                ?>" data-type-frais="<?php //echo  $result->id_type_frais 
-                                                                                                                                                      ?>" data-niveau="<?php //echo  $result->id_niveau 
-                                                                                                                                                                        ?>" data-filiere="<?php //echo  $result->id_filiere 
-                                                                                                                                                                                          ?>" data-montant="<?php //echo  $result->montant_base 
-                                                                                                                                                                                                                                          ?>" data-annee="<?php //echo  $result->annee_scolaire 
-                                                                                                                                                                                                                                                                                              ?>">
+                              <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#paiementModal" data-id="<?= $result->id_paiement ?>" data-id-eleve="<?= $result->id_eleve ?>" data-id-tarif="<?= $result->id_tarif ?>" data-id-periode="<?= $result->id_periode ?>" data-montant-base="<?= $result->paiement_montant_base ?>" data-reduction-appliquee="<?= $result->reduction_appliquee ?>" data-montant-final="<?= $result->montant_final ?>" data-date-paiement="<?= $result->date_paiement ?>" data-mode-paiement="<?= $result->mode_paiement ?>" data-reference-paiement="<?= $result->reference_paiement ?>" data-statut-paiement="<?= $result->statut_paiement ?>" data-commentaire="<?= $result->commentaire ?>">
                                 <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                               </a>
-                              <a href="tarif_scolarite.php?id=<?= $result->id_paiement ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr de vouloir supprimer?')">
+                              <a href="paiements_eleves.php?id=<?= $result->id_paiement ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr de vouloir supprimer?')">
                                 <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
                               </a>
                             </div>
@@ -208,7 +222,7 @@ if (isset($_POST['save'])) {
                   </tbody>
                 </table>
                 <!-- Modal -->
-                <?php require_once("form/tarif_modal.php") ?>
+                <?php require_once("form/paiement_modal.php") ?>
               </div>
             </div>
           </div>
@@ -226,7 +240,7 @@ if (isset($_POST['save'])) {
   <script src="../../assets/js/export.js"></script>
 
   <!-- Tarif passer les info a modal -->
-  <script src="../../assets/js/tarif_scolarite.js"></script>
+  <script src="../../assets/js/paiement_eleves.js"></script>
 
   <!-- pdf generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
