@@ -18,4 +18,40 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('commentaire').value = this.getAttribute('data-commentaire') || '';
     });
   });
+
+  const idTarifSelect = document.getElementById("id_tarif");
+  const montantBaseInput = document.getElementById("montant_base");
+
+  const idPeriodeSelect = document.getElementById("id_periode");
+  const reductionAppliqueeInput = document.getElementById("reduction_appliquee");
+  const montantFinalInput = document.getElementById("montant_final");
+
+  // Mettre à jour le montant de base lorsque le tarif change
+  idTarifSelect.addEventListener("change", function () {
+      const selectedOption = this.options[this.selectedIndex];
+      const montantBase = selectedOption.getAttribute("data-montant") || 0;
+      montantBaseInput.value = parseFloat(montantBase).toFixed(2);
+
+      // Recalculer le montant final
+      updateMontantFinal();
+  });
+
+  // Mettre à jour la réduction appliquée lorsque la période change
+  idPeriodeSelect.addEventListener("change", function () {
+      const selectedOption = this.options[this.selectedIndex];
+      const reduction = selectedOption.getAttribute("data-reduction") || 0;
+      reductionAppliqueeInput.value = parseFloat(reduction).toFixed(2);
+
+      // Recalculer le montant final
+      updateMontantFinal();
+  });
+
+  // Fonction pour recalculer le montant final
+  function updateMontantFinal() {
+      const montantBase = parseFloat(montantBaseInput.value) || 0;
+      const reduction = parseFloat(reductionAppliqueeInput.value) || 0;
+
+      const montantFinal = montantBase - (montantBase * (reduction / 100));
+      montantFinalInput.value = montantFinal.toFixed(2);
+  }
 });

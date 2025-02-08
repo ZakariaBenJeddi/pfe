@@ -14,10 +14,10 @@
               <select class="form-select" id="id_eleve" name="id_eleve" required>
                 <option value="">Sélectionner Élève</option>
                 <?php
-                  $periodes = getElevesInfo($dbh)['data'];
-                  foreach ($periodes as $eleve) {
-                    echo "<option value='{$eleve->id_eleve}'>{$eleve->nom} {$eleve->prenom}</option>";
-                  }
+                $periodes = getElevesInfo($dbh)['data'];
+                foreach ($periodes as $eleve) {
+                  echo "<option value='{$eleve->id_eleve}'>{$eleve->nom} {$eleve->prenom}</option>";
+                }
                 ?>
               </select>
             </div>
@@ -26,10 +26,10 @@
               <select class="form-select" id="id_tarif" name="id_tarif" required>
                 <option value="">Sélectionner</option>
                 <?php
-                  $tarifs = getAllTarifs($dbh);
-                  foreach ($tarifs as $tarif) {
-                    echo "<option value='{$tarif->id_type_frais}'>{$tarif->nom_frais}</option>";
-                  }
+                $tarifs = getAllTarifs($dbh);
+                foreach ($tarifs as $tarif) {
+                  echo "<option value='{$tarif->id_type_frais}' data-montant='{$tarif->montant_base}'>{$tarif->nom_frais}</option>";
+                }
                 ?>
               </select>
             </div>
@@ -40,12 +40,12 @@
               <select class="form-select" id="id_periode" name="id_periode" required>
                 <option value="">Sélectionner</option>
                 <?php
-                  $periodes = get_all_periodes_paiement($dbh);
-                  foreach ($periodes as $periode) {
-                    if($periode->est_actif == '1'){
-                      echo "<option value='{$periode->id_periode}'>{$periode->nom_periode}  Reduction {$periode->pourcentage_reduction}</option>";
-                    }
+                $periodes = get_all_periodes_paiement($dbh);
+                foreach ($periodes as $periode) {
+                  if ($periode->est_actif == '1') {
+                    echo "<option value='{$periode->id_periode}' data-reduction='{$periode->pourcentage_reduction}'>{$periode->nom_periode} - Réduction {$periode->pourcentage_reduction}%</option>";
                   }
+                }
                 ?>
               </select>
             </div>
