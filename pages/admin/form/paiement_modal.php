@@ -14,9 +14,15 @@
               <select class="form-select" id="id_eleve" name="id_eleve" required>
                 <option value="">Sélectionner Élève</option>
                 <?php
-                $periodes = getElevesInfo($dbh)['data'];
-                foreach ($periodes as $eleve) {
-                  echo "<option value='{$eleve->id_eleve}'>{$eleve->nom} {$eleve->prenom}</option>";
+                // $periodes = getElevesInfo($dbh)['data'];
+                // foreach ($periodes as $eleve) {
+                //   echo "<option value='{$eleve->id_eleve}'>{$eleve->nom} {$eleve->prenom}</option>";
+                // }
+                $eleves = getElevesInfo($dbh)['data'];
+                foreach ($eleves as $eleve) {
+                  echo "<option value='{$eleve->id_eleve}' data-niveau='{$eleve->niveau}' data-filiere='{$eleve->filiere}'>
+            {$eleve->nom} {$eleve->prenom}
+          </option>";
                 }
                 ?>
               </select>
@@ -26,9 +32,15 @@
               <select class="form-select" id="id_tarif" name="id_tarif" required>
                 <option value="">Sélectionner</option>
                 <?php
+                // $tarifs = getAllTarifs($dbh);
+                // foreach ($tarifs as $tarif) {
+                //   echo "<option value='{$tarif->id_type_frais}' data-montant='{$tarif->montant_base}'>{$tarif->nom_frais}</option>";
+                // }
                 $tarifs = getAllTarifs($dbh);
                 foreach ($tarifs as $tarif) {
-                  echo "<option value='{$tarif->id_type_frais}' data-montant='{$tarif->montant_base}'>{$tarif->nom_frais}</option>";
+                  echo "<option value='{$tarif->id_type_frais}' data-niveau='{$tarif->niveau}' data-filiere='{$tarif->filiere}' data-montant='{$tarif->montant_base}'>
+            {$tarif->nom_frais}
+          </option>";
                 }
                 ?>
               </select>
