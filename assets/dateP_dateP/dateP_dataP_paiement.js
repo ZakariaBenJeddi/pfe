@@ -47,56 +47,84 @@ $(function() {
                       <td  onclick='genererPDFPaiement(${paiement.id_paiement})' style='cursor:pointer'>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-center">
-                            <p class="text-secondary text-xs font-weight-bold">${paiement.id_paiement}</p>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">${paiement.id_paiement}</p>
                           </div>
                         </div>
                       </td>
-                      <td class="align-middle text-center">
-                        <p class="text-secondary text-xs font-weight-bold">${paiement.nom_eleve} ${paiement.prenom_eleve}</p>
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                          ${paiement.nom_eleve} ${paiement.prenom_eleve}
+                        </p>
                       </td>
                       <td>
-                        <p class="text-secondary text-xs font-weight-bold">${paiement.nom_filiere} - ${paiement.nom_niveau}</p>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">${paiement.nom_filiere} - ${paiement.nom_niveau}</p>
+                      </td>
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                          ${paiement.type_frais}
+                        </p>
                       </td>
                       <td class="align-middle text-center text-sm">
-                        ${paiement.type_frais}
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                          ${paiement.nom_periode} <br>  ${paiement.nombre_mois} 
+                        </p>
                       </td>
-                      <td class="align-middle text-center text-sm">
-                        ${paiement.nom_periode} <br>  ${paiement.nombre_mois} 
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                          ${paiement.tarif_montant_base}
+                        </p>
                       </td>
-                      <td class="align-middle text-center text-sm">
-                        ${paiement.tarif_montant_base}
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                          ${paiement.paiement_montant_base}
+                        </p>
                       </td>
-                      <td class="align-middle text-center text-sm">
-                        ${paiement.paiement_montant_base}
+                      <td title='${paiement.description_periode}'>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                          ${paiement.reduction_appliquee}
+                        </p>
                       </td>
-                      <td class="align-middle text-center text-sm" title='${paiement.description_periode}'>
-                        ${paiement.reduction_appliquee}
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                          ${paiement.montant_final}
+                        </p>
                       </td>
-                      <td class="align-middle text-center text-sm">
-                        ${paiement.montant_final}
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                          ${paiement.mode_paiement}
+                        </p>
                       </td>
-                      <td class="align-middle text-center">
-                        <span class="text-secondary text-xs font-weight-bold">${paiement.montant_final}</span>
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                          ${paiement.reference_paiement}
+                        </p>
                       </td>
-                      <td class="align-middle text-center">
-                        <span class="text-secondary text-xs font-weight-bold">${paiement.mode_paiement}</span>
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                          ${statut}
+                        </p>
                       </td>
-                      <td class="align-middle text-center">
-                        <span class="text-secondary text-xs font-weight-bold">${paiement.reference_paiement}</span>
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                          ${paiement.date_paiement}
+                        </p>
                       </td>
-                      <td class="align-middle text-center text-sm">
-                        ${statut}
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                          ${paiement.date_debut_periode}
+                        </p>
                       </td>
-                      <td class="align-middle text-center">
-                        <span class="text-secondary text-xs font-weight-bold">${paiement.date_paiement}</span>
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                          ${paiement.date_fin_periode}
+                        </p>
                       </td>
-                      <td class="align-middle text-center">
-                        <span class="text-secondary text-xs font-weight-bold">${paiement.date_debut_periode}</span>
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                          ${paiement.date_validation ? paiement.date_validation : 'En attente de validation'}
+                        </p>
                       </td>
-                      <td class="align-middle text-center">
-                        <span class="text-secondary text-xs font-weight-bold">${paiement.date_validation}</span>
-                      </td>
-                      <td class="align-middle text-center">
+                      <td>
                         <div class="d-flex">
                           <a href="#" class="dropdown-item" 
                             data-bs-toggle="modal"
