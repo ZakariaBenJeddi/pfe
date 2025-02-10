@@ -199,25 +199,26 @@ function mi2at(nbr) {
 }
 
 function genererRecuPaiement(paiement) {
-  // Prepare data for PDF generation
-  var currentDate = new Date();
-  var dateRecu = currentDate.toLocaleDateString();
-
-  // Generate random receipt number
-  var num_r = Math.floor(Math.random() * 10000) + 1;
-
-  // Calculate TVA and total
+  // Calculer la TVA et le total
   var prix = Number(paiement.data.montant_final);
   var tva = prix * 0.2;
   var total = prix + tva;
 
-  // Convert total to words
+  // Générer un numéro de reçu unique
+  var num_r = Math.floor(Math.random() * 10000) + 1;
+  var currentDate = new Date();
+  var dateRecu = currentDate.toLocaleDateString();
+
+  // Convertir le montant en lettres
   var montantEnLettre = capitalizeFirstLetter(transfere_nbr_lettre(String(total)));
 
-  // Create PDF content with professional styling
+  // HTML du reçu avec style professionnel
   var htmlRecu = `
   <style>
-      body { font-family: 'Arial', sans-serif; }
+      body { 
+          font-family: 'Arial', sans-serif; 
+          font-size: 12px;
+      }
       .invoice-container {
           width: 90%;
           margin: 0 auto;
@@ -246,7 +247,7 @@ function genererRecuPaiement(paiement) {
       }
       .invoice-table th, .invoice-table td {
           border: 1px solid #e0e0e0;
-          padding: 10px;
+          padding: 8px;
           text-align: left;
       }
       .invoice-total {
@@ -254,9 +255,12 @@ function genererRecuPaiement(paiement) {
           margin-bottom: 20px;
       }
       .invoice-footer {
-          font-size: 0.8em;
+          font-size: 0.9em;
           color: #666;
           text-align: center;
+      }
+      .page-break {
+          page-break-after: always;
       }
   </style>
   <div class="invoice-container">
@@ -272,12 +276,14 @@ function genererRecuPaiement(paiement) {
       <table class="invoice-table">
           <tr>
               <th>Élève</th>
+              <th>Code Massare</th>
               <th>Filière</th>
               <th>Niveau</th>
               <th>Type de Frais</th>
           </tr>
           <tr>
               <td>${paiement.data.nom_eleve} ${paiement.data.prenom_eleve}</td>
+              <td>${paiement.data.code_massare}</td>
               <td>${paiement.data.nom_filiere}</td>
               <td>${paiement.data.nom_niveau}</td>
               <td>${paiement.data.type_frais}</td>
@@ -287,36 +293,59 @@ function genererRecuPaiement(paiement) {
       <table class="invoice-table">
           <tr>
               <th>Période</th>
-              <th>Montant de Base</th>
-              <th>Réduction</th>
-              <th>Montant Final</th>
+              <th>Année Scolaire</th>
+              <th>Date Début Période</th>
+              <th>Date Fin Période</th>
+              <th>Nombre de Mois</th>
           </tr>
           <tr>
               <td>${paiement.data.nom_periode}</td>
+              <td>${paiement.data.annee_scolaire}</td>
+              <td>${paiement.data.date_debut_periode}</td>
+              <td>${paiement.data.date_fin_periode}</td>
+              <td>${paiement.data.nombre_mois}</td>
+          </tr>
+      </table>
+
+      <table class="invoice-table">
+          <tr>
+              <th>Montant de Base</th>
+              <th>Réduction</th>
+              <th>Montant Final</th>
+              <th>Mode de Paiement</th>
+              <th>Référence Paiement</th>
+          </tr>
+          <tr>
               <td>${paiement.data.tarif_montant_base} MAD</td>
-              <td>${paiement.data.reduction_appliquee} MAD</td>
+              <td>${paiement.data.reduction_appliquee} %</td>
               <td>${paiement.data.montant_final} MAD</td>
+              <td>${paiement.data.mode_paiement}</td>
+              <td>${paiement.data.reference_paiement}</td>
           </tr>
       </table>
       
       <div class="invoice-total">
-          <p><strong>Sous-Total HT:</strong> ${prix} MAD</p>
+          <p><strong>Sous-Total HT:</strong> ${prix.toFixed(2)} MAD</p>
           <p><strong>TVA (20%):</strong> ${tva.toFixed(2)} MAD</p>
           <p><strong>Total TTC:</strong> ${total.toFixed(2)} MAD</p>
       </div>
       
       <p class="invoice-footer">
-          Montant en lettres: <strong>${montantEnLettre} Dirhams</strong>
+      Montant en lettres: <strong>${montantEnLettre} Dirhams</strong>
       </p>
       
       <div class="invoice-footer">
+          <p>Date de Paiement: ${paiement.data.date_paiement}</p>
+          <p>Statut: ${paiement.data.statut_paiement}</p>
+          <p>Date de Validation: ${paiement.data.date_validation}</p>
+          <p>Commentaire: ${paiement.data.commentaire || 'Aucun'}</p>
           <p>Merci de conserver ce reçu</p>
           <p>École Professionnelle - Établissement Officiel</p>
       </div>
   </div>
   `;
 
-  // Generate PDF
+  // Générer le PDF
   html2pdf()
     .set({
       margin: [10, 10, 10, 10],
@@ -338,7 +367,6 @@ function genererRecuPaiement(paiement) {
     .from(htmlRecu)
     .save();
 }
-
 // Function to fetch payment details and generate PDF
 function genererPDFPaiement(id_paiement) {
   // AJAX call to fetch payment details
@@ -363,3 +391,5 @@ function genererPDFPaiement(id_paiement) {
     }
   });
 }
+
+
