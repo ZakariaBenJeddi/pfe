@@ -74,6 +74,12 @@
               <input type="date" class="form-control" id="date_paiement" name="date_paiement" required>
             </div>
             <div class="col-md-6 mb-3">
+              <label for="date_debut_periode" class="form-label">Date Debut Periode</label>
+              <input type="date" class="form-control" id="date_debut_periode" name="date_debut_periode" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
               <label for="mode_paiement" class="form-label">Mode Paiement</label>
               <select class="form-select" id="mode_paiement" name="mode_paiement" required>
                 <option value="">Sélectionner</option>
@@ -82,12 +88,6 @@
                 <option value="Virement">Virement</option>
               </select>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="reference_paiement" class="form-label">Référence Paiement</label>
-              <input type="text" class="form-control" id="reference_paiement" name="reference_paiement">
-            </div>
             <div class="col-md-6 mb-3">
               <label for="statut_paiement" class="form-label">Statut</label>
               <select class="form-select" id="statut_paiement" name="statut_paiement">
@@ -95,6 +95,12 @@
                 <option value="En attente">En attente</option>
                 <option value="Annulé">Annulé</option>
               </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="reference_paiement" class="form-label">Référence Paiement</label>
+              <input type="text" class="form-control" id="reference_paiement" name="reference_paiement">
             </div>
           </div>
           <div class="mb-3">

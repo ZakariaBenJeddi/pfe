@@ -1893,9 +1893,9 @@ if (file_exists($filePath)) {
 // =============== tarif payement ================
 
 // =============== payement eleves ================
-    function addPaiement($dbh, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, $mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement) {
+    function addPaiement($dbh, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, $date_debut_periode, $mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement) {
         try {
-            $stmt = $dbh->prepare("CALL add_paiement(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $dbh->prepare("CALL add_paiement(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([
                 $id_eleve, 
                 $id_tarif, 
@@ -1904,6 +1904,7 @@ if (file_exists($filePath)) {
                 $reduction_appliquee, 
                 $montant_final, 
                 $date_paiement, 
+                $date_debut_periode, 
                 $mode_paiement, 
                 $reference_paiement, 
                 $commentaire, 

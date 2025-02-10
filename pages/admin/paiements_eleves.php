@@ -18,7 +18,7 @@ try {
 }
 
 //* Filter
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['start_date']) && isset($_POST['end_date'])) {
   header('Content-Type: application/json');
   try {
       // Validation des dates
@@ -71,6 +71,7 @@ if (isset($_POST['save'])) {
   $reduction_appliquee = $_POST['reduction_appliquee'];
   $montant_final = $_POST['montant_final'];
   $date_paiement = $_POST['date_paiement'];
+  $date_debut_periode = $_POST['date_debut_periode'];
   $mode_paiement = $_POST['mode_paiement'];
   $reference_paiement = $_POST['reference_paiement'];
   $commentaire = $_POST['commentaire'];
@@ -80,7 +81,7 @@ if (isset($_POST['save'])) {
   if (!empty($id_paiement)) {
     $result = updatePaiement($dbh, $id_paiement, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, null, null, $mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement);
   } else {
-    $result = addPaiement($dbh, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, $mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement);
+    $result = addPaiement($dbh, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, $date_debut_periode ,$mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement);
   }
 
   if ($result['success']) {
