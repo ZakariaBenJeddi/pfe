@@ -11,10 +11,10 @@ require('../../includes/deconnexion_5s.php');
 
 //* Read
 try {
-  $results = getAllPaiements($dbh); // Call the function to fetch the data
+  $results = getAllPaiements($dbh);
 } catch (Exception $e) {
   echo "<script>alert('" . htmlspecialchars($e->getMessage()) . "');</script>";
-  $results = []; // In case of error, set the results to an empty array
+  $results = [];
 }
 
 //* Filter
