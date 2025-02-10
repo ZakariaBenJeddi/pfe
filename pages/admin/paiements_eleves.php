@@ -7,7 +7,7 @@ if (empty($_SESSION['user'])) {
 }
 
 //* deconnexion
-// require('../../includes/deconnexion_5s.php');
+require('../../includes/deconnexion_5s.php');
 
 //* Read
 try {
@@ -34,13 +34,13 @@ if (isset($_GET['action'])) {
 
 //* Delete
 if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] == 1) {
-  $id_tarif = $_GET['id'];
+  $id_paiement = $_GET['id'];
 
-  $result = deleteTarif($dbh, $id_tarif);
+  $result = deletePaiement($dbh, $id_paiement);
   echo $result['message'];
 
   if ($result['success']) {
-    header('Location: tarif_scolarite.php');
+    header('Location: paiements_eleves.php');
     exit();
   }
 }
@@ -50,22 +50,20 @@ if (isset($_POST['save'])) {
   $id_eleve = $_POST['id_eleve'];
   $id_tarif = $_POST['id_tarif'];
   $id_periode = $_POST['id_periode'];
-  $montant_base = $_POST['montant_base'] || 0;
-  $reduction_appliquee = $_POST['reduction_appliquee'] || 0;
-  $montant_final = $_POST['montant_final'] || 0;
+  $montant_base = $_POST['montant_base'];
+  $reduction_appliquee = $_POST['reduction_appliquee'];
+  $montant_final = $_POST['montant_final'];
   $date_paiement = $_POST['date_paiement'];
   $mode_paiement = $_POST['mode_paiement'];
   $reference_paiement = $_POST['reference_paiement'];
   $commentaire = $_POST['commentaire'];
-  $id_admin = $_SESSION['user'] || NULL; // id_admin
+  $id_admin = $_SESSION['user'] ?? NULL;
   $statut_paiement = $_POST['statut_paiement'];
 
   if (!empty($id_paiement)) {
-    // Mise à jour
     $result = updatePaiement($dbh, $id_paiement, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, null, null, $mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement);
   } else {
-    // Ajout
-    $result = addPaiement($dbh, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, null, null, $mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement);
+    $result = addPaiement($dbh, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, $mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement);
   }
 
   if ($result['success']) {

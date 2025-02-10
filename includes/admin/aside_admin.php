@@ -4,7 +4,7 @@
 		<a class="navbar-brand m-0" href=" https://demos.creative-tim.com/argon-dashboard/dashboard.html " target="_blank">
 			<img src="https://elaraki.ac.ma/images/logo2.png" class="navbar-brand-img h-100" alt="main_logo">
 			<span class="ms-1 font-weight-bold">
-				<?= strtoupper($_SESSION['nom_admin'] . " " . $_SESSION['prenom_admin'])  ?>
+				<?= strtoupper($_SESSION['nom_admin'] . " " . $_SESSION['user'])  ?>
 			</span>
 
 		</a>

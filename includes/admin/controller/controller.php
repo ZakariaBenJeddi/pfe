@@ -1893,25 +1893,22 @@ if (file_exists($filePath)) {
 // =============== tarif payement ================
 
 // =============== payement eleves ================
-    function addPaiement($dbh, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, $date_debut_periode, $date_fin_periode, $mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement) {
+    function addPaiement($dbh, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, $mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement) {
         try {
-            $sql = "CALL add_paiement(:id_eleve, :id_tarif, :id_periode, :montant_base, :reduction_appliquee, :montant_final, :date_paiement, :date_debut_periode, :date_fin_periode, :mode_paiement, :reference_paiement, :commentaire, :id_admin, :statut_paiement)";
-            $stmt = $dbh->prepare($sql);
+            $stmt = $dbh->prepare("CALL add_paiement(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([
-                ':id_eleve' => $id_eleve,
-                ':id_tarif' => $id_tarif,
-                ':id_periode' => $id_periode,
-                ':montant_base' => $montant_base,
-                ':reduction_appliquee' => $reduction_appliquee,
-                ':montant_final' => $montant_final,
-                ':date_paiement' => $date_paiement,
-                ':date_debut_periode' => $date_debut_periode,
-                ':date_fin_periode' => $date_fin_periode,
-                ':mode_paiement' => $mode_paiement,
-                ':reference_paiement' => $reference_paiement,
-                ':commentaire' => $commentaire,
-                ':id_admin' => $id_admin,
-                ':statut_paiement' => $statut_paiement
+                $id_eleve, 
+                $id_tarif, 
+                $id_periode, 
+                $montant_base, 
+                $reduction_appliquee, 
+                $montant_final, 
+                $date_paiement, 
+                $mode_paiement, 
+                $reference_paiement, 
+                $commentaire, 
+                $id_admin, 
+                $statut_paiement
             ]);
             return ['success' => true, 'message' => 'Paiement ajouté avec succès !'];
         } catch (PDOException $e) {

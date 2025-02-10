@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('reduction_appliquee').value = this.getAttribute('data-reduction-appliquee');
       document.getElementById('montant_final').value = this.getAttribute('data-montant-final');
       document.getElementById('date_paiement').value = this.getAttribute('data-date-paiement');
-      // document.getElementById('date_paiement').value = formatDate(this.getAttribute('data-date-paiement'));
       document.getElementById('mode_paiement').value = this.getAttribute('data-mode-paiement');
       document.getElementById('reference_paiement').value = this.getAttribute('data-reference-paiement');
       document.getElementById('statut_paiement').value = this.getAttribute('data-statut-paiement');
