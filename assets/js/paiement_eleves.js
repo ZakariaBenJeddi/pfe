@@ -5,7 +5,35 @@ document.addEventListener('DOMContentLoaded', function () {
   const idTarifSelect = document.getElementById('id_tarif');
   const allFormInputs = form.querySelectorAll('input, select, textarea');
   
-  // Désactiver tous les champs sauf la sélection de l'élève
+  // Gestion des événements d'édition
+  const editLinks = document.querySelectorAll('[data-bs-target="#paiementModal"][data-id]');
+  editLinks.forEach(link => {
+    link.addEventListener('click', function() {
+      // Activer tous les champs pour l'édition
+      enableAllFields();
+      
+      // Remplir les champs avec les données
+      document.getElementById('id_paiement').value = this.getAttribute('data-id');
+      document.getElementById('id_eleve').value = this.getAttribute('data-id-eleve');
+      document.getElementById('id_tarif').value = this.getAttribute('data-id-tarif');
+      document.getElementById('id_periode').value = this.getAttribute('data-id-periode');
+      document.getElementById('montant_base').value = this.getAttribute('data-montant-base');
+      document.getElementById('reduction_appliquee').value = this.getAttribute('data-reduction-appliquee');
+      document.getElementById('montant_final').value = this.getAttribute('data-montant-final');
+      document.getElementById('date_paiement').value = this.getAttribute('data-date-paiement');
+      // document.getElementById('date_paiement').value = formatDate(this.getAttribute('data-date-paiement'));
+      document.getElementById('mode_paiement').value = this.getAttribute('data-mode-paiement');
+      document.getElementById('reference_paiement').value = this.getAttribute('data-reference-paiement');
+      document.getElementById('statut_paiement').value = this.getAttribute('data-statut-paiement');
+      document.getElementById('commentaire').value = this.getAttribute('data-commentaire');
+      
+      // Déclencher l'événement change sur l'élève pour mettre à jour les tarifs
+      const event = new Event('change');
+      idEleveSelect.dispatchEvent(event);
+    });
+  });
+  
+  // Fonction pour désactiver tous les champs sauf la sélection de l'élève
   function disableAllFieldsExceptStudent() {
     allFormInputs.forEach(input => {
       if (input.id !== 'id_eleve') {
@@ -14,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
   
-  // Activer tous les champs
+  // Fonction pour activer tous les champs
   function enableAllFields() {
     allFormInputs.forEach(input => {
       input.disabled = false;
@@ -36,13 +64,17 @@ document.addEventListener('DOMContentLoaded', function () {
         option.style.display = 'none';
       }
     });
-    
-    // Réinitialiser la sélection
-    idTarifSelect.value = '';
   }
   
-  // Désactiver les champs au chargement
-  disableAllFieldsExceptStudent();
+  // Désactiver les champs au chargement initial (nouveau paiement)
+  const modalElement = document.getElementById('paiementModal');
+  modalElement.addEventListener('show.bs.modal', function (event) {
+    // Si c'est un nouveau paiement (pas de data-id)
+    if (!event.relatedTarget.getAttribute('data-id')) {
+      disableAllFieldsExceptStudent();
+      form.reset();
+    }
+  });
   
   // Gérer le changement d'élève
   idEleveSelect.addEventListener('change', function() {
@@ -64,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
   
-  // Garder le reste de votre code existant pour la gestion des montants
+  // Gestion des montants
   const montantBaseInput = document.getElementById("montant_base");
   const idPeriodeSelect = document.getElementById("id_periode");
   const reductionAppliqueeInput = document.getElementById("reduction_appliquee");

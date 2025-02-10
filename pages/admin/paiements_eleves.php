@@ -7,7 +7,7 @@ if (empty($_SESSION['user'])) {
 }
 
 //* deconnexion
-require('../../includes/deconnexion_5s.php');
+// require('../../includes/deconnexion_5s.php');
 
 //* Read
 try {
@@ -96,7 +96,7 @@ if (isset($_POST['save'])) {
           <div class="card mb-4">
             <div class="card-header pb-0 d-flex flex-wrap justify-content-between align-items-center text-center text-md-start">
               <div class="mb-2 mb-md-0 flex-grow-1 text-center text-md-start">
-                <h6 class="text-primary">Filière</h6>
+                <h6 class="text-primary">Paiement Eleves</h6>
               </div>
               <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
                 <a class="btn btn-primary btn-sm" href="ajouter_filiere.php" data-bs-toggle="modal" data-bs-target="#paiementModal">Ajouter Filière</a>
@@ -123,6 +123,7 @@ if (isset($_POST['save'])) {
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">date paiement</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">date debut periode</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">date fin periode</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">date validation</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
                     </tr>
                   </thead>
@@ -176,7 +177,17 @@ if (isset($_POST['save'])) {
                             <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->reference_paiement; ?></p>
                           </td>
                           <td>
-                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->statut_paiement; ?></p>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                              <?php if ($result->statut_paiement === "En attente") { ?>
+                                <button class="btn btn-xs text-white bg-secondary"><?= $result->statut_paiement ?></button>
+                              <?php }?>
+                              <?php if ($result->statut_paiement === "Validé") { ?>
+                                <button class="btn btn-xs text-white bg-success"><?= $result->statut_paiement ?></button>
+                              <?php }?>
+                              <?php if ($result->statut_paiement === "Annulé") { ?>
+                                <button class="btn btn-xs text-white bg-warning"><?= $result->statut_paiement ?></button>
+                              <?php }?>
+                            </p>
                           </td>
                           <td>
                             <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->date_paiement; ?></p>
@@ -200,9 +211,14 @@ if (isset($_POST['save'])) {
                               <?= $result->date_fin_periode; ?>
                             </p>
                           </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                              <?php echo $result->date_validation === NULL ? "En attente de validation" : $result->date_validation; ?>
+                            </p>
+                          </td>
                           <td class="align-middle text-center">
                             <div class="d-flex">
-                              <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#paiementModal" data-id="<?= $result->id_paiement ?>" data-id-eleve="<?= $result->id_eleve ?>" data-id-tarif="<?= $result->id_tarif ?>" data-id-periode="<?= $result->id_periode ?>" data-montant-base="<?= $result->paiement_montant_base ?>" data-reduction-appliquee="<?= $result->reduction_appliquee ?>" data-montant-final="<?= $result->montant_final ?>" data-date-paiement="<?= $result->date_paiement ?>" data-mode-paiement="<?= $result->mode_paiement ?>" data-reference-paiement="<?= $result->reference_paiement ?>" data-statut-paiement="<?= $result->statut_paiement ?>" data-commentaire="<?= $result->commentaire ?>">
+                              <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#paiementModal" data-id="<?= $result->id_paiement ?>" data-id-eleve="<?= $result->id_eleve ?>" data-id-tarif="<?= $result->id_tarif ?>" data-id-periode="<?= $result->id_periode ?>" data-montant-base="<?= $result->paiement_montant_base ?>" data-reduction-appliquee="<?= $result->reduction_appliquee ?>" data-montant-final="<?= $result->montant_final ?>" data-date-paiement="<?php echo  $data_date_paiement = date('Y-m-d', strtotime($result->date_paiement)); //$result->date_paiement ?>" data-mode-paiement="<?= $result->mode_paiement ?>" data-reference-paiement="<?= $result->reference_paiement ?>" data-statut-paiement="<?= $result->statut_paiement ?>" data-commentaire="<?= $result->commentaire ?>">
                                 <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                               </a>
                               <a href="paiements_eleves.php?id=<?= $result->id_paiement ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr de vouloir supprimer?')">
