@@ -17,20 +17,35 @@ try {
   $results = []; // In case of error, set the results to an empty array
 }
 
-if (isset($_GET['action'])) {
-  if ($_GET['action'] === "getElevesInfo") {
-    $eleves = getElevesInfo($dbh);
-    echo json_encode($eleves);
-  }
-  if ($_GET['action'] === "getAllTarifs") {
-    $tarifs = getAllTarifs($dbh);
-    echo json_encode($tarifs);
-  }
-  if ($_GET['action'] === "getAllPeriodesPaiement") {
-    $periodes = get_all_periodes_paiement($dbh);
-    echo json_encode($periodes);
-  }
-}
+//* Filter
+// if ($_SERVER["REQUEST_METHOD"] === "POST") {
+//   header('Content-Type: application/json');
+//   try {
+//       // Validation des dates
+//       if (!isset($_POST['start_date']) || !isset($_POST['end_date'])) {
+//           throw new Exception("Les dates sont requises");
+//       }
+
+//       $result = get_classes_by_date_range($dbh, $_POST['start_date'], $_POST['end_date']);
+
+//       if ($result['success']) {
+//           echo json_encode([
+//               'status' => 'success',
+//               'data' => $result['data'],
+//               'count' => $result['count']
+//           ]);
+//       } else {
+//           throw new Exception($result['message']);
+//       }
+//   } catch (Exception $e) {
+//       http_response_code(400);
+//       echo json_encode([
+//           'status' => 'error',
+//           'message' => $e->getMessage()
+//       ]);
+//   }
+//   exit;
+// }
 
 //* Delete
 if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] == 1) {
@@ -40,9 +55,11 @@ if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] == 1) {
   echo $result['message'];
 
   if ($result['success']) {
-    header('Location: paiements_eleves.php');
-    exit();
+    header('Location: paiements_eleves.php?success=1');
+  } else {
+    header('Location: paiements_eleves.php?error=' . urlencode($result['message']));
   }
+  exit();
 }
 
 if (isset($_POST['save'])) {
@@ -67,10 +84,11 @@ if (isset($_POST['save'])) {
   }
 
   if ($result['success']) {
-    header("Location: paiements_eleves.php");
+    header("Location: paiements_eleves.php?success=1");
     exit();
   } else {
-    echo "<p class='text-danger'>" . $result['message'] . "</p>";
+    header("Location: paiements_eleves.php?error=" . urlencode($result['message']));
+    exit();
   }
 }
 
@@ -80,7 +98,7 @@ if (isset($_POST['save'])) {
 
 <!-- HEAD -->
 <?php include '../../includes/admin/head_admin.php' ?>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <body class="g-sidenav-show  bg-gray-100">
   <div class="min-height-300 bg-primary position-absolute w-100"></div>
   <?php require('../../includes/admin/aside_admin.php') ?>
@@ -97,6 +115,7 @@ if (isset($_POST['save'])) {
                 <h6 class="text-primary">Paiement Eleves</h6>
               </div>
               <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
+                <input type="text" class="form-control w-100 w-md-auto mb-3" id="daterange" name="daterange" value="" />
                 <a class="btn btn-primary btn-sm" href="ajouter_filiere.php" data-bs-toggle="modal" data-bs-target="#paiementModal">Ajouter Filière</a>
                 <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
               </div>
@@ -257,12 +276,15 @@ if (isset($_POST['save'])) {
   <!-- Tarif passer les info a modal -->
   <script src="../../assets/js/paiement_eleves.js"></script>
 
+  <!-- //* Date Picker + AJAX eleves intervalle date  -->
+  <script src="../../assets/dateP_dateP/dateP_dataP_classe.js"></script>
+
   <!-- pdf generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="../../assets/js/generation_pdf.js"></script>
 
   <!-- sweet alert -->
-  <script src="../../assets/js/alerts/delete_alert.js"></script>
+  <script src="../../assets/js/alerts/sweet_alert.js"></script>
 
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
