@@ -136,6 +136,8 @@ $(function() {
                             data-montant-base="${paiement.paiement_montant_base}"
                             data-reduction-appliquee="${paiement.reduction_appliquee}"
                             data-montant-final="${paiement.montant_final}"
+                            data-date-paiement="${paiement.date_paiement}"
+                            data-date-debut-periode="${paiement.date_debut_periode}"
                             data-mode-paiement="${paiement.mode_paiement}"
                             data-reference-paiement="${paiement.reference_paiement}"
                             data-statut-paiement="${paiement.statut_paiement}"

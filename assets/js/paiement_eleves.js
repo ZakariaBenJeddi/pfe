@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const editLinks = document.querySelectorAll('[data-bs-target="#paiementModal"][data-id]');
   editLinks.forEach(link => {
     link.addEventListener('click', function() {
+      console.log("Attributs dataset :", this.dataset);
       // Activer tous les champs pour l'édition
       enableAllFields();
       
@@ -21,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('reduction_appliquee').value = this.getAttribute('data-reduction-appliquee');
       document.getElementById('montant_final').value = this.getAttribute('data-montant-final');
       document.getElementById('date_paiement').value = this.getAttribute('data-date-paiement');
+      document.getElementById('date_debut_periode').value = this.getAttribute('data-date-debut-periode');
       document.getElementById('mode_paiement').value = this.getAttribute('data-mode-paiement');
       document.getElementById('reference_paiement').value = this.getAttribute('data-reference-paiement');
       document.getElementById('statut_paiement').value = this.getAttribute('data-statut-paiement');

@@ -79,7 +79,7 @@ if (isset($_POST['save'])) {
   $statut_paiement = $_POST['statut_paiement'];
 
   if (!empty($id_paiement)) {
-    $result = updatePaiement($dbh, $id_paiement, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, null, null, $mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement);
+    $result = updatePaiement($dbh, $id_paiement, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, $date_debut_periode, null, $mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement);
   } else {
     $result = addPaiement($dbh, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, $date_debut_periode ,$mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement);
   }
@@ -238,6 +238,7 @@ if (isset($_POST['save'])) {
                             <div class="d-flex">
                               <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#paiementModal" data-id="<?= $result->id_paiement ?>" data-id-eleve="<?= $result->id_eleve ?>" data-id-tarif="<?= $result->id_tarif ?>" data-id-periode="<?= $result->id_periode ?>" data-montant-base="<?= $result->paiement_montant_base ?>" data-reduction-appliquee="<?= $result->reduction_appliquee ?>" data-montant-final="<?= $result->montant_final ?>" 
                                 data-date-paiement="<?php echo  $data_date_paiement = date('Y-m-d', strtotime($result->date_paiement));?>"
+                                data-date-debut-periode="<?php echo  $data_date_debut_periode = date('Y-m-d', strtotime($result->date_debut_periode));?>"
                                 data-mode-paiement="<?= $result->mode_paiement ?>" data-reference-paiement="<?= $result->reference_paiement ?>" data-statut-paiement="<?= $result->statut_paiement ?>" data-commentaire="<?= $result->commentaire ?>">
                                 <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                               </a>
