@@ -18,34 +18,34 @@ try {
 }
 
 //* Filter
-// if ($_SERVER["REQUEST_METHOD"] === "POST") {
-//   header('Content-Type: application/json');
-//   try {
-//       // Validation des dates
-//       if (!isset($_POST['start_date']) || !isset($_POST['end_date'])) {
-//           throw new Exception("Les dates sont requises");
-//       }
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+  header('Content-Type: application/json');
+  try {
+      // Validation des dates
+      if (!isset($_POST['start_date']) || !isset($_POST['end_date'])) {
+          throw new Exception("Les dates sont requises");
+      }
 
-//       $result = get_classes_by_date_range($dbh, $_POST['start_date'], $_POST['end_date']);
+      $result = get_payments_by_date_range($dbh, $_POST['start_date'], $_POST['end_date']);
 
-//       if ($result['success']) {
-//           echo json_encode([
-//               'status' => 'success',
-//               'data' => $result['data'],
-//               'count' => $result['count']
-//           ]);
-//       } else {
-//           throw new Exception($result['message']);
-//       }
-//   } catch (Exception $e) {
-//       http_response_code(400);
-//       echo json_encode([
-//           'status' => 'error',
-//           'message' => $e->getMessage()
-//       ]);
-//   }
-//   exit;
-// }
+      if ($result['success']) {
+          echo json_encode([
+              'status' => 'success',
+              'data' => $result['data'],
+              'count' => $result['count']
+          ]);
+      } else {
+          throw new Exception($result['message']);
+      }
+  } catch (Exception $e) {
+      http_response_code(400);
+      echo json_encode([
+          'status' => 'error',
+          'message' => $e->getMessage()
+      ]);
+  }
+  exit;
+}
 
 //* Delete
 if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] == 1) {
@@ -196,13 +196,13 @@ if (isset($_POST['save'])) {
                           <td>
                             <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
                               <?php if ($result->statut_paiement === "En attente") { ?>
-                                <button class="btn btn-xs text-white bg-secondary"><?= $result->statut_paiement ?></button>
+                                <span class="badge badge-md bg-gradient-secondary"><?= $result->statut_paiement ?></span>
                               <?php } ?>
                               <?php if ($result->statut_paiement === "Validé") { ?>
-                                <button class="btn btn-xs text-white bg-success"><?= $result->statut_paiement ?></button>
+                                <span class="badge badge-md bg-gradient-success"><?= $result->statut_paiement ?></span>
                               <?php } ?>
                               <?php if ($result->statut_paiement === "Annulé") { ?>
-                                <button class="btn btn-xs text-white bg-warning"><?= $result->statut_paiement ?></button>
+                                <span class="badge badge-md bg-gradient-danger"><?= $result->statut_paiement ?></span>
                               <?php } ?>
                             </p>
                           </td>
@@ -235,8 +235,9 @@ if (isset($_POST['save'])) {
                           </td>
                           <td class="align-middle text-center">
                             <div class="d-flex">
-                              <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#paiementModal" data-id="<?= $result->id_paiement ?>" data-id-eleve="<?= $result->id_eleve ?>" data-id-tarif="<?= $result->id_tarif ?>" data-id-periode="<?= $result->id_periode ?>" data-montant-base="<?= $result->paiement_montant_base ?>" data-reduction-appliquee="<?= $result->reduction_appliquee ?>" data-montant-final="<?= $result->montant_final ?>" data-date-paiement="<?php echo  $data_date_paiement = date('Y-m-d', strtotime($result->date_paiement)); //$result->date_paiement 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ?>" data-mode-paiement="<?= $result->mode_paiement ?>" data-reference-paiement="<?= $result->reference_paiement ?>" data-statut-paiement="<?= $result->statut_paiement ?>" data-commentaire="<?= $result->commentaire ?>">
+                              <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#paiementModal" data-id="<?= $result->id_paiement ?>" data-id-eleve="<?= $result->id_eleve ?>" data-id-tarif="<?= $result->id_tarif ?>" data-id-periode="<?= $result->id_periode ?>" data-montant-base="<?= $result->paiement_montant_base ?>" data-reduction-appliquee="<?= $result->reduction_appliquee ?>" data-montant-final="<?= $result->montant_final ?>" 
+                                data-date-paiement="<?php echo  $data_date_paiement = date('Y-m-d', strtotime($result->date_paiement));?>"
+                                data-mode-paiement="<?= $result->mode_paiement ?>" data-reference-paiement="<?= $result->reference_paiement ?>" data-statut-paiement="<?= $result->statut_paiement ?>" data-commentaire="<?= $result->commentaire ?>">
                                 <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                               </a>
                               <a href="paiements_eleves.php?id=<?= $result->id_paiement ?>&del=1" class="dropdown-item" onClick="return confirmDelete(event, this)">
@@ -277,7 +278,7 @@ if (isset($_POST['save'])) {
   <script src="../../assets/js/paiement_eleves.js"></script>
 
   <!-- //* Date Picker + AJAX eleves intervalle date  -->
-  <script src="../../assets/dateP_dateP/dateP_dataP_classe.js"></script>
+  <script src="../../assets/dateP_dateP/dateP_dataP_paiement.js"></script>
 
   <!-- pdf generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>

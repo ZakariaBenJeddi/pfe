@@ -2001,4 +2001,41 @@ if (file_exists($filePath)) {
             ];
         }
     }
+    function get_payments_by_date_range($dbh, $start_date, $end_date) {
+        try {
+            $start_date = filter_var($start_date, FILTER_SANITIZE_STRING);
+            $end_date = filter_var($end_date, FILTER_SANITIZE_STRING);
+    
+            if (!$start_date || !$end_date) {
+                return [
+                    'success' => false,
+                    'message' => 'Format de date invalide'
+                ];
+            }
+    
+            $start_date = date("Y-m-d", strtotime($start_date));
+            $end_date = date("Y-m-d", strtotime($end_date));
+    
+            $sql = "CALL get_payments_by_date_range(:start_date, :end_date)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute([
+                ':start_date' => $start_date,
+                ':end_date' => $end_date
+            ]);
+    
+            $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+    
+            return [
+                'success' => true,
+                'data' => $results,
+                'count' => count($results)
+            ];
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+            return [
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de la recherche'
+            ];
+        }
+    }
 // =============== payement eleves ================
