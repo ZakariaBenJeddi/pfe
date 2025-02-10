@@ -55,17 +55,17 @@
             </div>
             <div class="col-md-6 mb-3">
               <label for="montant_base" class="form-label">Montant de Base</label>
-              <input type="number" class="form-control" id="montant_base" name="montant_base" required>
+              <input type="number" class="form-control" id="montant_base" name="montant_base" required readonly>
             </div>
           </div>
           <div class="row">
             <div class="col-md-6 mb-3">
               <label for="reduction_appliquee" class="form-label">Réduction Appliquée</label>
-              <input type="number" class="form-control" id="reduction_appliquee" name="reduction_appliquee">
+              <input type="number" class="form-control" id="reduction_appliquee" name="reduction_appliquee" readonly>
             </div>
             <div class="col-md-6 mb-3">
               <label for="montant_final" class="form-label">Montant Final</label>
-              <input type="number" class="form-control" id="montant_final" name="montant_final" step="0.01" required>
+              <input type="number" class="form-control" id="montant_final" name="montant_final" step="0.01" required readonly>
             </div>
           </div>
           <div class="row">

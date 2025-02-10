@@ -96,10 +96,10 @@ if (isset($_POST['save'])) {
           <div class="card mb-4">
             <div class="card-header pb-0 d-flex flex-wrap justify-content-between align-items-center text-center text-md-start">
               <div class="mb-2 mb-md-0 flex-grow-1 text-center text-md-start">
-                <h6 class="text-primary">Filière</h6>
+                <h6 class="text-primary">Frais Scolarite</h6>
               </div>
               <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
-                <a class="btn btn-primary btn-sm" href="ajouter_filiere.php" data-bs-toggle="modal" data-bs-target="#exampleModal">Ajouter Filière</a>
+                <a class="btn btn-primary btn-sm" href="ajouter_filiere.php" data-bs-toggle="modal" data-bs-target="#exampleModal">Ajouter Frais</a>
                 <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
               </div>
             </div>
@@ -144,7 +144,7 @@ if (isset($_POST['save'])) {
                               <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="<?= $result->id_type_frais ?>" data-nom="<?= htmlspecialchars($result->nom_frais) ?>" data-description="<?= htmlspecialchars($result->description) ?>" data-obligatoire="<?= $result->est_obligatoire ?>" data-mensuel="<?= $result->est_mensuel ?>" data-actif="<?= $result->est_actif ?>">
                                 <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                               </a>
-                              <a href="frais_scolarite.php?id=<?= $result->id_type_frais ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                              <a href="frais_scolarite.php?id=<?= $result->id_type_frais ?>&del=1" class="dropdown-item" onClick="return confirmDelete(event, this)">
                                 <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
                             </div>
                             </a>
@@ -180,6 +180,9 @@ if (isset($_POST['save'])) {
 
   <!-- periode paiement passer les info a modal -->
   <script src="../../assets/js/frais_scolarite.js"></script>
+
+  <!-- sweet alert -->
+  <script src="../../assets/js/alerts/delete_alert.js"></script>
 
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
