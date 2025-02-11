@@ -11,10 +11,10 @@ require('../../includes/deconnexion_5s.php');
 
 //* Read
 try {
-  $results = getAllTarifs($dbh); // Call the function to fetch the data
+  $results = getAllTarifs($dbh);
 } catch (Exception $e) {
   echo "<script>alert('" . htmlspecialchars($e->getMessage()) . "');</script>";
-  $results = []; // In case of error, set the results to an empty array
+  $results = [];
 }
 
 //* Delete
@@ -25,11 +25,14 @@ if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] == 1) {
   echo $result['message'];
 
   if ($result['success']) {
-    header('Location: tarif_scolarite.php');
-    exit();
+    header('Location: tarif_scolarite.php?success=1');
+  } else {
+    header('Location: tarif_scolarite.php?error=' . urlencode($result['message']));
   }
+  exit();
 }
 
+//* add & update
 if (isset($_POST['save'])) {
     $id_tarif = isset($_POST['id_tarif']) ? $_POST['id_tarif'] : null;
     $id_type_frais = $_POST['id_type_frais'];
@@ -47,19 +50,21 @@ if (isset($_POST['save'])) {
     }
 
     if ($result['success']) {
-        header("Location: tarif_scolarite.php");
-        exit();
+      header("Location: tarif_scolarite.php?success=1");
+      exit();
     } else {
-        echo "<p class='text-danger'>" . $result['message'] . "</p>";
+      header("Location: tarif_scolarite.php?error=" . urlencode($result['message']));
+      exit();
     }
 }
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <!-- HEAD -->
 <?php include '../../includes/admin/head_admin.php' ?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <body class="g-sidenav-show  bg-gray-100">
   <div class="min-height-300 bg-primary position-absolute w-100"></div>
@@ -74,7 +79,7 @@ if (isset($_POST['save'])) {
           <div class="card mb-4">
             <div class="card-header pb-0 d-flex flex-wrap justify-content-between align-items-center text-center text-md-start">
               <div class="mb-2 mb-md-0 flex-grow-1 text-center text-md-start">
-                <h6 class="text-primary">Filière</h6>
+                <h6 class="text-primary">Tarif Scolarite</h6>
               </div>
               <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
                 <input type="text" class="form-control w-100 w-md-auto mb-3" id="daterange" name="daterange" value="" />
@@ -123,7 +128,10 @@ if (isset($_POST['save'])) {
                               <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="<?= $result->id_tarif ?>" data-type-frais="<?= $result->id_type_frais ?>" data-niveau="<?= $result->id_niveau ?>" data-filiere="<?= $result->id_filiere ?>" data-montant="<?= $result->montant_base ?>" data-annee="<?= $result->annee_scolaire ?>">
                                 <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                               </a>
-                              <a href="tarif_scolarite.php?id=<?= $result->id_tarif ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr de vouloir supprimer?')">
+                              <!-- <a href="tarif_scolarite.php?id=<?php //$result->id_tarif ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr de vouloir supprimer?')">
+                                <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
+                              </a> -->
+                              <a href="tarif_scolarite.php?id=<?= $result->id_tarif ?>&del=1" class="dropdown-item" onClick="return confirmDelete(event, this)">
                                 <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
                               </a>
                             </div>
@@ -162,6 +170,10 @@ if (isset($_POST['save'])) {
 
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
+
+  <!-- sweet alert -->
+  <script src="../../assets/js/alerts/sweet_alert.js"></script>
+
   <!--   Core JS Files   -->
   <script src="../../assets/js/core/popper.min.js"></script>
   <script src="../../assets/js/core/bootstrap.min.js"></script>
