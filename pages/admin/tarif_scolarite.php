@@ -64,7 +64,6 @@ if (isset($_POST['save'])) {
 
 <!-- HEAD -->
 <?php include '../../includes/admin/head_admin.php' ?>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <body class="g-sidenav-show  bg-gray-100">
   <div class="min-height-300 bg-primary position-absolute w-100"></div>
@@ -128,9 +127,6 @@ if (isset($_POST['save'])) {
                               <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="<?= $result->id_tarif ?>" data-type-frais="<?= $result->id_type_frais ?>" data-niveau="<?= $result->id_niveau ?>" data-filiere="<?= $result->id_filiere ?>" data-montant="<?= $result->montant_base ?>" data-annee="<?= $result->annee_scolaire ?>">
                                 <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                               </a>
-                              <!-- <a href="tarif_scolarite.php?id=<?php //$result->id_tarif ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr de vouloir supprimer?')">
-                                <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
-                              </a> -->
                               <a href="tarif_scolarite.php?id=<?= $result->id_tarif ?>&del=1" class="dropdown-item" onClick="return confirmDelete(event, this)">
                                 <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
                               </a>
@@ -170,6 +166,9 @@ if (isset($_POST['save'])) {
 
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
+
+  <!-- //* Date Picker + AJAX eleves intervalle date  -->
+  <script src="../../assets/dateP_dateP/dateP_dataP_paiement.js"></script>
 
   <!-- sweet alert -->
   <script src="../../assets/js/alerts/sweet_alert.js"></script>
