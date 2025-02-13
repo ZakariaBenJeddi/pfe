@@ -185,6 +185,9 @@ if (isset($_POST['save'])) {
   <!-- sweet alert -->
   <script src="../../assets/js/alerts/delete_alert.js"></script>
 
+  <!-- //* Date Picker + AJAX eleves intervalle date  -->
+  <script src="../../assets/dateP_dateP/dateP_dataP_paiement.js"></script>
+
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
   <!--   Core JS Files   -->

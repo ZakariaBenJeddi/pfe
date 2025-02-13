@@ -184,6 +184,9 @@ if (isset($_POST['save'])) {
   <!-- periode paiement passer les info a modal -->
   <script src="../../assets/js/periode_paiement.js"></script>
 
+  <!-- //* Date Picker + AJAX eleves intervalle date  -->
+  <script src="../../assets/dateP_dateP/dateP_dataP_paiement.js"></script>
+
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
   <!--   Core JS Files   -->
