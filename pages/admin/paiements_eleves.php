@@ -149,7 +149,12 @@ if (isset($_POST['save'])) {
                     <?php if (count($results) > 0) { ?>
                       <?php foreach ($results as $result) : ?>
                         <tr>
-                          <td onclick="genererPDFPaiement(<?= $result->id_paiement ?>)" style="cursor:pointer">
+                          <td 
+                            style="cursor:pointer"
+                            <?php if($result->statut_paiement === "Validé"){?>
+                              onclick="genererPDFPaiement(<?= $result->id_paiement ?>)"
+                            <?php }?>
+                          >
                             <div class="d-flex px-2 py-1">
                               <div class="d-flex flex-column justify-content-center">
                                 <h6 class="mb-0 text-sm"><?= $result->id_paiement ?></h6>
