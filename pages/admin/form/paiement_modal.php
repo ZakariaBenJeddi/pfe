@@ -16,10 +16,11 @@
                 <?php
                 $eleves = getElevesInfo($dbh)['data'];
                 foreach ($eleves as $eleve) {
-                  echo "<option value='{$eleve->id_eleve}' data-niveau='{$eleve->niveau}' data-filiere='{$eleve->filiere}'>
-            {$eleve->nom} {$eleve->prenom}
-          </option>";
-                }
+                echo "<option value='{$eleve->id_eleve}' 
+                  data-niveau='{$eleve->id_niveau}' 
+                  data-filiere='{$eleve->id_filiere}'>
+                  {$eleve->nom} {$eleve->prenom} 
+                </option>";}
                 ?>
               </select>
             </div>
@@ -30,9 +31,12 @@
                 <?php
                 $tarifs = getAllTarifs($dbh);
                 foreach ($tarifs as $tarif) {
-                  echo "<option value='{$tarif->id_type_frais}' data-niveau='{$tarif->niveau}' data-filiere='{$tarif->filiere}' data-montant='{$tarif->montant_base}'>
-            {$tarif->nom_frais}
-          </option>";
+                  echo "<option value='{$tarif->id_type_frais}' 
+                  data-niveau='{$tarif->id_niveau}' 
+                  data-filiere='{$tarif->id_filiere}' 
+                  data-montant='{$tarif->montant_base}'>
+                  {$tarif->nom_frais} 
+                </option>";
                 }
                 ?>
               </select>
