@@ -21,28 +21,28 @@ try {
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['start_date']) && isset($_POST['end_date'])) {
   header('Content-Type: application/json');
   try {
-      // Validation des dates
-      if (!isset($_POST['start_date']) || !isset($_POST['end_date'])) {
-          throw new Exception("Les dates sont requises");
-      }
+    // Validation des dates
+    if (!isset($_POST['start_date']) || !isset($_POST['end_date'])) {
+      throw new Exception("Les dates sont requises");
+    }
 
-      $result = get_payments_by_date_range($dbh, $_POST['start_date'], $_POST['end_date']);
+    $result = get_payments_by_date_range($dbh, $_POST['start_date'], $_POST['end_date']);
 
-      if ($result['success']) {
-          echo json_encode([
-              'status' => 'success',
-              'data' => $result['data'],
-              'count' => $result['count']
-          ]);
-      } else {
-          throw new Exception($result['message']);
-      }
-  } catch (Exception $e) {
-      http_response_code(400);
+    if ($result['success']) {
       echo json_encode([
-          'status' => 'error',
-          'message' => $e->getMessage()
+        'status' => 'success',
+        'data' => $result['data'],
+        'count' => $result['count']
       ]);
+    } else {
+      throw new Exception($result['message']);
+    }
+  } catch (Exception $e) {
+    http_response_code(400);
+    echo json_encode([
+      'status' => 'error',
+      'message' => $e->getMessage()
+    ]);
   }
   exit;
 }
@@ -81,7 +81,7 @@ if (isset($_POST['save'])) {
   if (!empty($id_paiement)) {
     $result = updatePaiement($dbh, $id_paiement, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, $date_debut_periode, null, $mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement);
   } else {
-    $result = addPaiement($dbh, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, $date_debut_periode ,$mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement);
+    $result = addPaiement($dbh, $id_eleve, $id_tarif, $id_periode, $montant_base, $reduction_appliquee, $montant_final, $date_paiement, $date_debut_periode, $mode_paiement, $reference_paiement, $commentaire, $id_admin, $statut_paiement);
   }
 
   if ($result['success']) {
@@ -100,6 +100,7 @@ if (isset($_POST['save'])) {
 <!-- HEAD -->
 <?php include '../../includes/admin/head_admin.php' ?>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <body class="g-sidenav-show  bg-gray-100">
   <div class="min-height-300 bg-primary position-absolute w-100"></div>
   <?php require('../../includes/admin/aside_admin.php') ?>
@@ -117,7 +118,7 @@ if (isset($_POST['save'])) {
               </div>
               <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
                 <input type="text" class="form-control w-100 w-md-auto mb-3" id="daterange" name="daterange" value="" />
-                <a class="btn btn-primary btn-sm" href="ajouter_filiere.php" data-bs-toggle="modal" data-bs-target="#paiementModal">Ajouter Paiement</a>
+                <a class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#paiementModal">Ajouter Paiement</a>
                 <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
               </div>
             </div>
@@ -149,18 +150,22 @@ if (isset($_POST['save'])) {
                     <?php if (count($results) > 0) { ?>
                       <?php foreach ($results as $result) : ?>
                         <tr>
-                          <td 
-                            style="cursor:pointer"
-                            <?php if($result->statut_paiement === "Validé"){?>
-                              onclick="genererPDFPaiement(<?= $result->id_paiement ?>)"
-                            <?php }?>
-                          >
+                        <td style="cursor:pointer" 
+                            <?php if ($result->statut_paiement === "Validé") { ?> 
+                                onclick="genererPDFPaiement(<?= $result->id_paiement ?>)"
+                            <?php } else { ?>
+                                onclick="window.location.href='paiements_eleves.php?error=<?= urlencode('Paiement non validé') ?>'"
+                            <?php } ?>>
                             <div class="d-flex px-2 py-1">
-                              <div class="d-flex flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm"><?= $result->id_paiement ?></h6>
-                              </div>
+                                <div class="d-flex flex-column justify-content-center">
+                                    <h6 class="mb-0 text-sm"><?= $result->id_paiement ?></h6>
+                                </div>
+                                <?php if ($result->statut_paiement === "Validé") { ?>
+                                    <i class="fas fa-file-pdf text-primary ms-2"></i> <!-- Icône PDF -->
+                                <?php } ?>
                             </div>
-                          </td>
+                        </td>
+
                           <td>
                             <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
                               <?= strtoupper($result->nom_eleve . " " . $result->prenom_eleve) . "<br>" . $result->code_massare; ?>
@@ -241,10 +246,7 @@ if (isset($_POST['save'])) {
                           </td>
                           <td class="align-middle text-center">
                             <div class="d-flex">
-                              <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#paiementModal" data-id="<?= $result->id_paiement ?>" data-id-eleve="<?= $result->id_eleve ?>" data-id-tarif="<?= $result->id_tarif ?>" data-id-periode="<?= $result->id_periode ?>" data-montant-base="<?= $result->paiement_montant_base ?>" data-reduction-appliquee="<?= $result->reduction_appliquee ?>" data-montant-final="<?= $result->montant_final ?>" 
-                                data-date-paiement="<?php echo  $data_date_paiement = date('Y-m-d', strtotime($result->date_paiement));?>"
-                                data-date-debut-periode="<?php echo  $data_date_debut_periode = date('Y-m-d', strtotime($result->date_debut_periode));?>"
-                                data-mode-paiement="<?= $result->mode_paiement ?>" data-reference-paiement="<?= $result->reference_paiement ?>" data-statut-paiement="<?= $result->statut_paiement ?>" data-commentaire="<?= $result->commentaire ?>">
+                              <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#paiementModal" data-id="<?= $result->id_paiement ?>" data-id-eleve="<?= $result->id_eleve ?>" data-id-tarif="<?= $result->id_tarif ?>" data-id-periode="<?= $result->id_periode ?>" data-montant-base="<?= $result->paiement_montant_base ?>" data-reduction-appliquee="<?= $result->reduction_appliquee ?>" data-montant-final="<?= $result->montant_final ?>" data-date-paiement="<?php echo  $data_date_paiement = date('Y-m-d', strtotime($result->date_paiement)); ?>" data-date-debut-periode="<?php echo  $data_date_debut_periode = date('Y-m-d', strtotime($result->date_debut_periode)); ?>" data-mode-paiement="<?= $result->mode_paiement ?>" data-reference-paiement="<?= $result->reference_paiement ?>" data-statut-paiement="<?= $result->statut_paiement ?>" data-commentaire="<?= $result->commentaire ?>">
                                 <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                               </a>
                               <a href="paiements_eleves.php?id=<?= $result->id_paiement ?>&del=1" class="dropdown-item" onClick="return confirmDelete(event, this)">
