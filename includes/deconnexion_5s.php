@@ -1,5 +1,5 @@
 <?php
-$inactivity_limit = 300*2; // 5 minutes
+$inactivity_limit = 600; // 5 minutes
 if (isset($_SESSION['last_action'])) {
     $inactivity_duration = time() - $_SESSION['last_action'];
     if ($inactivity_duration > $inactivity_limit) {

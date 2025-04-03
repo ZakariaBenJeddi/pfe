@@ -70,9 +70,6 @@ try {
   echo "<script>alert('Une erreur est survenue lors de la récupération des données.');</script>";
 }
 
-// var_dump($result);
-
-
 //* delete
 try {
   if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
@@ -142,6 +139,7 @@ try {
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Heure Fin</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Motif</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Type Absence</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date Creation</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
                     </tr>
@@ -157,7 +155,7 @@ try {
                               </div>
                               <div class="d-flex flex-column justify-content-center">
                                 <h6 class="mb-0 text-sm"><?= $result->nom_eleve . ' ' . $result->prenom_eleve ?></h6>
-                                <p class="text-xs text-secondary mb-0"><?php // $result->email ?></p>
+                                <p class="text-xs text-secondary mb-0"><?= $result->telephone_tuteur ?></p>
                               </div>
                             </div>
                           </td>
@@ -185,24 +183,24 @@ try {
                           <td class="align-middle text-center">
                             <p class="text-xs font-weight-bold mb-0"><?= $result->type_absence; ?></p>
                           </td>
+                          <?php if ($result->statut === 'validee') { ?>
+                            <td class="align-middle text-center text-sm">
+                              <span class="badge badge-sm bg-gradient-success">Validee</span>
+                            </td>
+                          <?php } ?>
+                          <?php if ($result->statut === 'en_attente'){ ?>
+                            <td class="align-middle text-center text-sm">
+                              <span class="badge badge-sm bg-gradient-secondary">En Attente</span>
+                            </td>
+                          <?php } ?>
+                          <?php if ($result->statut === 'annulee') { ?>
+                            <td class="align-middle text-center text-sm">
+                              <span class="badge badge-sm bg-gradient-secondary">Annulee</span>
+                            </td>
+                          <?php }  ?>
                           <td class="align-middle text-center">
                             <p class="text-xs font-weight-bold mb-0"><?= $result->date_creation; ?></p>
                           </td>
-                          <?php if ($result->statut === 'Actif') { ?>
-                            <td class="align-middle text-center text-sm">
-                              <span class="badge badge-sm bg-gradient-success">Online</span>
-                            </td>
-                          <?php } ?>
-                          <?php if ($result->statut === 'Inactif'){ ?>
-                            <td class="align-middle text-center text-sm">
-                              <span class="badge badge-sm bg-gradient-secondary">Offline</span>
-                            </td>
-                          <?php } ?>
-                          <?php if ($result->statut === 'Retraité') { ?>
-                            <td class="align-middle text-center text-sm">
-                              <span class="badge badge-sm bg-gradient-secondary">Retraité</span>
-                            </td>
-                          <?php }  ?>
                           <td class="align-middle text-center">
                             <div class="d-flex">
                               <a href="edit_absence.php?id_absence=<?= $result->id_absence ?>" class="dropdown-item">
