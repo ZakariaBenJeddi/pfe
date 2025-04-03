@@ -2040,3 +2040,65 @@ if (file_exists($filePath)) {
         }
     }
 // =============== payement eleves ================
+
+// =============== Abcsnce ================
+function getAbscenceinfo($dbh)
+{
+    try {
+        // Appel de la procédure stockée
+        $sql = "CALL get_absences_info()";
+        $stmt = $dbh->prepare($sql);
+        $stmt->execute();
+
+        $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return [
+            'success' => true,
+            'data' => $results,
+            'count' => count($results)
+        ];
+    } catch (PDOException $e) {
+        error_log($e->getMessage());
+        return [
+            'success' => false,
+            'message' => 'Erreur lors de la récupération des données élèves'
+        ];
+    }
+}
+
+function getAbscenceById($dbh, $id_absence) {
+    try {
+        if (!filter_var($id_absence, FILTER_VALIDATE_INT)) {
+            return [
+                'success' => false,
+                'message' => "ID d'élève invalide"
+            ];
+        }
+
+        $sql = "CALL get_absence_by_id(:id_absence)";
+        $stmt = $dbh->prepare($sql);
+        $stmt->execute([':id_absence' => $id_absence]);
+        
+        $eleve = $stmt->fetch(PDO::FETCH_OBJ);
+        
+        if (!$eleve) {
+            return [
+                'success' => false,
+                'message' => "Élève non trouvé"
+            ];
+        }
+
+        return [
+            'success' => true,
+            'data' => $eleve
+        ];
+
+    } catch (PDOException $e) {
+        error_log($e->getMessage());
+        return [
+            'success' => false,
+            'message' => "Erreur lors de la récupération de l'élève"
+        ];
+    }
+}
+// =============== Abcsnce ================

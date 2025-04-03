@@ -57,19 +57,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   }
   exit;
 }
-// if ($_SERVER["REQUEST_METHOD"] === "POST") {
-//     header('Content-Type: application/json');
-//     $resultat = filtrerElevesParDate(
-//         $dbh,
-//         $_POST['start_date'] ?? null,
-//         $_POST['end_date'] ?? null
-//     );
-//     if (!$resultat['success']) {
-//         http_response_code(400);
-//     }
-//     echo json_encode($resultat);
-//     exit;
-// }
 
 //* read 
 try {
