@@ -51,6 +51,24 @@ if (isset($_GET['id'])) {
   header('location:eleves.php');
 }
 
+try {
+  $eleve_id = $_GET['id']; // Remplacez par l'ID de l'élève souhaité
+  $result = getHeuresAbsenceEleve($dbh, $eleve_id);
+  
+  if ($result['success']) {
+      $donnees_absence = $result['data'];
+      // Utiliser les données ici, par exemple:
+      if (count($donnees_absence) > 0) {
+          $total_heures = $donnees_absence[0]->{'Total Heures Absence'};
+          // echo "L'élève a été absent pendant " . $total_heures . " heures.";
+      }
+  } else {
+      echo "<script>alert('" . $result['message'] . "');</script>";
+  }
+} catch (Exception $e) {
+  echo "<script>alert('Une erreur est survenue lors du calcul des heures d\'absence.');</script>";
+}
+
 
 ?>
 
@@ -138,10 +156,10 @@ if (isset($_GET['id'])) {
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
-                      <h6 class="text-center mb-0">Nationalite </h6>
-                      <span class="text-xs">Nationalite Origin</span>
+                      <h6 class="text-center mb-0">Absence</h6>
+                      <span class="text-xs">Nombre d'heure </span>
                       <hr class="horizontal dark my-3">
-                      <h5 class="mb-0"><?= $results->nationalite ?> </h5>
+                      <h5 class="mb-0"><?= $total_heures ?> <br> Heure</h5>
                     </div>
                   </div>
                 </div>

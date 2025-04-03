@@ -517,6 +517,32 @@ if (file_exists($filePath)) {
             'filename' => $fileName
         ];
     }
+
+    function getHeuresAbsenceEleve($dbh, $eleve_id)
+{
+    try {
+        // Appel de la procédure stockée
+        $sql = "CALL CalculerHeuresAbsence(:eleve_id)";
+        $stmt = $dbh->prepare($sql);
+        $stmt->bindParam(':eleve_id', $eleve_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return [
+            'success' => true,
+            'data' => $results,
+            'count' => count($results)
+        ];
+    } catch (PDOException $e) {
+        error_log($e->getMessage());
+        return [
+            'success' => false,
+            'message' => 'Erreur lors du calcul des heures d\'absence'
+        ];
+    }
+}
+
 // =============== Eleve ================
 
 // =============== Niveau ================
