@@ -138,7 +138,13 @@ function getElevesByClasse($dbh, $classe_id) {
             <form method="post">
               <div class="card-body">
                 <div class="row">
-                  <div class="col-md-12">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="id" class="form-control-label">Nom & Prenom</label>
+                      <input class="form-control" type="text" name="nom_prenom" id="nom_prenom" readonly>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
                     <div class="form-group">
                       <label for="id" class="form-control-label">id eleves</label>
                       <input class="form-control" type="text" name="id_elevesX" id="id_elevesX" required readonly>

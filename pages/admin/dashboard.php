@@ -101,19 +101,19 @@ if ($pourcentage_absence === null) {
 
 
 // Fonction pour traduire les jours en français
-function translateDay($englishDay)
-{
-  $translations = [
-    'Mon' => 'Lun',
-    'Tue' => 'Mar',
-    'Wed' => 'Mer',
-    'Thu' => 'Jeu',
-    'Fri' => 'Ven',
-    'Sat' => 'Sam',
-    'Sun' => 'Dim'
-  ];
-  return $translations[$englishDay] ?? $englishDay;
-}
+// function translateDay($englishDay)
+// {
+//   $translations = [
+//     'Mon' => 'Lun',
+//     'Tue' => 'Mar',
+//     'Wed' => 'Mer',
+//     'Thu' => 'Jeu',
+//     'Fri' => 'Ven',
+//     'Sat' => 'Sam',
+//     'Sun' => 'Dim'
+//   ];
+//   return $translations[$englishDay] ?? $englishDay;
+// }
 
 // Requête SQL améliorée pour récupérer les absences de la semaine
 $query_absc = "SELECT 
@@ -139,12 +139,35 @@ $data = [
 
 // Remplir les données
 while ($row = $stmt_absc->fetch(PDO::FETCH_ASSOC)) {
-  $genre = $row['genre'] === 'Masculin' ? 'garçon' : 'fille';
-  $jour = $row['jour'];
-  $data[$genre][$jour] = (int)$row['nb_absences'];
+  if ($row['genre'] === 'Masculin') {
+    $genre = 'garçon';
+  } elseif ($row['genre'] === 'Féminin') {
+    $genre = 'fille';
+  } else {
+    continue; // Ignorer les genres non reconnus
+  }
+  
+  if (in_array($row['jour'], $jours)) {
+    $data[$genre][$row['jour']] = (int)$row['nb_absences'];
+  }
 }
 
-// Préparer les données pour le graphique
+// Fonction pour traduire les jours en français
+function translateDay($englishDay) {
+    $translations = [
+        'Mon' => 'Lundi',
+        'Tue' => 'Mardi',
+        'Wed' => 'Mercredi',
+        'Thu' => 'Jeudi',
+        'Fri' => 'Vendredi',
+        'Sat' => 'Samedi',
+        'Sun' => 'Dimanche'
+    ];
+    
+    return $translations[$englishDay] ?? $englishDay;
+}
+
+// Préparer les données pour le graphique ApexCharts
 $chartData = [
   'garçon' => [],
   'fille' => []
@@ -160,7 +183,6 @@ foreach ($jours as $jour) {
     'y' => $data['fille'][$jour]
   ];
 }
-
 
 ?>
 
@@ -336,8 +358,9 @@ foreach ($jours as $jour) {
                     <div>
                       <p class="card-title mb-0 text-secondary">Statistiques des Absences</p>
                       <?php
-                      // Calcul du total des absences aujourd'hui
-                      $total_absences = $data['garçon']['Mon'] + $data['fille']['Mon']; // Supposons que 'Mon' représente aujourd'hui
+                      $jour_actuel = date('D', strtotime('today'));
+                      $jour_actuel = substr($jour_actuel, 0, 3);
+                      $total_absences = $data['garçon'][$jour_actuel] + $data['fille'][$jour_actuel];
                       ?>
                       <span class="fw-semibold text-dark"><?= $total_absences ?> absence(s)</span>
                     </div>
@@ -348,7 +371,7 @@ foreach ($jours as $jour) {
               <div id="column-chart" class="mt-2"></div>
               <!-- Footer -->
               <div class="d-flex justify-content-between align-items-center mt-4">
-                <div class="dropdown">
+                <!-- <div class="dropdown">
                   <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-calendar-alt me-2"></i>
                     <span>7 derniers jours</span>
@@ -385,7 +408,7 @@ foreach ($jours as $jour) {
                       </a>
                     </li>
                   </ul>
-                </div>
+                </div> -->
 
                 <a href="absence.php" class="btn btn-primary d-flex align-items-center">
                   <span>Rapport détaillé</span>

@@ -82,12 +82,27 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Écouter le changement d'élève
   eleveSelect.addEventListener('change', function() {
-      const eleveId = this.value;
-      if (eleveId) {
-          id_elevesX.value = eleveId; // Utiliser eleveId au lieu de selectedEleveId
-      } else {
-          id_elevesX.value = '';
-          heuresAbsenceDiv.classList.add('d-none');
-      }
-  });
+    const eleveId = this.value;
+    if (eleveId) {
+        // Récupère l'ID de l'élève sélectionné
+        id_elevesX.value = eleveId;
+        
+        // Affiche le nom et prénom dans l'input correspondant
+        document.getElementById('nom_prenom').value = this.options[this.selectedIndex].text;
+        
+        // Affiche la div des heures d'absence si elle était masquée
+        if (heuresAbsenceDiv) {
+            heuresAbsenceDiv.classList.remove('d-none');
+        }
+    } else {
+        // Réinitialise les champs si aucun élève n'est sélectionné
+        id_elevesX.value = '';
+        document.getElementById('nom_prenom').value = '';
+        
+        // Cache la div des heures d'absence
+        if (heuresAbsenceDiv) {
+            heuresAbsenceDiv.classList.add('d-none');
+        }
+    }
+});
 });
