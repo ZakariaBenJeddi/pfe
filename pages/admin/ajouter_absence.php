@@ -32,6 +32,56 @@ try {
   error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
   die("Erreur lors de la récupération des données.");
 }
+
+
+// classe
+try {
+  $result = get_all_classes($dbh);
+  if ($result['success']) {
+    $classe = $result['data'];
+  } else {
+    echo "Erreur : " . $result['message'];
+  }
+} catch (PDOException $e) {
+  error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+  die("Erreur lors de la récupération des données.");
+}
+
+
+function getElevesByClasse($dbh, $classe_id) {
+  try {
+      $sql = "SELECT id_eleve, nom, prenom FROM eleves 
+              WHERE id_classe = :classe_id 
+              ORDER BY nom, prenom";
+      $stmt = $dbh->prepare($sql);
+      $stmt->bindParam(':classe_id', $classe_id, PDO::PARAM_INT);
+      $stmt->execute();
+      
+      // Assurez-vous que fetchAll renvoie un tableau indexé et non un tableau associatif
+      $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+      
+      return $results; // Retourner simplement le tableau d'objets
+  } catch (PDOException $e) {
+      error_log($e->getMessage());
+      return [];
+  }
+}
+
+if ($_GET['action'] === 'getEleves' && isset($_GET['classe_id'])) {
+  $eleves = getElevesByClasse($dbh, intval($_GET['classe_id']));
+  
+  // Afficher les données pour le débogage
+  error_log('Elèves trouvés: ' . print_r($eleves, true));
+  
+  echo json_encode([
+      'success' => true,
+      'data' => $eleves, // Un tableau simple d'objets
+      'count' => count($eleves)
+  ]);
+  exit;
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -67,17 +117,21 @@ try {
               </div>
               <div class="mt-4">
                 <div class="my-4">
-                  <label for="class_box">Choisir La Classe</label>
-                  <select name="" id="classe_box" class="form-select" >
-                    <option value="">Sélectionner un élève</option>
-                    <option value="">Sélectionner un élève</option>
+                  <label for="classe_box">Choisir La Classe</label>
+                  <select name="classe_id" id="classe_box" class="form-select">
+                    <option value="">Sélectionnez une classe</option>
+                    <?php foreach ($classe as $c) : ?>
+                      <option value="<?= htmlspecialchars($c->id_classe) ?>">
+                        <?= htmlspecialchars($c->nom_classe) ?>
+                      </option>
+                    <?php endforeach; ?>
                   </select>
                 </div>
+
                 <div class="my-4">
-                  <label for="class_box">Choisir La Classe</label>
-                  <select name="" id="class_box" class="form-select">
-                    <option value="">Sélectionner un élève</option>
-                    <option value="">Sélectionner un élève</option>
+                  <label for="eleve_box">Choisir L'élève</label>
+                  <select name="eleve_id" id="eleve_box" class="form-select">
+                    <option value="">Sélectionnez d'abord une classe</option>
                   </select>
                 </div>
               </div>
@@ -127,6 +181,7 @@ try {
                     <div class="form-group">
                       <label for="type_absence" class="form-control-label">Type Absence</label>
                       <select class="form-select" name="type_absence" id="type_absence" required>
+                        <option value="">Choisir Le Type</option>
                         <option value="excusee">excusee</option>
                         <option value="non_excusee">non_excusee</option>
                       </select>
@@ -137,6 +192,7 @@ try {
                     <div class="form-group">
                       <label for="statut" class="form-control-label">Statut</label>
                       <select class="form-select" name="statut" id="statut" required>
+                        <option value="">Choisir Le Statut</option>
                         <option value="en_attente">en_attente</option>
                         <option value="validee">validee</option>
                         <option value="annulee">annulee</option>
@@ -153,6 +209,161 @@ try {
           </div>
         </div>
       </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const classeSelect = document.getElementById('classe_box');
+            const eleveSelect = document.getElementById('eleve_box');
+            const heuresAbsenceDiv = document.getElementById('heures_absence');
+            const totalHeuresSpan = document.getElementById('total_heures');
+            
+            // Fonction pour charger les élèves d'une classe
+
+            // function loadEleves(classeId) {
+            //   eleveSelect.innerHTML = '<option value="">Chargement...</option>';
+            //   console.log("Chargement des élèves pour la classe ID:", classeId);
+              
+            //   // Obtenir l'URL actuelle
+            //   const currentUrl = window.location.href.split('?')[0];
+            //   const url = `${currentUrl}?action=getEleves&classe_id=${classeId}`;
+              
+            //   console.log("URL de requête:", url);
+              
+            //   fetch(url)
+            //       .then(response => {
+            //           console.log("Réponse reçue:", response.status);
+            //           return response.json();
+            //       })
+            //       .then(data => {
+            //           console.log("Données reçues:", data);
+            //           eleveSelect.innerHTML = '<option value="">Sélectionner un élève</option>';
+                      
+            //           if (data.success && data.data.length > 0) {
+            //               data.data.forEach(eleve => {
+            //                   const option = document.createElement('option');
+            //                   option.value = eleve.id_eleve;
+            //                   option.textContent = eleve.nom + ' ' + eleve.prenom;
+            //                   eleveSelect.appendChild(option);
+            //               });
+            //           } else {
+            //               eleveSelect.innerHTML = '<option value="">Aucun élève dans cette classe</option>';
+            //           }
+            //       })
+            //       .catch(error => {
+            //           console.error('Erreur:', error);
+            //           eleveSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+            //       });
+            // }
+
+            function loadEleves(classeId) {
+                  eleveSelect.innerHTML = '<option value="">Chargement...</option>';
+                  console.log("Chargement des élèves pour la classe ID:", classeId);
+                  
+                  // Obtenir l'URL actuelle
+                  const url = window.location.pathname + `?action=getEleves&classe_id=${classeId}`;
+                  
+                  fetch(url)
+                      .then(response => {
+                          console.log("Réponse reçue:", response.status);
+                          return response.json();
+                      })
+                      .then(data => {
+                          console.log("Données reçues:", data);
+                          eleveSelect.innerHTML = '<option value="">Sélectionner un élève</option>';
+                          
+                          // Vérifier si data.data existe
+                          const eleves = data.data;
+                          
+                          // Vérifier si les données sont un tableau ou un objet
+                          if (data.success && eleves) {
+                              // Si c'est un objet avec des indices numériques
+                              if (typeof eleves === 'object' && !Array.isArray(eleves)) {
+                                  // Convertir l'objet en tableau
+                                  const elevesArray = Object.values(eleves).filter(item => typeof item === 'object');
+                                  
+                                  if (elevesArray.length > 0) {
+                                      elevesArray.forEach(eleve => {
+                                          if (eleve && eleve.id_eleve) {
+                                              const option = document.createElement('option');
+                                              option.value = eleve.id_eleve;
+                                              option.textContent = eleve.nom + ' ' + eleve.prenom;
+                                              eleveSelect.appendChild(option);
+                                          }
+                                      });
+                                      return;
+                                  }
+                              }
+                              // Si c'est un tableau standard
+                              else if (Array.isArray(eleves) && eleves.length > 0) {
+                                  eleves.forEach(eleve => {
+                                      const option = document.createElement('option');
+                                      option.value = eleve.id_eleve;
+                                      option.textContent = eleve.nom + ' ' + eleve.prenom;
+                                      eleveSelect.appendChild(option);
+                                  });
+                                  return;
+                              }
+                          }
+                          
+                          // Si on arrive ici, c'est qu'on n'a pas pu ajouter d'élèves
+                          eleveSelect.innerHTML = '<option value="">Aucun élève dans cette classe</option>';
+                          
+                          // Débogage supplémentaire
+                          console.log("Structure de data:", JSON.stringify(data));
+                      })
+                      .catch(error => {
+                          console.error('Erreur:', error);
+                          eleveSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+                      });
+            }
+            
+            // Fonction pour calculer les heures d'absence
+            function calculateAbsence(eleveId) {
+                totalHeuresSpan.textContent = "Chargement...";
+                heuresAbsenceDiv.classList.remove('d-none');
+                
+                fetch('?action=calculateAbsence&eleve_id=' + eleveId)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Formater le nombre avec 2 décimales
+                            const heures = parseFloat(data.total_heures).toFixed(2);
+                            totalHeuresSpan.textContent = heures + " heures";
+                        } else {
+                            totalHeuresSpan.textContent = "Erreur: " + data.message;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur:', error);
+                        totalHeuresSpan.textContent = "Erreur lors du calcul";
+                    });
+            }
+            
+            // Écouter le changement de classe
+            classeSelect.addEventListener('change', function() {
+                const classeId = this.value;
+                if (classeId) {
+                    console.log(classeId)
+                    loadEleves(classeId);
+                    heuresAbsenceDiv.classList.add('d-none');
+                } else {
+                    eleveSelect.innerHTML = '<option value="">Sélectionnez d\'abord une classe</option>';
+                    heuresAbsenceDiv.classList.add('d-none');
+                }
+            });
+            
+            // Écouter le changement d'élève
+            eleveSelect.addEventListener('change', function() {
+                const eleveId = this.value;
+                if (eleveId) {
+                    calculateAbsence(eleveId);
+                    // hna 7et l'id dial eleve li mselectionner f input tkon disabled
+                } else {
+                    heuresAbsenceDiv.classList.add('d-none');
+                }
+            });
+        });
+    </script>
       <!-- FOOTER -->
       <?php include '../../includes/footer.php' ?>
 
