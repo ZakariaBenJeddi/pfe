@@ -153,7 +153,7 @@ try {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="historique_scolaire_eleve" class="form-control-label">Historique Scolaire</label>
-                      <input class="form-control" type="text" name="historique_scolaire_eleve" id="historique_scolaire_eleve" required>
+                      <input class="form-control" type="text" name="historique_scolaire_eleve" id="historique_scolaire_eleve" >
                     </div>
                   </div>
 
@@ -174,7 +174,7 @@ try {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="telephone_tuteur_eleve" class="form-control-label">Téléphone Tuteur</label>
-                      <input class="form-control" type="text" name="telephone_tuteur_eleve" id="telephone_tuteur_eleve" required>
+                      <input class="form-control" type="text" name="telephone_tuteur_eleve" id="telephone_tuteur_eleve" value="+212" required >
                     </div>
                   </div>
 
@@ -223,7 +223,7 @@ try {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="besoins_speciaux_eleve" class="form-control-label">Besoins Spéciaux</label>
-                      <input class="form-control" type="text" name="besoins_speciaux_eleve" id="besoins_speciaux_eleve" required>
+                      <input class="form-control" type="text" name="besoins_speciaux_eleve" id="besoins_speciaux_eleve" >
                     </div>
                   </div>
 

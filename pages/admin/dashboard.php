@@ -387,7 +387,7 @@ foreach ($jours as $jour) {
                   </ul>
                 </div>
 
-                <a href="#" class="btn btn-primary d-flex align-items-center">
+                <a href="absence.php" class="btn btn-primary d-flex align-items-center">
                   <span>Rapport détaillé</span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right ms-2" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z" />
@@ -641,86 +641,6 @@ foreach ($jours as $jour) {
         },
       },
     });
-  </script>
-
-  <!-- //! CHART JS ABSCENCE -->
-  <script>
-    const ctx = document.getElementById("chart-bar").getContext("2d");
-    const labels = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"];
-    const data = {
-      labels: labels,
-      datasets: [{
-        label: 'Abscence',
-        data: [65, 59, 80, 81, 56, ],
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
-          'rgba(255, 205, 86, 0.2)',
-          'rgba(75, 192, 192, 0.2)',
-          'rgba(54, 162, 235, 0.2)',
-        ],
-        borderColor: [
-          'rgb(255, 99, 132)',
-          'rgb(255, 159, 64)',
-          'rgb(255, 205, 86)',
-          'rgb(75, 192, 192)',
-          'rgb(54, 162, 235)',
-        ],
-        borderWidth: 0
-      }]
-    };
-
-    const config = {
-      type: 'bar',
-      data: data,
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: true,
-            position: 'top',
-          },
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              display: true,
-              drawBorder: false,
-              color: 'rgba(200, 200, 200, 0.2)',
-            },
-            ticks: {
-              color: '#666',
-              font: {
-                size: 10,
-              },
-            },
-          },
-          x: {
-            grid: {
-              display: false,
-            },
-            ticks: {
-              color: '#666',
-              font: {
-                size: 10,
-              },
-            },
-            // Ajout de barThickness pour réduire la largeur des barres
-            ticks: {
-              callback: function(value, index, values) {
-                return this.getLabelForValue(value);
-              },
-            },
-            // Configurer la largeur des barres
-            categoryPercentage: 0.5, // Réduit la largeur des barres
-            barPercentage: 0.5, // Encore plus de réduction de la largeur
-          },
-        },
-      },
-    };
-    new Chart(ctx, config);
   </script>
 
   <!-- //! LINE CHART BLEU ROSE -->

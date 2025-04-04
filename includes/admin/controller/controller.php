@@ -2068,63 +2068,125 @@ if (file_exists($filePath)) {
 // =============== payement eleves ================
 
 // =============== Abcsnce ================
-function getAbscenceinfo($dbh)
-{
-    try {
-        // Appel de la procédure stockée
-        $sql = "CALL get_absences_info()";
-        $stmt = $dbh->prepare($sql);
-        $stmt->execute();
+    function getAbscenceinfo($dbh)
+    {
+        try {
+            // Appel de la procédure stockée
+            $sql = "CALL get_absences_info()";
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute();
 
-        $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+            $results = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-        return [
-            'success' => true,
-            'data' => $results,
-            'count' => count($results)
-        ];
-    } catch (PDOException $e) {
-        error_log($e->getMessage());
-        return [
-            'success' => false,
-            'message' => 'Erreur lors de la récupération des données élèves'
-        ];
-    }
-}
-
-function getAbscenceById($dbh, $id_absence) {
-    try {
-        if (!filter_var($id_absence, FILTER_VALIDATE_INT)) {
+            return [
+                'success' => true,
+                'data' => $results,
+                'count' => count($results)
+            ];
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
             return [
                 'success' => false,
-                'message' => "ID d'élève invalide"
+                'message' => 'Erreur lors de la récupération des données élèves'
             ];
         }
+    }
 
-        $sql = "CALL get_absence_by_id(:id_absence)";
-        $stmt = $dbh->prepare($sql);
-        $stmt->execute([':id_absence' => $id_absence]);
-        
-        $eleve = $stmt->fetch(PDO::FETCH_OBJ);
-        
-        if (!$eleve) {
+    function getAbscenceById($dbh, $id_absence) {
+        try {
+            if (!filter_var($id_absence, FILTER_VALIDATE_INT)) {
+                return [
+                    'success' => false,
+                    'message' => "ID d'élève invalide"
+                ];
+            }
+
+            $sql = "CALL get_absence_by_id(:id_absence)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute([':id_absence' => $id_absence]);
+            
+            $eleve = $stmt->fetch(PDO::FETCH_OBJ);
+            
+            if (!$eleve) {
+                return [
+                    'success' => false,
+                    'message' => "Élève non trouvé"
+                ];
+            }
+
+            return [
+                'success' => true,
+                'data' => $eleve
+            ];
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
             return [
                 'success' => false,
-                'message' => "Élève non trouvé"
+                'message' => "Erreur lors de la récupération de l'élève"
             ];
         }
-
-        return [
-            'success' => true,
-            'data' => $eleve
-        ];
-
-    } catch (PDOException $e) {
-        error_log($e->getMessage());
-        return [
-            'success' => false,
-            'message' => "Erreur lors de la récupération de l'élève"
-        ];
     }
-}
+    function ajouterAbsence($dbh, $donnees_absence) {
+        try {
+            // Validation des données requises
+            $champs_requis = ['id_elevesX', 'date_absence', 'heure_debut', 'heure_fin', 'type_absence', 'statut'];
+            foreach ($champs_requis as $champ) {
+                if (empty($donnees_absence[$champ])) {
+                    return [
+                        'success' => false,
+                        'message' => "Le champ $champ est requis."
+                    ];
+                }
+            }
+            
+            // Validation que l'heure de fin est après l'heure de début
+            if (strtotime($donnees_absence['heure_fin']) <= strtotime($donnees_absence['heure_debut'])) {
+                return [
+                    'success' => false,
+                    'message' => "L'heure de fin doit être postérieure à l'heure de début."
+                ];
+            }
+            
+            // Appel de la procédure stockée
+            $sql = "CALL ajouter_absence(
+                :id_eleve, 
+                NULL, 
+                :date_absence, 
+                :heure_debut, 
+                :heure_fin, 
+                :motif, 
+                :type_absence, 
+                :statut
+            )";
+            
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute([
+                ':id_eleve' => $donnees_absence['id_elevesX'],
+                ':date_absence' => $donnees_absence['date_absence'],
+                ':heure_debut' => $donnees_absence['heure_debut'],
+                ':heure_fin' => $donnees_absence['heure_fin'],
+                ':motif' => $donnees_absence['motif'] ?? null,
+                ':type_absence' => $donnees_absence['type_absence'],
+                ':statut' => $donnees_absence['statut']
+            ]);
+            
+            // Récupérer l'ID de la nouvelle absence
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $id_absence = $result['id_absence'] ?? null;
+            
+            return [
+                'success' => true,
+                'message' => 'Absence ajoutée avec succès',
+                'id_absence' => $id_absence
+            ];
+            
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de l\'ajout de l\'absence.'
+            ];
+        }
+    }
 // =============== Abcsnce ================
