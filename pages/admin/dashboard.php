@@ -91,30 +91,6 @@ if ($pourcentage === null) {
   setcookie("show_alert", "1", time() + 2); // Expire dans 2 secondes
 }
 
-if ($pourcentage_enseignant === null) {
-  // echo "<script>alert(`Impossible de calculer le pourcentage d'enseignants (pas de données l'année dernière)`)\n</script>";
-}
-
-if ($pourcentage_absence === null) {
-  // echo "<script>alert(`Impossible de calculer le pourcentage d'absences (pas de données hier)`)\n</script>";
-}
-
-
-// Fonction pour traduire les jours en français
-// function translateDay($englishDay)
-// {
-//   $translations = [
-//     'Mon' => 'Lun',
-//     'Tue' => 'Mar',
-//     'Wed' => 'Mer',
-//     'Thu' => 'Jeu',
-//     'Fri' => 'Ven',
-//     'Sat' => 'Sam',
-//     'Sun' => 'Dim'
-//   ];
-//   return $translations[$englishDay] ?? $englishDay;
-// }
-
 // Requête SQL améliorée pour récupérer les absences de la semaine
 $query_absc = "SELECT 
   e.genre,
