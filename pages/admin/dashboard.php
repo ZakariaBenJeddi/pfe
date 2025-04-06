@@ -12,243 +12,7 @@ require '../../includes/DatabaseConnexion.php';
 //* deconnexion
 require('../../includes/deconnexion_5s.php');
 
-//**Récupère le nombre total de salles
-$query_nbr_salle = $dbh->query("SELECT COUNT(*) FROM salle ");
-$nbr_salle = $query_nbr_salle->fetchColumn();
-//**Récupère le nombre total de salles
-$query_nbr_eleves = $dbh->query("SELECT COUNT(*) FROM eleves ");
-$nbr_eleves = $query_nbr_eleves->fetchColumn();
-//**Récupère le nombre total de enseignant
-$query_nbr_enseignant = $dbh->query("SELECT COUNT(*) FROM enseignant ");
-$nbr_enseignant = $query_nbr_enseignant->fetchColumn();
-//**Récupère le nombre total d'abscence
-$query_nbr_abscence = $dbh->query("SELECT COUNT(*) FROM absences ");
-$nbr_abscence = $query_nbr_abscence->fetchColumn();
-
-// Récupération des dates
-$date_cette_anne = date('Y');
-$date_anne_dernier = date('Y', strtotime('-1 year'));
-
-// Fonction générique pour calculer le pourcentage de changement
-function calculerPourcentageChangement($valeur_actuelle, $valeur_precedente)
-{
-  if ($valeur_precedente <= 0) {
-    return null;
-  }
-  return (($valeur_actuelle - $valeur_precedente) / $valeur_precedente) * 100;
-}
-
-//* Calcul pour les élèves
-$query = $dbh->prepare("SELECT COUNT(*) FROM eleves WHERE YEAR(date_inscription) = :date");
-$query->bindParam(":date", $date_cette_anne);
-$query->execute();
-$nbr_eleves_inscrit_cette_anne = $query->fetchColumn();
-
-$query->bindParam(":date", $date_anne_dernier);
-$query->execute();
-$nbr_eleves_inscrit_anne_dernier = $query->fetchColumn();
-
-$pourcentage = calculerPourcentageChangement(
-  $nbr_eleves_inscrit_cette_anne,
-  $nbr_eleves_inscrit_anne_dernier
-);
-
-//* Calcul pour les enseignants
-$query = $dbh->prepare("SELECT COUNT(*) FROM enseignant WHERE YEAR(date_creation) = :date");
-$query->bindParam(":date", $date_cette_anne);
-$query->execute();
-$nbr_enseignants_inscrit_cette_anne = $query->fetchColumn();
-
-$query->bindParam(":date", $date_anne_dernier);
-$query->execute();
-$nbr_enseignants_inscrit_anne_dernier = $query->fetchColumn();
-
-$pourcentage_enseignant = calculerPourcentageChangement(
-  $nbr_enseignants_inscrit_cette_anne,
-  $nbr_enseignants_inscrit_anne_dernier
-);
-
-//* Calcul pour les absences
-$date_aujourdhui = date('Y-m-d');
-$date_hier = date('Y-m-d', strtotime('-1 day'));
-
-$query = $dbh->prepare("SELECT COUNT(*) FROM absences WHERE date_absence = :date");
-$query->bindParam(":date", $date_aujourdhui);
-$query->execute();
-$nbr_absences_aujourdhui = $query->fetchColumn();
-
-$query->bindParam(":date", $date_hier);
-$query->execute();
-$nbr_absences_hier = $query->fetchColumn();
-
-$pourcentage_absence = calculerPourcentageChangement(
-  $nbr_absences_aujourdhui,
-  $nbr_absences_hier
-);
-
-//* Affichage des résultats avec gestion des erreurs
-if ($pourcentage === null) {
-  setcookie("show_alert", "1", time() + 2); // Expire dans 2 secondes
-}
-
-// Requête SQL améliorée pour récupérer les absences de la semaine
-$query_absc = "SELECT 
-  e.genre,
-  DATE_FORMAT(a.date_absence, '%a') AS jour,
-  COUNT(DISTINCT a.id_absence) AS nb_absences
-  FROM absences a
-  JOIN eleves e ON a.id_eleve = e.id_eleve
-  WHERE a.date_absence BETWEEN DATE_SUB(CURRENT_DATE, INTERVAL 6 DAY) AND CURRENT_DATE
-  AND a.statut = 'validee'
-  GROUP BY e.genre, jour
-  ORDER BY FIELD(jour, 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')";
-
-$stmt_absc = $dbh->prepare($query_absc);
-$stmt_absc->execute();
-
-// Initialiser le tableau avec tous les jours à 0
-$jours = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-$data = [
-  'garçon' => array_fill_keys($jours, 0),
-  'fille' => array_fill_keys($jours, 0)
-];
-
-// Remplir les données
-while ($row = $stmt_absc->fetch(PDO::FETCH_ASSOC)) {
-  if ($row['genre'] === 'Masculin') {
-    $genre = 'garçon';
-  } elseif ($row['genre'] === 'Féminin') {
-    $genre = 'fille';
-  } else {
-    continue; // Ignorer les genres non reconnus
-  }
-  
-  if (in_array($row['jour'], $jours)) {
-    $data[$genre][$row['jour']] = (int)$row['nb_absences'];
-  }
-}
-
-// Fonction pour traduire les jours en français
-function translateDay($englishDay) {
-    $translations = [
-        'Mon' => 'Lundi',
-        'Tue' => 'Mardi',
-        'Wed' => 'Mercredi',
-        'Thu' => 'Jeudi',
-        'Fri' => 'Vendredi',
-        'Sat' => 'Samedi',
-        'Sun' => 'Dimanche'
-    ];
-    
-    return $translations[$englishDay] ?? $englishDay;
-}
-
-// Préparer les données pour le graphique ApexCharts
-$chartData = [
-  'garçon' => [],
-  'fille' => []
-];
-
-foreach ($jours as $jour) {
-  $chartData['garçon'][] = [
-    'x' => translateDay($jour),
-    'y' => $data['garçon'][$jour]
-  ];
-  $chartData['fille'][] = [
-    'x' => translateDay($jour),
-    'y' => $data['fille'][$jour]
-  ];
-}
-
-//! ---------
-// Connexion à la base de données
-$conn = new mysqli("localhost", "root", "", "pfe1");
-
-// Vérifier la connexion
-if ($conn->connect_error) {
-    die("Erreur de connexion : " . $conn->connect_error);
-}
-
-// Requêtes pour les métriques principales
-$queryTotalValide = "SELECT SUM(montant_final) as total FROM paiements_eleves WHERE statut_paiement = 'Validé'";
-$queryEnAttente = "SELECT COUNT(*) as nombre, SUM(montant_final) as montant FROM paiements_eleves WHERE statut_paiement = 'En attente'";
-$queryMoyenneEleve = "SELECT AVG(total) as moyenne FROM (SELECT id_eleve, SUM(montant_final) as total FROM paiements_eleves GROUP BY id_eleve) as totaux_eleves";
-$queryMoisActuel = "SELECT SUM(montant_final) as total FROM paiements_eleves WHERE MONTH(date_paiement) = MONTH(CURRENT_DATE()) AND YEAR(date_paiement) = YEAR(CURRENT_DATE()) AND statut_paiement = 'Validé'";
-
-// Exécution des requêtes
-$resultTotal = $conn->query($queryTotalValide);
-$totalValide = $resultTotal->fetch_assoc()['total'];
-
-$resultEnAttente = $conn->query($queryEnAttente);
-$enAttente = $resultEnAttente->fetch_assoc();
-
-$resultMoyenne = $conn->query($queryMoyenneEleve);
-$moyenneEleve = $resultMoyenne->fetch_assoc()['moyenne'];
-
-$resultMoisActuel = $conn->query($queryMoisActuel);
-$totalMois = $resultMoisActuel->fetch_assoc()['total'];
-
-// Requête pour données du graphique par mois
-$queryGraphMois = "SELECT 
-                    YEAR(date_paiement) as annee, 
-                    MONTH(date_paiement) as mois, 
-                    SUM(montant_final) as total 
-                  FROM paiements_eleves 
-                  WHERE statut_paiement = 'Validé' 
-                  GROUP BY YEAR(date_paiement), MONTH(date_paiement) 
-                  ORDER BY annee, mois";
-
-$resultGraphMois = $conn->query($queryGraphMois);
-$mois = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-$dataGraphMois = array_fill_keys($mois, 0); // Initialiser avec tous les mois à 0
-
-while ($row = $resultGraphMois->fetch_assoc()) {
-    $moisKey = date("M", mktime(0, 0, 0, $row['mois'], 1, $row['annee']));
-    if (isset($dataGraphMois[$moisKey])) {
-        $dataGraphMois[$moisKey] = $row['total'];
-    }
-}
-
-// Requête pour répartition des modes de paiement
-$queryModes = "SELECT 
-                mode_paiement, 
-                COUNT(*) as nombre, 
-                SUM(montant_final) as total 
-              FROM paiements_eleves 
-              GROUP BY mode_paiement";
-
-$resultModes = $conn->query($queryModes);
-$dataModes = [];
-while ($row = $resultModes->fetch_assoc()) {
-    $dataModes[] = [
-        'mode' => $row['mode_paiement'],
-        'nombre' => $row['nombre'],
-        'total' => $row['total']
-    ];
-}
-
-// Requête pour les 4 élèves ayant payé le plus
-$queryTopEleves = "SELECT 
-                    e.id_eleve,
-                    e.nom,
-                    e.prenom,
-                    SUM(p.montant_final) as total_paye,
-                    COUNT(p.id_paiement) as nb_paiements
-                FROM paiements_eleves p
-                JOIN eleves e ON p.id_eleve = e.id_eleve
-                WHERE p.statut_paiement = 'Validé'
-                GROUP BY e.id_eleve, e.nom, e.prenom
-                ORDER BY total_paye DESC
-                LIMIT 4";
-
-$resultTopEleves = $conn->query($queryTopEleves);
-$topEleves = [];
-while ($row = $resultTopEleves->fetch_assoc()) {
-    $topEleves[] = $row;
-}
-
-// Fermer la connexion
-$conn->close();
+include '../../includes/admin/dashboard_data.php';
 
 ?>
 
@@ -274,7 +38,8 @@ $conn->close();
 <body class="g-sidenav-show  bg-gray-100">
   <div class="min-height-300 bg-primary position-absolute w-100"></div>
   <?php require('../../includes/admin/aside_admin.php') ?>
-  <?php //require('../../includes/aside_admin.php') ?>
+  <?php //require('../../includes/aside_admin.php') 
+  ?>
   <main class="main-content position-relative border-radius-lg ">
     <!-- Navbar -->
     <?php require('../../includes/admin/navbar_admin.php') ?>
@@ -289,7 +54,7 @@ $conn->close();
                   <div class="numbers">
                     <p class="text-sm mb-0 text-uppercase font-weight-bold">Nombre eleve</p>
                     <h5 class="font-weight-bolder">
-                      <?=  $nbr_eleves ?>
+                      <?= $nbr_eleves ?>
                     </h5>
                     <?php if ($pourcentage !== null) { ?>
                       <p class="mb-0">
@@ -628,10 +393,208 @@ $conn->close();
           </div>
         </div>
       </div>
+      <div class="row mt-4">
+        <div class="col-lg-7 mb-lg-0 mb-4">
+          <div class="card ">
+            <div class="card-header pb-0 p-3">
+              <div class="d-flex justify-content-between">
+                <h6 class="mb-2">Top élèves payé</h6>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table align-items-center ">
+                <tbody>
+                  <?php foreach ($topEleves as $index => $eleve) : ?>
+                    <tr>
+                      <td class="w-30">
+                        <div class="d-flex px-2 py-1 align-items-center">
+                          <div>
+                            <!-- Utilisation d'icônes numériques pour le classement -->
+                            <div class="avatar avatar-sm bg-gradient-primary rounded-circle shadow text-center">
+                              <span class="text-white text-xs font-weight-bold"><?php echo $index + 1; ?></span>
+                            </div>
+                          </div>
+                          <div class="ms-4">
+                            <p class="text-xs font-weight-bold mb-0">Élève:</p>
+                            <h6 class="text-sm mb-0"><?php echo htmlspecialchars($eleve['prenom'] . ' ' . $eleve['nom']); ?></h6>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="text-center">
+                          <p class="text-xs font-weight-bold mb-0">Paiements:</p>
+                          <h6 class="text-sm mb-0"><?php echo $eleve['nb_paiements']; ?></h6>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="text-center">
+                          <p class="text-xs font-weight-bold mb-0">Montant total:</p>
+                          <h6 class="text-sm mb-0"><?php echo number_format($eleve['total_paye'], 2, ',', ' '); ?> €</h6>
+                        </div>
+                      </td>
+                      <td class="align-middle text-sm">
+                        <div class="col text-center">
+                          <p class="text-xs font-weight-bold mb-0">% du total:</p>
+                          <h6 class="text-sm mb-0">
+                            <?php
+                            // Calcul du pourcentage par rapport au total validé
+                            $pourcentage = ($totalValide > 0) ? ($eleve['total_paye'] / $totalValide * 100) : 0;
+                            echo number_format($pourcentage, 2, ',', ' ') . '%';
+                            ?>
+                          </h6>
+                        </div>
+                      </td>
+                    </tr>
+                  <?php endforeach; ?>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <figure class="highcharts-figure">
+            <div id="container-donut"></div>
+          </figure>
+
+        </div>
+      </div>
       <!-- FOOTER -->
       <?php include '../../includes/footer.php' ?>
     </div>
   </main>
+
+
+  <!-- //TODO Highcahrt -->
+  <script>
+    // Animation personnalisée pour le graphique en cercle
+    (function(H) {
+      H.seriesTypes.pie.prototype.animate = function(init) {
+        const series = this,
+          chart = series.chart,
+          points = series.points,
+          {
+            animation
+          } = series.options,
+          {
+            startAngleRad
+          } = series;
+
+        function fanAnimate(point, startAngleRad) {
+          const graphic = point.graphic,
+            args = point.shapeArgs;
+          if (graphic && args) {
+            graphic
+              // Set inital animation values
+              .attr({
+                start: startAngleRad,
+                end: startAngleRad,
+                opacity: 1
+              })
+              // Animate to the final position
+              .animate({
+                start: args.start,
+                end: args.end
+              }, {
+                duration: animation.duration / points.length
+              }, function() {
+                // On complete, start animating the next point
+                if (points[point.index + 1]) {
+                  fanAnimate(points[point.index + 1], args.end);
+                }
+                // On the last point, fade in the data labels, then
+                // apply the inner size
+                if (point.index === series.points.length - 1) {
+                  series.dataLabelsGroup.animate({
+                      opacity: 1
+                    },
+                    void 0,
+                    function() {
+                      points.forEach(point => {
+                        point.opacity = 1;
+                      });
+                      series.update({
+                        enableMouseTracking: true
+                      }, false);
+                      chart.update({
+                        plotOptions: {
+                          pie: {
+                            innerSize: '40%',
+                            borderRadius: 8
+                          }
+                        }
+                      });
+                    });
+                }
+              });
+          }
+        }
+
+        if (init) {
+          // Hide points on init
+          points.forEach(point => {
+            point.opacity = 0;
+          });
+        } else {
+          fanAnimate(points[0], startAngleRad);
+        }
+      };
+    }(Highcharts));
+
+    // Préparation des données à partir du PHP
+    const modesPaiement = <?php echo json_encode($dataModes); ?>;
+
+    // Transformer les données dans le format attendu par Highcharts
+    const chartData = modesPaiement.map(item => ({
+      name: item.mode,
+      y: parseFloat(item.total),
+      count: item.nombre
+    }));
+
+    // Création du graphique
+    Highcharts.chart('container-donut', {
+      chart: {
+        type: 'pie'
+      },
+      title: {
+        text: 'Répartition des modes de paiement'
+      },
+      subtitle: {
+        text: 'Par montant total'
+      },
+      tooltip: {
+        headerFormat: '',
+        pointFormat: '<span style="color:{point.color}">\u25cf</span> ' +
+          '<b>{point.name}</b>: {point.y} € ({point.percentage:.1f}%)<br>' +
+          'Nombre de transactions: {point.count}'
+      },
+      accessibility: {
+        point: {
+          valueSuffix: '€'
+        }
+      },
+      plotOptions: {
+        pie: {
+          allowPointSelect: true,
+          borderWidth: 2,
+          cursor: 'pointer',
+          dataLabels: {
+            enabled: true,
+            format: '<b>{point.name}</b><br>{point.percentage:.1f}%',
+            distance: 20
+          }
+        }
+      },
+      series: [{
+        // Disable mouse tracking on load, enable after custom animation
+        enableMouseTracking: false,
+        animation: {
+          duration: 2000
+        },
+        colorByPoint: true,
+        data: chartData
+      }]
+    });
+  </script>
 
   <!-- //! DRIVER JS -->
   <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
@@ -841,131 +804,131 @@ $conn->close();
   </script>
 
 
-<!-- paiement chart -->
+  <!-- paiement chart -->
 
-<script>
-        // Graphique d'évolution des paiements par mois avec le style demandé
-        var ctx1 = document.getElementById("paiement-chart-line").getContext("2d");
-        var gradientStroke1 = ctx1.createLinearGradient(0, 230, 0, 50);
+  <script>
+    // Graphique d'évolution des paiements par mois avec le style demandé
+    var ctx1 = document.getElementById("paiement-chart-line").getContext("2d");
+    var gradientStroke1 = ctx1.createLinearGradient(0, 230, 0, 50);
 
-        gradientStroke1.addColorStop(1, 'rgba(94, 114, 228, 0.2)');
-        gradientStroke1.addColorStop(0.2, 'rgba(94, 114, 228, 0.0)');
-        gradientStroke1.addColorStop(0, 'rgba(94, 114, 228, 0)');
-        
-        new Chart(ctx1, {
-            type: "line",
-            data: {
-                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                datasets: [{
-                    label: "Paiements mensuels",
-                    tension: 0.4,
-                    borderWidth: 0,
-                    pointRadius: 0,
-                    borderColor: "#5e72e4",
-                    backgroundColor: gradientStroke1,
-                    borderWidth: 3,
-                    fill: true,
-                    data: [
-                        <?= $dataGraphMois["Jan"] ?>,
-                        <?= $dataGraphMois["Feb"] ?>,
-                        <?= $dataGraphMois["Mar"] ?>,
-                        <?= $dataGraphMois["Apr"] ?>,
-                        <?= $dataGraphMois["May"] ?>,
-                        <?= $dataGraphMois["Jun"] ?>,
-                        <?= $dataGraphMois["Jul"] ?>,
-                        <?= $dataGraphMois["Aug"] ?>,
-                        <?= $dataGraphMois["Sep"] ?>,
-                        <?= $dataGraphMois["Oct"] ?>,
-                        <?= $dataGraphMois["Nov"] ?>,
-                        <?= $dataGraphMois["Dec"] ?>
-                    ],
-                    maxBarThickness: 6
-                }],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false,
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
-                },
-                scales: {
-                    y: {
-                        grid: {
-                            drawBorder: false,
-                            display: true,
-                            drawOnChartArea: true,
-                            drawTicks: false,
-                            borderDash: [5, 5]
-                        },
-                        ticks: {
-                            display: true,
-                            padding: 10,
-                            color: '#fbfbfb',
-                            font: {
-                                size: 11,
-                                family: "Open Sans",
-                                style: 'normal',
-                                lineHeight: 2
-                            },
-                        }
-                    },
-                    x: {
-                        grid: {
-                            drawBorder: false,
-                            display: false,
-                            drawOnChartArea: false,
-                            drawTicks: false,
-                            borderDash: [5, 5]
-                        },
-                        ticks: {
-                            display: true,
-                            color: '#ccc',
-                            padding: 20,
-                            font: {
-                                size: 11,
-                                family: "Open Sans",
-                                style: 'normal',
-                                lineHeight: 2
-                            },
-                        }
-                    },
-                },
-            },
-        });
+    gradientStroke1.addColorStop(1, 'rgba(94, 114, 228, 0.2)');
+    gradientStroke1.addColorStop(0.2, 'rgba(94, 114, 228, 0.0)');
+    gradientStroke1.addColorStop(0, 'rgba(94, 114, 228, 0)');
 
-        // Graphique de répartition des modes de paiement
-        const ctxModes = document.getElementById('graphModes').getContext('2d');
-        new Chart(ctxModes, {
-            type: 'pie',
-            data: {
-                labels: <?= json_encode(array_column($dataModes, 'mode')) ?>,
-                datasets: [{
-                    data: <?= json_encode(array_column($dataModes, 'total')) ?>,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.7)',
-                        'rgba(54, 162, 235, 0.7)',
-                        'rgba(255, 206, 86, 0.7)',
-                        'rgba(75, 192, 192, 0.7)'
-                    ],
-                    borderWidth: 1
-                }]
+    new Chart(ctx1, {
+      type: "line",
+      data: {
+        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        datasets: [{
+          label: "Paiements mensuels",
+          tension: 0.4,
+          borderWidth: 0,
+          pointRadius: 0,
+          borderColor: "#5e72e4",
+          backgroundColor: gradientStroke1,
+          borderWidth: 3,
+          fill: true,
+          data: [
+            <?= $dataGraphMois["Jan"] ?>,
+            <?= $dataGraphMois["Feb"] ?>,
+            <?= $dataGraphMois["Mar"] ?>,
+            <?= $dataGraphMois["Apr"] ?>,
+            <?= $dataGraphMois["May"] ?>,
+            <?= $dataGraphMois["Jun"] ?>,
+            <?= $dataGraphMois["Jul"] ?>,
+            <?= $dataGraphMois["Aug"] ?>,
+            <?= $dataGraphMois["Sep"] ?>,
+            <?= $dataGraphMois["Oct"] ?>,
+            <?= $dataGraphMois["Nov"] ?>,
+            <?= $dataGraphMois["Dec"] ?>
+          ],
+          maxBarThickness: 6
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5]
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'right'
-                    }
-                }
+            ticks: {
+              display: true,
+              padding: 10,
+              color: '#fbfbfb',
+              font: {
+                size: 11,
+                family: "Open Sans",
+                style: 'normal',
+                lineHeight: 2
+              },
             }
-        });
-    </script>
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: false,
+              drawOnChartArea: false,
+              drawTicks: false,
+              borderDash: [5, 5]
+            },
+            ticks: {
+              display: true,
+              color: '#ccc',
+              padding: 20,
+              font: {
+                size: 11,
+                family: "Open Sans",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    // Graphique de répartition des modes de paiement
+    const ctxModes = document.getElementById('graphModes').getContext('2d');
+    new Chart(ctxModes, {
+      type: 'pie',
+      data: {
+        labels: <?= json_encode(array_column($dataModes, 'mode')) ?>,
+        datasets: [{
+          data: <?= json_encode(array_column($dataModes, 'total')) ?>,
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(75, 192, 192, 0.7)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'right'
+          }
+        }
+      }
+    });
+  </script>
 
 
   <script>
