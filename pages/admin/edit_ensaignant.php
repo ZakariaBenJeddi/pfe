@@ -5,7 +5,7 @@ include('../../includes/admin/controller/controller.php');
 
 session_start();
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-in.php');
+  header('location:../sign-in.php');
 }
 
 //* deconnexion
@@ -30,34 +30,34 @@ if (isset($_GET['id'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
   // Préparer les données
   $enseignantData = [
-      'id_enseignant' => $_POST['id_enseignant'],
-      'nom_enseignant' => $_POST['nom_enseignant'],
-      'prenom_enseignant' => $_POST['prenom_enseignant'],
-      'email_enseignant' => $_POST['email_enseignant'],
-      'telephone_enseignant' => $_POST['telephone_enseignant'],
-      'date_naissance' => $_POST['date_naissance'],
-      'specialite' => $_POST['specialite'],
-      'masse_horaire' => $_POST['masse_horaire'],
-      'date_embauche' => $_POST['date_embauche'],
-      'adresse' => $_POST['adresse'],
-      'genre' => $_POST['genre'],
-      'niveau_education' => $_POST['niveau_education'],
-      'salaire' => $_POST['salaire'],
-      'date_creation' => $_POST['date_creation'],
-      'est_connecte' => $_POST['est_connecte'],
-      'degree' => $_POST['degree']
+    'id_enseignant' => $_POST['id_enseignant'],
+    'nom_enseignant' => $_POST['nom_enseignant'],
+    'prenom_enseignant' => $_POST['prenom_enseignant'],
+    'email_enseignant' => $_POST['email_enseignant'],
+    'telephone_enseignant' => $_POST['telephone_enseignant'],
+    'date_naissance' => $_POST['date_naissance'],
+    'specialite' => $_POST['specialite'],
+    'masse_horaire' => $_POST['masse_horaire'],
+    'date_embauche' => $_POST['date_embauche'],
+    'adresse' => $_POST['adresse'],
+    'genre' => $_POST['genre'],
+    'niveau_education' => $_POST['niveau_education'],
+    'salaire' => $_POST['salaire'],
+    'date_creation' => $_POST['date_creation'],
+    'est_connecte' => $_POST['est_connecte'],
+    'degree' => $_POST['degree']
   ];
 
   // Appeler la fonction du controller
   $result = modifierEnseignant($dbh, $enseignantData);
 
   if ($result['success']) {
-      echo "<script>
+    echo "<script>
           alert('Les informations de l\'enseignant ont été mises à jour avec succès.');
           window.location.href = 'enseignant.php';
       </script>";
   } else {
-      echo "<script>
+    echo "<script>
           alert('" . $result['message'] . "');
       </script>";
   }

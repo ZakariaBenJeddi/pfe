@@ -2,7 +2,7 @@
 session_start();
 
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-in.php');
+  header('location:../sign-in.php');
 }
 
 //* deconnexion
@@ -31,22 +31,21 @@ require_once __DIR__ . '/../../includes/admin/controller/controller_timeTable.ph
 
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
   try {
-      $timeTableData = new TimeTableData();
-      
-      if (isset($_GET['teacher'])) {
-          $html = $timeTableData->getSpecificTeacherSchedule($_GET['teacher']);
-          echo $html ?: '<div class="alert alert-info">Aucun emploi du temps trouvé pour cet enseignant</div>';
-      } elseif (isset($_GET['group'])) {
-          $html = $timeTableData->getClassSchedule($_GET['group']);
-          echo $html ?: '<div class="alert alert-info">Aucun emploi du temps trouvé pour ce groupe</div>';
-      } elseif (isset($_GET['room'])) {
-          $html = $timeTableData->getSpecificRoomSchedule($_GET['room']);
-          echo $html ?: '<div class="alert alert-info">Aucun emploi du temps trouvé pour cette salle</div>';
-      }
-      
+    $timeTableData = new TimeTableData();
+
+    if (isset($_GET['teacher'])) {
+      $html = $timeTableData->getSpecificTeacherSchedule($_GET['teacher']);
+      echo $html ?: '<div class="alert alert-info">Aucun emploi du temps trouvé pour cet enseignant</div>';
+    } elseif (isset($_GET['group'])) {
+      $html = $timeTableData->getClassSchedule($_GET['group']);
+      echo $html ?: '<div class="alert alert-info">Aucun emploi du temps trouvé pour ce groupe</div>';
+    } elseif (isset($_GET['room'])) {
+      $html = $timeTableData->getSpecificRoomSchedule($_GET['room']);
+      echo $html ?: '<div class="alert alert-info">Aucun emploi du temps trouvé pour cette salle</div>';
+    }
   } catch (Exception $e) {
-      http_response_code(500);
-      echo '<div class="alert alert-danger">Erreur: ' . htmlspecialchars($e->getMessage()) . '</div>';
+    http_response_code(500);
+    echo '<div class="alert alert-danger">Erreur: ' . htmlspecialchars($e->getMessage()) . '</div>';
   }
   exit;
 }
@@ -114,7 +113,7 @@ try {
               <option value="">Selectionner professeurs</option>
               <?php foreach ($professeurs as $prof) : ?>
                 <option value="<?= htmlspecialchars($prof['nom_enseignant']) ?>">
-                  <?= htmlspecialchars($prof['nom_enseignant'])." ".htmlspecialchars($prof['prenom_enseignant']) ?>
+                  <?= htmlspecialchars($prof['nom_enseignant']) . " " . htmlspecialchars($prof['prenom_enseignant']) ?>
                 </option>
               <?php endforeach; ?>
             </select>
@@ -157,10 +156,13 @@ try {
               // foreach ($weeks as $week) :
               //   $value = $week['start'] . ',' . $week['end'];
               ?>
-                <option value="<?php //echo htmlspecialchars($value) ?>">
-                  <?php //echo htmlspecialchars($week['display']) ?>
+                <option value="<?php //echo htmlspecialchars($value) 
+                                ?>">
+                  <?php //echo htmlspecialchars($week['display']) 
+                  ?>
                 </option>
-              <?php //endforeach; ?>
+              <?php //endforeach; 
+              ?>
             </select>
           </div>
         </div> -->
@@ -319,7 +321,7 @@ try {
   ?>
 
   <!-- filtration d'emploi du temps -->
-   <script src="../../assets/js/timetablefilter.js"></script>
+  <script src="../../assets/js/timetablefilter.js"></script>
 
   <!-- dezoumer la page si le type d'ecran est portable -->
   <script src="../../assets/js/dezoomer.js"></script>

@@ -2,7 +2,7 @@
 session_start();
 
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-in.php');
+  header('location:../sign-in.php');
 }
 include('../../includes/admin/controller/controller.php');
 
@@ -176,7 +176,7 @@ try {
                               <span class="badge badge-sm bg-gradient-success">Online</span>
                             </td>
                           <?php } ?>
-                          <?php if ($result->statut === 'Inactif'){ ?>
+                          <?php if ($result->statut === 'Inactif') { ?>
                             <td class="align-middle text-center text-sm">
                               <span class="badge badge-sm bg-gradient-secondary">Offline</span>
                             </td>

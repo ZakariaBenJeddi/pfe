@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-in.php');
+  header('location:../sign-in.php');
 }
 include('../../includes/admin/controller/controller.php');
 
@@ -12,20 +12,20 @@ require('../../includes/deconnexion_5s.php');
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
   // Définir l'en-tête de réponse JSON
   header('Content-Type: application/json');
-  
+
   // Exécuter la recherche
   $result = get_salle_by_date_range(
-      $dbh,
-      $_POST['start_date'] ?? null,
-      $_POST['end_date'] ?? null
+    $dbh,
+    $_POST['start_date'] ?? null,
+    $_POST['end_date'] ?? null
   );
-  
+
   // Définir le code de statut HTTP
   http_response_code($result['code']);
-  
+
   // Supprimer le code du résultat final
   unset($result['code']);
-  
+
   // Renvoyer le résultat en JSON
   echo json_encode($result);
   exit;
@@ -37,14 +37,14 @@ $results = get_all_salles($dbh);
 //* Delete
 if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
   $result = delete_class($dbh, $_GET['id']);
-  
+
   // Affichage du message
   echo "<script>alert('" . htmlspecialchars($result['message']) . "');</script>";
-  
+
   // Redirection si nécessaire
   if ($result['success'] && $result['redirect']) {
-      header("Location: " . $result['redirect_url']);
-      exit;
+    header("Location: " . $result['redirect_url']);
+    exit;
   }
 }
 ?>
@@ -107,7 +107,7 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
                               </div>
                             </td>
                             <td class="align-middle text-center text-sm">
-                              <p class="text-xs font-weight-bold mb-0">Etage  <?php echo $result->etage !== 0 ? $result->etage : 'Rez de chaussée'; ?></p>
+                              <p class="text-xs font-weight-bold mb-0">Etage <?php echo $result->etage !== 0 ? $result->etage : 'Rez de chaussée'; ?></p>
                             </td>
                             <td>
                               <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?= $result->capacite_salle; ?></p>

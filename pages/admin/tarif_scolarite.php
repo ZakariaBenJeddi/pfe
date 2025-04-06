@@ -3,7 +3,7 @@ include('../../includes/admin/controller/controller.php');
 session_start();
 
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-in.php');
+  header('location:../sign-in.php');
 }
 
 //* deconnexion
@@ -34,28 +34,28 @@ if (isset($_GET['id']) && isset($_GET['del']) && $_GET['del'] == 1) {
 
 //* add & update
 if (isset($_POST['save'])) {
-    $id_tarif = isset($_POST['id_tarif']) ? $_POST['id_tarif'] : null;
-    $id_type_frais = $_POST['id_type_frais'];
-    $id_niveau = $_POST['id_niveau'];
-    $id_filiere = $_POST['id_filiere'];
-    $montant_base = $_POST['montant_base'];
-    $annee_scolaire = $_POST['annee_scolaire'];
+  $id_tarif = isset($_POST['id_tarif']) ? $_POST['id_tarif'] : null;
+  $id_type_frais = $_POST['id_type_frais'];
+  $id_niveau = $_POST['id_niveau'];
+  $id_filiere = $_POST['id_filiere'];
+  $montant_base = $_POST['montant_base'];
+  $annee_scolaire = $_POST['annee_scolaire'];
 
-    if (!empty($id_tarif)) {
-        // Mise à jour si l'ID du tarif existe
-        $result = updateTarif($dbh, $id_tarif, $id_type_frais, $id_niveau, $id_filiere, $montant_base, $annee_scolaire);
-    } else {
-        // Ajout d'un nouveau tarif
-        $result = addTarif($dbh, $id_type_frais, $id_niveau, $id_filiere, $montant_base, $annee_scolaire);
-    }
+  if (!empty($id_tarif)) {
+    // Mise à jour si l'ID du tarif existe
+    $result = updateTarif($dbh, $id_tarif, $id_type_frais, $id_niveau, $id_filiere, $montant_base, $annee_scolaire);
+  } else {
+    // Ajout d'un nouveau tarif
+    $result = addTarif($dbh, $id_type_frais, $id_niveau, $id_filiere, $montant_base, $annee_scolaire);
+  }
 
-    if ($result['success']) {
-      header("Location: tarif_scolarite.php?success=1");
-      exit();
-    } else {
-      header("Location: tarif_scolarite.php?error=" . urlencode($result['message']));
-      exit();
-    }
+  if ($result['success']) {
+    header("Location: tarif_scolarite.php?success=1");
+    exit();
+  } else {
+    header("Location: tarif_scolarite.php?error=" . urlencode($result['message']));
+    exit();
+  }
 }
 ?>
 

@@ -10,7 +10,7 @@ session_start();
 
 //* Vérification de l'authentification
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-in.php');
+  header('location:../sign-in.php');
   exit();
 }
 
@@ -20,17 +20,17 @@ require('../../includes/deconnexion_5s.php');
 //* Filter
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
   header('Content-Type: application/json');
-  
+
   $result = search_niveau_by_date(
-      $dbh,
-      $_POST['start_date'] ?? '',
-      $_POST['end_date'] ?? ''
+    $dbh,
+    $_POST['start_date'] ?? '',
+    $_POST['end_date'] ?? ''
   );
-  
+
   if ($result['status'] === 'error') {
-      http_response_code(400);
+    http_response_code(400);
   }
-  
+
   echo json_encode($result);
   exit();
 }
@@ -47,11 +47,11 @@ try {
 if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
   $result = delete_niveau($dbh, $_GET['id']);
   if ($result['success']) {
-      echo "<script>alert('" . $result['message'] . "');</script>";
-      header("Location: niveau.php");
-      exit();
+    echo "<script>alert('" . $result['message'] . "');</script>";
+    header("Location: niveau.php");
+    exit();
   } else {
-      echo "<script>alert('" . $result['message'] . "');</script>";
+    echo "<script>alert('" . $result['message'] . "');</script>";
   }
 }
 ?>
@@ -96,7 +96,7 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
                     </tr>
                   </thead>
                   <tbody id="tableBody">
-                    <?php if (count($results)> 0) { ?>
+                    <?php if (count($results) > 0) { ?>
                       <?php foreach ($results as $result) : ?>
                         <tr>
                           <td>

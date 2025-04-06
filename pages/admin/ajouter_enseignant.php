@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-in.php');
+  header('location:../sign-in.php');
 }
 
 // require '../../includes/DatabaseConnexion.php';
@@ -14,32 +14,32 @@ require('../../includes/deconnexion_5s.php');
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
   // Préparer les données
   $enseignantData = [
-      'nom_enseignant' => $_POST['nom_enseignant'],
-      'prenom_enseignant' => $_POST['prenom_enseignant'],
-      'email_enseignant' => $_POST['email_enseignant'],
-      'telephone_enseignant' => $_POST['telephone_enseignant'],
-      'date_naissance' => $_POST['date_naissance'],
-      'specialite' => $_POST['specialite'],
-      'masse_horaire' => $_POST['masse_horaire'],
-      'date_embauche' => $_POST['date_embauche'],
-      'adresse' => $_POST['adresse'],
-      'genre' => $_POST['genre'],
-      'niveau_education' => $_POST['niveau_education'],
-      'salaire' => $_POST['salaire'],
-      'est_connecte' => $_POST['est_connecte'],
-      'degree' => $_POST['degree']
+    'nom_enseignant' => $_POST['nom_enseignant'],
+    'prenom_enseignant' => $_POST['prenom_enseignant'],
+    'email_enseignant' => $_POST['email_enseignant'],
+    'telephone_enseignant' => $_POST['telephone_enseignant'],
+    'date_naissance' => $_POST['date_naissance'],
+    'specialite' => $_POST['specialite'],
+    'masse_horaire' => $_POST['masse_horaire'],
+    'date_embauche' => $_POST['date_embauche'],
+    'adresse' => $_POST['adresse'],
+    'genre' => $_POST['genre'],
+    'niveau_education' => $_POST['niveau_education'],
+    'salaire' => $_POST['salaire'],
+    'est_connecte' => $_POST['est_connecte'],
+    'degree' => $_POST['degree']
   ];
 
   // Appeler la fonction du controller
   $result = ajouterEnseignant($dbh, $enseignantData);
 
   if ($result['success']) {
-      echo "<script>
+    echo "<script>
           alert('Enseignant ajouté avec succès.');
           window.location.href = 'enseignant.php';
       </script>";
   } else {
-      echo "<script>
+    echo "<script>
           alert('" . $result['message'] . "');
       </script>";
   }

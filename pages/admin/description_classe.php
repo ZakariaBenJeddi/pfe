@@ -16,7 +16,7 @@ if (!isset($_SESSION['initialized'])) {
 
 //** Vérification de l'authentification de l'utilisateur
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-in.php');
+  header('location:../sign-in.php');
   exit();
 }
 

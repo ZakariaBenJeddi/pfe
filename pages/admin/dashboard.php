@@ -160,6 +160,96 @@ foreach ($jours as $jour) {
   ];
 }
 
+//! ---------
+// Connexion à la base de données
+$conn = new mysqli("localhost", "root", "", "pfe1");
+
+// Vérifier la connexion
+if ($conn->connect_error) {
+    die("Erreur de connexion : " . $conn->connect_error);
+}
+
+// Requêtes pour les métriques principales
+$queryTotalValide = "SELECT SUM(montant_final) as total FROM paiements_eleves WHERE statut_paiement = 'Validé'";
+$queryEnAttente = "SELECT COUNT(*) as nombre, SUM(montant_final) as montant FROM paiements_eleves WHERE statut_paiement = 'En attente'";
+$queryMoyenneEleve = "SELECT AVG(total) as moyenne FROM (SELECT id_eleve, SUM(montant_final) as total FROM paiements_eleves GROUP BY id_eleve) as totaux_eleves";
+$queryMoisActuel = "SELECT SUM(montant_final) as total FROM paiements_eleves WHERE MONTH(date_paiement) = MONTH(CURRENT_DATE()) AND YEAR(date_paiement) = YEAR(CURRENT_DATE()) AND statut_paiement = 'Validé'";
+
+// Exécution des requêtes
+$resultTotal = $conn->query($queryTotalValide);
+$totalValide = $resultTotal->fetch_assoc()['total'];
+
+$resultEnAttente = $conn->query($queryEnAttente);
+$enAttente = $resultEnAttente->fetch_assoc();
+
+$resultMoyenne = $conn->query($queryMoyenneEleve);
+$moyenneEleve = $resultMoyenne->fetch_assoc()['moyenne'];
+
+$resultMoisActuel = $conn->query($queryMoisActuel);
+$totalMois = $resultMoisActuel->fetch_assoc()['total'];
+
+// Requête pour données du graphique par mois
+$queryGraphMois = "SELECT 
+                    YEAR(date_paiement) as annee, 
+                    MONTH(date_paiement) as mois, 
+                    SUM(montant_final) as total 
+                  FROM paiements_eleves 
+                  WHERE statut_paiement = 'Validé' 
+                  GROUP BY YEAR(date_paiement), MONTH(date_paiement) 
+                  ORDER BY annee, mois";
+
+$resultGraphMois = $conn->query($queryGraphMois);
+$mois = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+$dataGraphMois = array_fill_keys($mois, 0); // Initialiser avec tous les mois à 0
+
+while ($row = $resultGraphMois->fetch_assoc()) {
+    $moisKey = date("M", mktime(0, 0, 0, $row['mois'], 1, $row['annee']));
+    if (isset($dataGraphMois[$moisKey])) {
+        $dataGraphMois[$moisKey] = $row['total'];
+    }
+}
+
+// Requête pour répartition des modes de paiement
+$queryModes = "SELECT 
+                mode_paiement, 
+                COUNT(*) as nombre, 
+                SUM(montant_final) as total 
+              FROM paiements_eleves 
+              GROUP BY mode_paiement";
+
+$resultModes = $conn->query($queryModes);
+$dataModes = [];
+while ($row = $resultModes->fetch_assoc()) {
+    $dataModes[] = [
+        'mode' => $row['mode_paiement'],
+        'nombre' => $row['nombre'],
+        'total' => $row['total']
+    ];
+}
+
+// Requête pour les 4 élèves ayant payé le plus
+$queryTopEleves = "SELECT 
+                    e.id_eleve,
+                    e.nom,
+                    e.prenom,
+                    SUM(p.montant_final) as total_paye,
+                    COUNT(p.id_paiement) as nb_paiements
+                FROM paiements_eleves p
+                JOIN eleves e ON p.id_eleve = e.id_eleve
+                WHERE p.statut_paiement = 'Validé'
+                GROUP BY e.id_eleve, e.nom, e.prenom
+                ORDER BY total_paye DESC
+                LIMIT 4";
+
+$resultTopEleves = $conn->query($queryTopEleves);
+$topEleves = [];
+while ($row = $resultTopEleves->fetch_assoc()) {
+    $topEleves[] = $row;
+}
+
+// Fermer la connexion
+$conn->close();
+
 ?>
 
 <!DOCTYPE html>
@@ -230,7 +320,7 @@ foreach ($jours as $jour) {
               <div class="row">
                 <div class="col-8">
                   <div class="numbers">
-                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Ensaignant</p>
+                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Paiement ****</p>
                     <h5 class="font-weight-bolder">
                       <?= $nbr_enseignant ?>
                     </h5>
@@ -457,19 +547,18 @@ foreach ($jours as $jour) {
         <div class="col-lg-7 mb-lg-0 mb-4">
           <div class="card z-index-2 h-100">
             <div class="card-header pb-0 pt-3 bg-transparent">
-              <h6 class="text-capitalize">Abscence Chart</h6>
+              <h6 class="text-capitalize">Sales overview</h6>
               <p class="text-sm mb-0">
                 <i class="fa fa-arrow-up text-success"></i>
-                <span class="font-weight-bold">4% plus</span> in 2021
+                <span class="font-weight-bold">4% more</span> in 2021
               </p>
             </div>
             <div class="card-body p-3">
               <div class="chart">
-                <canvas id="chart-bar" class="chart-canvas" height="300"></canvas>
+                <canvas id="paiement-chart-line" class="chart-canvas" height="300"></canvas>
               </div>
             </div>
           </div>
-
         </div>
         <div class="col-lg-5">
           <div class="card">
@@ -750,6 +839,133 @@ foreach ($jours as $jour) {
       chart.render();
     }
   </script>
+
+
+<!-- paiement chart -->
+
+<script>
+        // Graphique d'évolution des paiements par mois avec le style demandé
+        var ctx1 = document.getElementById("paiement-chart-line").getContext("2d");
+        var gradientStroke1 = ctx1.createLinearGradient(0, 230, 0, 50);
+
+        gradientStroke1.addColorStop(1, 'rgba(94, 114, 228, 0.2)');
+        gradientStroke1.addColorStop(0.2, 'rgba(94, 114, 228, 0.0)');
+        gradientStroke1.addColorStop(0, 'rgba(94, 114, 228, 0)');
+        
+        new Chart(ctx1, {
+            type: "line",
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                datasets: [{
+                    label: "Paiements mensuels",
+                    tension: 0.4,
+                    borderWidth: 0,
+                    pointRadius: 0,
+                    borderColor: "#5e72e4",
+                    backgroundColor: gradientStroke1,
+                    borderWidth: 3,
+                    fill: true,
+                    data: [
+                        <?= $dataGraphMois["Jan"] ?>,
+                        <?= $dataGraphMois["Feb"] ?>,
+                        <?= $dataGraphMois["Mar"] ?>,
+                        <?= $dataGraphMois["Apr"] ?>,
+                        <?= $dataGraphMois["May"] ?>,
+                        <?= $dataGraphMois["Jun"] ?>,
+                        <?= $dataGraphMois["Jul"] ?>,
+                        <?= $dataGraphMois["Aug"] ?>,
+                        <?= $dataGraphMois["Sep"] ?>,
+                        <?= $dataGraphMois["Oct"] ?>,
+                        <?= $dataGraphMois["Nov"] ?>,
+                        <?= $dataGraphMois["Dec"] ?>
+                    ],
+                    maxBarThickness: 6
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            drawBorder: false,
+                            display: true,
+                            drawOnChartArea: true,
+                            drawTicks: false,
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            display: true,
+                            padding: 10,
+                            color: '#fbfbfb',
+                            font: {
+                                size: 11,
+                                family: "Open Sans",
+                                style: 'normal',
+                                lineHeight: 2
+                            },
+                        }
+                    },
+                    x: {
+                        grid: {
+                            drawBorder: false,
+                            display: false,
+                            drawOnChartArea: false,
+                            drawTicks: false,
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            display: true,
+                            color: '#ccc',
+                            padding: 20,
+                            font: {
+                                size: 11,
+                                family: "Open Sans",
+                                style: 'normal',
+                                lineHeight: 2
+                            },
+                        }
+                    },
+                },
+            },
+        });
+
+        // Graphique de répartition des modes de paiement
+        const ctxModes = document.getElementById('graphModes').getContext('2d');
+        new Chart(ctxModes, {
+            type: 'pie',
+            data: {
+                labels: <?= json_encode(array_column($dataModes, 'mode')) ?>,
+                datasets: [{
+                    data: <?= json_encode(array_column($dataModes, 'total')) ?>,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+    </script>
 
 
   <script>

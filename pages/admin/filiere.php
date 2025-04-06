@@ -1,10 +1,11 @@
 <?php
-include('../../includes/admin/controller/controller.php');
 session_start();
 
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-in.php');
+  header('location:../sign-in.php');
 }
+
+include('../../includes/admin/controller/controller.php');
 
 //* deconnexion
 require('../../includes/deconnexion_5s.php');
@@ -13,28 +14,28 @@ require('../../includes/deconnexion_5s.php');
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
   header('Content-Type: application/json');
   try {
-      // Validation des dates
-      if (!isset($_POST['start_date']) || !isset($_POST['end_date'])) {
-          throw new Exception("Les dates sont requises");
-      }
+    // Validation des dates
+    if (!isset($_POST['start_date']) || !isset($_POST['end_date'])) {
+      throw new Exception("Les dates sont requises");
+    }
 
-      $result = get_filieres_by_date_range($dbh, $_POST['start_date'], $_POST['end_date']);
+    $result = get_filieres_by_date_range($dbh, $_POST['start_date'], $_POST['end_date']);
 
-      if ($result['success']) {
-          echo json_encode([
-              'status' => 'success',
-              'data' => $result['data'],
-              'count' => $result['count']
-          ]);
-      } else {
-          throw new Exception($result['message']);
-      }
-  } catch (Exception $e) {
-      http_response_code(400);
+    if ($result['success']) {
       echo json_encode([
-          'status' => 'error',
-          'message' => $e->getMessage()
+        'status' => 'success',
+        'data' => $result['data'],
+        'count' => $result['count']
       ]);
+    } else {
+      throw new Exception($result['message']);
+    }
+  } catch (Exception $e) {
+    http_response_code(400);
+    echo json_encode([
+      'status' => 'error',
+      'message' => $e->getMessage()
+    ]);
   }
   exit;
 }
@@ -43,11 +44,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 try {
   $result = get_filieres_with_niveaux($dbh);
   if ($result['success']) {
-      $results = $result['data'];
-      // Utilisation des données...
+    $results = $result['data'];
+    // Utilisation des données...
   } else {
-      // Gestion de l'erreur
-      echo "<script>alert('" . htmlspecialchars($result['message']) . "');</script>";
+    // Gestion de l'erreur
+    echo "<script>alert('" . htmlspecialchars($result['message']) . "');</script>";
   }
 } catch (Exception $e) {
   error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
@@ -59,15 +60,15 @@ try {
   $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
   if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
-      $result = delete_filiere($dbh, $_GET['id']);
-      
-      if ($result['success']) {
-          echo "<script>alert('Filière Bien Supprimée');</script>";
-          header("Location: filiere.php");
-          exit;
-      } else {
-          echo "<script>alert('" . htmlspecialchars($result['message']) . "');</script>";
-      }
+    $result = delete_filiere($dbh, $_GET['id']);
+
+    if ($result['success']) {
+      echo "<script>alert('Filière Bien Supprimée');</script>";
+      header("Location: filiere.php");
+      exit;
+    } else {
+      echo "<script>alert('" . htmlspecialchars($result['message']) . "');</script>";
+    }
   }
 } catch (Exception $e) {
   error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');

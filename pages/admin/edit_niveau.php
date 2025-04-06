@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-in.php');
+  header('location:../sign-in.php');
 }
 
 include('../../includes/admin/controller/controller.php');
@@ -9,10 +9,10 @@ include('../../includes/admin/controller/controller.php');
 if (isset($_GET['id'])) {
   $result = get_niveau_by_id($dbh, $_GET['id']);
   if ($result['success']) {
-      $niveauSelected = $result['data'];
+    $niveauSelected = $result['data'];
   } else {
-      echo "<script>alert('" . $result['message'] . "');</script>";
-      exit();
+    echo "<script>alert('" . $result['message'] . "');</script>";
+    exit();
   }
 }
 
@@ -50,20 +50,20 @@ if ($id) {
 //*Update
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
   $result = update_niveau(
-      $dbh,
-      $_POST['id_niveau'],
-      $_POST['nom_niveau'],
-      $_POST['description_niveau'],
-      $_POST['statut']
+    $dbh,
+    $_POST['id_niveau'],
+    $_POST['nom_niveau'],
+    $_POST['description_niveau'],
+    $_POST['statut']
   );
-  
+
   if ($result['success']) {
-      echo "<script>
+    echo "<script>
               alert('" . $result['message'] . "');
               window.location.href = 'niveau.php';
             </script>";
   } else {
-      echo "<script>alert('" . $result['message'] . "');</script>";
+    echo "<script>alert('" . $result['message'] . "');</script>";
   }
 }
 

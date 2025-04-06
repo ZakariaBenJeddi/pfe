@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-in.php');
+  header('location:../sign-in.php');
 }
 
 include('../../includes/admin/controller/controller.php');
@@ -20,21 +20,21 @@ try {
 //* Add
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
   try {
-      $result = insert_filiere($dbh, $_POST);
-      
-      if ($result['success']) {
-          echo "<script>
+    $result = insert_filiere($dbh, $_POST);
+
+    if ($result['success']) {
+      echo "<script>
               alert('Filière ajoutée avec succès.');
               window.location.href = 'filiere.php';
           </script>";
-      } else {
-          echo "<script>
+    } else {
+      echo "<script>
               alert('" . htmlspecialchars($result['message']) . "');
           </script>";
-      }
+    }
   } catch (Exception $e) {
-      error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
-      echo "<script>
+    error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+    echo "<script>
           alert('Une erreur est survenue. Veuillez réessayer plus tard.');
       </script>";
   }

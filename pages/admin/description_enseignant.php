@@ -6,7 +6,7 @@ session_start();
 ob_clean();
 
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-in.php');
+  header('location:../sign-in.php');
 }
 
 //* deconnexion
@@ -54,16 +54,16 @@ if (isset($_POST['matiere']) && isset($_POST['id_enseignant'])) {
 
 if (isset($_GET['id'])) {
   $resultat = getEnseignantById($dbh, $_GET['id']);
-  
+
   if (!$resultat['success']) {
-      if ($resultat['redirect']) {
-          header('location:enseignant.php');
-          exit;
-      }
-      echo $resultat['message'];
+    if ($resultat['redirect']) {
+      header('location:enseignant.php');
       exit;
+    }
+    echo $resultat['message'];
+    exit;
   }
-  
+
   $results = $resultat['data'];
 } else {
   header('location:enseignant.php');

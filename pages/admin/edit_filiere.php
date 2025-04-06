@@ -1,24 +1,24 @@
 <?php
 session_start();
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-in.php');
+  header('location:../sign-in.php');
 }
 
 include('../../includes/admin/controller/controller.php');
 
 if (isset($_GET['id'])) {
   try {
-      $result = get_filiere_by_id($dbh, $_GET['id']);
-      if ($result['success']) {
-          $filiere = $result['data'];
-      } else {
-          echo htmlspecialchars($result['message']);
-          exit();
-      }
-  } catch (Exception $e) {
-      error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
-      echo "Une erreur est survenue. Veuillez réessayer plus tard.";
+    $result = get_filiere_by_id($dbh, $_GET['id']);
+    if ($result['success']) {
+      $filiere = $result['data'];
+    } else {
+      echo htmlspecialchars($result['message']);
       exit();
+    }
+  } catch (Exception $e) {
+    error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+    echo "Une erreur est survenue. Veuillez réessayer plus tard.";
+    exit();
   }
 } else {
   echo "ID de Filière non fourni.";
@@ -34,21 +34,21 @@ $AllNiveau = get_all_niveau($dbh);
 //* Edit
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
   try {
-      $result = update_filiere($dbh, $_POST);
-      
-      if ($result['success']) {
-          echo "<script>
+    $result = update_filiere($dbh, $_POST);
+
+    if ($result['success']) {
+      echo "<script>
               alert('Filière modifiée avec succès.');
               window.location.href = 'filiere.php';
           </script>";
-      } else {
-          echo "<script>
+    } else {
+      echo "<script>
               alert('" . htmlspecialchars($result['message']) . "');
           </script>";
-      }
+    }
   } catch (Exception $e) {
-      error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
-      echo "<script>
+    error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+    echo "<script>
           alert('Une erreur est survenue. Veuillez réessayer plus tard.');
       </script>";
   }

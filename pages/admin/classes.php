@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-up.php');
+  header('location:../sign-in.php');
 }
 include('../../includes/admin/controller/controller.php');
 

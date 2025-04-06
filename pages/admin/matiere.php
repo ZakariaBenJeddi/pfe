@@ -3,7 +3,7 @@ include('../../includes/admin/controller/controller.php');
 session_start();
 
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-in.php');
+  header('location:../sign-in.php');
 }
 
 //* deconnexion
@@ -81,12 +81,12 @@ try {
 //* Delete
 if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
   $result = delete_matiere($dbh, $_GET['id']);
-  
+
   echo "<script>alert('" . htmlspecialchars($result['message']) . "');</script>";
-  
+
   if ($result['success'] && $result['redirect']) {
-      header("Location: " . $result['redirect_url']);
-      exit;
+    header("Location: " . $result['redirect_url']);
+    exit;
   }
 }
 ?>

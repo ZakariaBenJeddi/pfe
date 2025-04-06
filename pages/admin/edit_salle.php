@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-in.php');
+  header('location:../sign-in.php');
 }
 
 include('../../includes/admin/controller/controller.php');
@@ -21,14 +21,14 @@ if (isset($_GET['id_salle'])) {
 //* Edit
 if (isset($_POST['modifier'])) {
   $result = update_class($dbh, $_POST);
-  
+
   if (!$result['success']) {
-      echo "<script>alert('" . htmlspecialchars($result['message']) . "');</script>";
+    echo "<script>alert('" . htmlspecialchars($result['message']) . "');</script>";
   }
-  
+
   if ($result['redirect']) {
-      header("Location: " . $result['redirect_url']);
-      exit;
+    header("Location: " . $result['redirect_url']);
+    exit;
   }
 }
 ?>
@@ -55,7 +55,7 @@ if (isset($_POST['modifier'])) {
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
                 <p class="mb-0">Modifier Salle</p>
-                
+
               </div>
             </div>
             <hr class="horizontal dark">
@@ -63,7 +63,7 @@ if (isset($_POST['modifier'])) {
               <div class="card-body">
                 <p class="text-uppercase text-sm">Salle Information</p>
                 <div class="row">
-                      <input type="hidden" readonly name="id_salle" value="<?= $salle['id_salle'] ?>">
+                  <input type="hidden" readonly name="id_salle" value="<?= $salle['id_salle'] ?>">
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="nom_salle" class="form-control-label">Nom Salle</label>
@@ -158,25 +158,25 @@ if (isset($_POST['modifier'])) {
       <?php include '../../includes/footer.php' ?>
 
     </div>
-  </div>
-  <!-- FIXED PLUGIN  -->
-  <?php include '../../includes/fixedplugin.php' ?>
-  <!--   Core JS Files   -->
-  <script src="../../assets/js/core/popper.min.js"></script>
-  <script src="../../assets/js/core/bootstrap.min.js"></script>
-  <script src="../../assets/js/plugins/perfect-scrollbar.min.js"></script>
-  <script src="../../assets/js/plugins/smooth-scrollbar.min.js"></script>
-  <script>
-    var win = navigator.platform.indexOf('Win') > -1;
-    if (win && document.querySelector('#sidenav-scrollbar')) {
-      var options = {
-        damping: '0.5'
+    </div>
+    <!-- FIXED PLUGIN  -->
+    <?php include '../../includes/fixedplugin.php' ?>
+    <!--   Core JS Files   -->
+    <script src="../../assets/js/core/popper.min.js"></script>
+    <script src="../../assets/js/core/bootstrap.min.js"></script>
+    <script src="../../assets/js/plugins/perfect-scrollbar.min.js"></script>
+    <script src="../../assets/js/plugins/smooth-scrollbar.min.js"></script>
+    <script>
+      var win = navigator.platform.indexOf('Win') > -1;
+      if (win && document.querySelector('#sidenav-scrollbar')) {
+        var options = {
+          damping: '0.5'
+        }
+        Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
       }
-      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
-    }
-  </script>
-  <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
-  <script src="../../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
+    </script>
+    <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
+    <script src="../../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
 </body>
 
 </html>

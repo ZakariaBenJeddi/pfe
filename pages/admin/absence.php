@@ -2,14 +2,14 @@
 session_start();
 
 if (empty($_SESSION['user'])) {
-  header('location:../../sign-in.php');
+  header('location:../sign-in.php');
 }
 include('../../includes/admin/controller/controller.php');
 
 //* deconnexion
 require('../../includes/deconnexion_5s.php');
 
-//* FILTER
+//* FILTER ABSENCES
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
   header('Content-Type: application/json');
   try {
@@ -26,14 +26,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       throw new Exception("Format de date invalide");
     }
 
-    // Conversion des dates au format MySQL
-    $start_date = date("Y-m-d", strtotime($start_date));
-    $end_date = date("Y-m-d", strtotime($end_date));
+    // Ajout des heures pour couvrir la journée entière
+    $start_date = $start_date . " 00:00:00";
+    $end_date = $end_date . " 23:59:59";
 
     // Requête SQL avec préparation
-    $sql = "SELECT * FROM eleves 
-              WHERE date_inscription BETWEEN :start_date AND :end_date
-              ORDER BY date_inscription DESC";
+    $sql = "SELECT a.*, 
+           e.nom AS nom_eleve, 
+           e.prenom AS prenom_eleve, 
+           e.telephone_tuteur, 
+           c.nom_classe,
+           en.nom_enseignant AS nom_enseignant, 
+           en.prenom_enseignant AS prenom_enseignant
+    FROM absences a
+    LEFT JOIN eleves e ON a.id_eleve = e.id_eleve
+    LEFT JOIN classe c ON e.id_classe = c.id_classe
+    LEFT JOIN enseignant en ON a.id_enseignant = en.id_enseignant
+    WHERE a.date_creation BETWEEN :start_date AND :end_date
+    ORDER BY a.date_creation DESC";
 
     $stmt = $dbh->prepare($sql);
     $stmt->execute([
@@ -44,19 +54,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $results = $stmt->fetchAll(PDO::FETCH_OBJ);
 
     echo json_encode([
-      'status' => 'success',
+      'success' => true,  // Assurez-vous que c'est "success" et pas "status"
       'data' => $results,
       'count' => count($results)
     ]);
   } catch (Exception $e) {
     http_response_code(400);
     echo json_encode([
-      'status' => 'error',
+      'success' => false,
       'message' => $e->getMessage()
     ]);
   }
   exit;
 }
+
 
 //* read 
 try {
@@ -144,7 +155,7 @@ try {
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
                     </tr>
                   </thead>
-                  <tbody id="tableBody">
+                  <tbody id="absencesTableBody">
                     <?php if (count($results) > 0) { ?>
                       <?php foreach ($results as $result) : ?>
                         <tr>
@@ -166,7 +177,7 @@ try {
                             <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?php echo $result->nom_classe === null ? 'Aucun Classe' : $result->nom_classe;  ?></p>
                           </td>
                           <td class="align-middle text-center">
-                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?php echo $result->nom_enseignant || $result->prenom_enseignant === NULL ? 'Aucun Enseignant' : $result->nom_enseignant." ".$result->prenom_enseignant  ?></p>
+                            <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5"><?php echo $result->nom_enseignant || $result->prenom_enseignant === NULL ? 'Aucun Enseignant' : $result->nom_enseignant . " " . $result->prenom_enseignant  ?></p>
                           </td>
                           <td class="align-middle text-center">
                             <p class="text-xs font-weight-bold mb-0"><?= $result->date_absence; ?></p>
@@ -188,7 +199,7 @@ try {
                               <span class="badge badge-sm bg-gradient-success">Validee</span>
                             </td>
                           <?php } ?>
-                          <?php if ($result->statut === 'en_attente'){ ?>
+                          <?php if ($result->statut === 'en_attente') { ?>
                             <td class="align-middle text-center text-sm">
                               <span class="badge badge-sm bg-gradient-secondary">En Attente</span>
                             </td>
@@ -238,7 +249,7 @@ try {
   <script src="../../assets/js/export.js"></script>
 
   <!-- //* Date Picker + AJAX eleves intervalle date  -->
-  <script src="../../assets/dateP_dateP/dateP_dataP_eleve.js"></script>
+  <script src="../../assets/dateP_dateP/dateP_dataP_absence.js"></script>
 
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
