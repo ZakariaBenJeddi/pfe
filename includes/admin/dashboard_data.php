@@ -95,7 +95,7 @@ $stmt_absc = $dbh->prepare($query_absc);
 $stmt_absc->execute();
 
 // Initialiser le tableau avec tous les jours à 0
-$jours = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+$jours = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 $data = [
   'garçon' => array_fill_keys($jours, 0),
   'fille' => array_fill_keys($jours, 0)
@@ -226,4 +226,29 @@ while ($row = $resultTopEleves->fetch()) {
   $topEleves[] = $row;
 }
 
+
+// Requête pour obtenir le total des paiements validés de l'année en cours
+$queryTotalValideAnneeActuelle = "SELECT SUM(montant_final) as total 
+                                FROM paiements_eleves 
+                                WHERE statut_paiement = 'Validé' 
+                                AND YEAR(date_paiement) = YEAR(CURRENT_DATE())";
+$resultTotalAnneeActuelle = $dbh->query($queryTotalValideAnneeActuelle);
+$totalValideAnneeActuelle = $resultTotalAnneeActuelle->fetch()['total'] ?: 0;
+
+// Requête pour obtenir le total des paiements validés de l'année précédente
+$queryTotalValideAnneePrecedente = "SELECT SUM(montant_final) as total 
+                                  FROM paiements_eleves 
+                                  WHERE statut_paiement = 'Validé' 
+                                  AND YEAR(date_paiement) = YEAR(CURRENT_DATE()) - 1";
+$resultTotalAnneePrecedente = $dbh->query($queryTotalValideAnneePrecedente);
+$totalValideAnneePrecedente = $resultTotalAnneePrecedente->fetch()['total'] ?: 0;
+
+// Calcul du pourcentage d'évolution
+$pourcentage_evolution = 0;
+if ($totalValideAnneePrecedente > 0) {
+  $pourcentage_evolution = (($totalValideAnneeActuelle - $totalValideAnneePrecedente) / $totalValideAnneePrecedente) * 100;
+} else {
+  // Si pas de données pour l'année précédente, on considère une augmentation de 100%
+  $pourcentage_evolution = $totalValideAnneeActuelle > 0 ? 100 : null;
+}
 ?>

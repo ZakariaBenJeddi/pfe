@@ -61,7 +61,7 @@ include '../../includes/admin/dashboard_data.php';
                         <span class="<?= $pourcentage < 0 ? 'text-danger' : 'text-success'; ?> text-sm font-weight-bolder">
                           <?= number_format($pourcentage, 2) . "%"; ?>
                         </span>
-                        l'année précédente
+                        par rapport l'année précédente
                       </p>
                     <?php } else { ?>
                       <p class="text-danger text-sm mb-0 mb-3">
@@ -85,27 +85,26 @@ include '../../includes/admin/dashboard_data.php';
               <div class="row">
                 <div class="col-8">
                   <div class="numbers">
-                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Paiement ****</p>
+                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Paiement validés</p>
                     <h5 class="font-weight-bolder">
-                      <?= $nbr_enseignant ?>
+                      <?= number_format($totalValideAnneeActuelle, 2, ',', ' ') ?> DH
                     </h5>
                     <?php if ($pourcentage_enseignant !== null) { ?>
                       <p class="mb-0">
-                        <span class="<?= $pourcentage_enseignant < 0 ? 'text-danger' : 'text-success'; ?> text-sm font-weight-bolder">
-                          <?= number_format($pourcentage_enseignant, 2) . "%"; ?>
+                        <span class="<?= $pourcentage_evolution < 0 ? 'text-danger' : 'text-success'; ?> text-sm font-weight-bolder">
+                          <?= ($pourcentage_evolution > 0 ? '+' : '') . number_format($pourcentage_evolution, 2) . "%"; ?>
                         </span>
-                        l'année précédente
+                        par rapport à l'année précédente
                       </p>
                     <?php } else { ?>
                       <p class="text-danger text-sm mb-0 mb-3">
-                        <i class="fas fa-exclamation-circle text-danger text-lg"></i> Error pourcentage
+                        <i class="fas fa-exclamation-circle text-danger text-lg"></i> Aucune donnée pour l'année précédente
                       </p>
                     <?php } ?>
                   </div>
                 </div>
                 <div class="col-4 text-end">
                   <div class="icon icon-shape bg-gradient-success shadow-success text-center rounded-circle">
-                    <!-- <i class="ni ni-paper-diploma text-lg opacity-10" aria-hidden="true"></i> -->
                     <i class="ni ni-single-02 text-light text-lg opacity-10"></i>
                   </div>
                 </div>
@@ -429,7 +428,7 @@ include '../../includes/admin/dashboard_data.php';
                       <td>
                         <div class="text-center">
                           <p class="text-xs font-weight-bold mb-0">Montant total:</p>
-                          <h6 class="text-sm mb-0"><?php echo number_format($eleve['total_paye'], 2, ',', ' '); ?> €</h6>
+                          <h6 class="text-sm mb-0"><?php echo number_format($eleve['total_paye'], 2, ',', ' '); ?> DH</h6>
                         </div>
                       </td>
                       <td class="align-middle text-sm">
@@ -466,7 +465,6 @@ include '../../includes/admin/dashboard_data.php';
 
   <!-- //TODO Highcahrt -->
   <script>
-    // Animation personnalisée pour le graphique en cercle
     (function(H) {
       H.seriesTypes.pie.prototype.animate = function(init) {
         const series = this,
@@ -564,12 +562,12 @@ include '../../includes/admin/dashboard_data.php';
       tooltip: {
         headerFormat: '',
         pointFormat: '<span style="color:{point.color}">\u25cf</span> ' +
-          '<b>{point.name}</b>: {point.y} € ({point.percentage:.1f}%)<br>' +
+          '<b>{point.name}</b>: {point.y} DH ({point.percentage:.1f}%)<br>' +
           'Nombre de transactions: {point.count}'
       },
       accessibility: {
         point: {
-          valueSuffix: '€'
+          valueSuffix: 'DH'
         }
       },
       plotOptions: {
