@@ -201,45 +201,6 @@ include '../../includes/admin/dashboard_data.php';
               <div id="column-chart" class="mt-2"></div>
               <!-- Footer -->
               <div class="d-flex justify-content-between align-items-center mt-4">
-                <!-- <div class="dropdown">
-                  <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-calendar-alt me-2"></i>
-                    <span>7 derniers jours</span>
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li>
-                      <a class="dropdown-item d-flex align-items-center" href="#">
-                        <i class="fas fa-clock me-2 text-secondary"></i>
-                        Aujourd'hui
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item d-flex align-items-center" href="#">
-                        <i class="fas fa-calendar-day me-2 text-secondary"></i>
-                        Hier
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item d-flex align-items-center active" href="#">
-                        <i class="fas fa-calendar-week me-2 text-secondary"></i>
-                        7 derniers jours
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item d-flex align-items-center" href="#">
-                        <i class="fas fa-calendar me-2 text-secondary"></i>
-                        30 derniers jours
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item d-flex align-items-center" href="#">
-                        <i class="fas fa-calendar-alt me-2 text-secondary"></i>
-                        90 derniers jours
-                      </a>
-                    </li>
-                  </ul>
-                </div> -->
-
                 <a href="absence.php" class="btn btn-primary d-flex align-items-center">
                   <span>Rapport détaillé</span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right ms-2" viewBox="0 0 16 16">
@@ -290,7 +251,6 @@ include '../../includes/admin/dashboard_data.php';
                       <i class="ni ni-trophy text-dark opacity-10"></i>
                     </div>
                     <h5 class="text-white mb-1">Presentaion Projet</h5>
-                    <!-- <p>Don’t be afraid to be wrong because you can’t learn anything from a compliment.</p> -->
                   </div>
                 </div>
               </div>
