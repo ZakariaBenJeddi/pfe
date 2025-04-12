@@ -9,7 +9,7 @@ if (empty($_SESSION['user'])) {
 //* deconnexion
 require('../../includes/deconnexion_5s.php');
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['start_date']) && isset($_POST['end_date'])) {
   header('Content-Type: application/json');
   try {
     // Validation des dates
@@ -78,6 +78,13 @@ try {
   $results = [];
 }
 
+try {
+  $filieres = get_filieres_with_niveaux($dbh);
+} catch (Exception $e) {
+  echo "<script>alert('" . htmlspecialchars($e->getMessage()) . "');</script>";
+  $filieres = [];
+}
+
 //* Delete
 if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
   $result = delete_matiere($dbh, $_GET['id']);
@@ -87,6 +94,74 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
   if ($result['success'] && $result['redirect']) {
     header("Location: " . $result['redirect_url']);
     exit;
+  }
+}
+
+if (isset($_POST['save'])) {
+  try {
+      // Récupérer et nettoyer les données du formulaire
+      $nom_matiere = filter_var($_POST['nom_filiere'], FILTER_SANITIZE_STRING); // Note: le champ s'appelle nom_filiere dans le formulaire
+      $code_matiere = filter_var($_POST['code_filiere'], FILTER_SANITIZE_STRING); // Note: le champ s'appelle code_filiere dans le formulaire
+      $id_filiere = filter_var($_POST['filiere'], FILTER_SANITIZE_NUMBER_INT);
+      $statut = filter_var($_POST['statut'], FILTER_SANITIZE_STRING);
+      $coefficient = filter_var($_POST['coeficient'], FILTER_SANITIZE_NUMBER_INT); // Note: le champ s'appelle nombre_heures_max dans le formulaire
+      $nombre_seance_semaine = filter_var($_POST['nombre_seance'], FILTER_SANITIZE_NUMBER_INT); // Même problème de nommage
+      $nombre_heures_semaine = filter_var($_POST['nombre_heures_max'], FILTER_SANITIZE_NUMBER_INT); // Même problème de nommage
+      $volume_horaire = filter_var($_POST['volume_horaire'], FILTER_SANITIZE_NUMBER_INT); // Même problème de nommage
+      $type_matiere = filter_var($_POST['type_matiere'], FILTER_SANITIZE_STRING);
+      $description = filter_var($_POST['description'], FILTER_SANITIZE_STRING);
+      
+      // Validation des données (vérification que les champs requis sont présents)
+      if (!$nom_matiere || !$code_matiere || !$id_filiere || !$coefficient) {
+          throw new Exception("Tous les champs obligatoires doivent être remplis.");
+      }
+      
+      // Insérer la matière dans la base de données
+      $sql = "INSERT INTO matiere (
+          id_filiere, 
+          nom_matiere, 
+          code_matiere, 
+          coefficient, 
+          description, 
+          statut, 
+          volume_horaire, 
+          nombre_heures_semaine, 
+          nombre_seance_semaine, 
+          type_matiere, 
+          annee_creation
+      ) VALUES (
+          :id_filiere, 
+          :nom_matiere, 
+          :code_matiere, 
+          :coefficient, 
+          :description, 
+          :statut, 
+          :volume_horaire, 
+          :nombre_heures_semaine, 
+          :nombre_seance_semaine, 
+          :type_matiere, 
+          CURDATE()
+      )";
+      
+      $stmt = $dbh->prepare($sql);
+      $stmt->execute([
+          ':id_filiere' => $id_filiere,
+          ':nom_matiere' => $nom_matiere,
+          ':code_matiere' => $code_matiere,
+          ':coefficient' => $coefficient,
+          ':description' => $description,
+          ':statut' => $statut,
+          ':volume_horaire' => $volume_horaire,
+          ':nombre_heures_semaine' => $nombre_heures_semaine,
+          ':nombre_seance_semaine' => $nombre_seance_semaine,
+          ':type_matiere' => $type_matiere
+      ]);
+      
+      // Redirection ou message de succès
+      echo "<script>alert('Matière ajoutée avec succès!'); window.location.href='matiere.php';</script>";
+      
+  } catch (Exception $e) {
+      echo "<script>alert('Erreur: " . htmlspecialchars($e->getMessage()) . "');</script>";
   }
 }
 ?>
@@ -113,7 +188,8 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
               </div>
               <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
                 <input type="text" class="form-control w-100 w-md-auto mb-3" id="daterange" name="daterange" value="" />
-                <a class="btn btn-primary btn-sm" href="ajouter_filiere.php">Ajouter Filière</a>
+                <!-- <a class="btn btn-primary btn-sm" href="ajouter_matiere.php">Ajouter Matiere</a> -->
+                <a class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#MatiereModal">Ajouter Matiere</a>
                 <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
               </div>
             </div>
@@ -192,6 +268,7 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
                   </tbody>
                 </table>
               </div>
+              <?php require_once("form/matiere_modal.php") ?>
             </div>
           </div>
         </div>

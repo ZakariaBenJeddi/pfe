@@ -65,11 +65,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
-                <p class="mb-0">Ajouter Ensaignant</p>
+                <p class="mb-0">Ajouter Filière</p>
               </div>
             </div>
             <hr class="horizontal dark">
-            <form method="post">
+            <!-- <form method="post"> -->
+            <div class="modal fade" id="paiementModal" tabindex="-1" aria-labelledby="paiementModalLabel" aria-hidden="true">
               <div class="card-body">
                 <p class="text-uppercase text-sm">Information Filière</p>
                 <div class="row">

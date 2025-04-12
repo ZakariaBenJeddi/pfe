@@ -95,7 +95,7 @@ $stmt_absc = $dbh->prepare($query_absc);
 $stmt_absc->execute();
 
 // Initialiser le tableau avec tous les jours à 0
-$jours = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+$jours = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat','Sun'];
 $data = [
   'garçon' => array_fill_keys($jours, 0),
   'fille' => array_fill_keys($jours, 0)
