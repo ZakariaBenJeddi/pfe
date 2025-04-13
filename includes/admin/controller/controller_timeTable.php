@@ -1,6 +1,4 @@
 <?php
-
-
 class TimeTableData
 {
   private $pdo;
