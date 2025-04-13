@@ -41,10 +41,15 @@ try {
 $_SESSION['errmsg'] = "You have successfully logged out";
 unset($_SESSION['user']);
 
-// Store redirect URL in a temporary cookie before destroying session
 if ($redirect_url) {
   setcookie("redirect_after_login", $redirect_url, time() + 3600, "/");
 }
 
 session_destroy();
-header("location:../../index.php");
+
+// Si c'est une déconnexion due à une expiration de session (vérifiez avec un paramètre)
+if (isset($_GET['expired']) && $_GET['expired'] == 1) {
+  header("location:../../session_expired.php?redirect=" . urlencode("../../pages/sign-in.php"));
+} else {
+  header("location:../../index.php");
+}

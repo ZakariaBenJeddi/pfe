@@ -70,7 +70,6 @@ if (isset($_POST['login'])) {
           $host = $_SERVER['HTTP_HOST'];
           $uri = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
           // header("location:admin/dashboard.php");
-
           if (isset($_COOKIE['redirect_after_login'])) {
             $redirect_url = $_COOKIE['redirect_after_login'];
             setcookie("redirect_after_login", "", time() - 3600, "/"); // Clear the cookie
@@ -80,7 +79,6 @@ if (isset($_POST['login'])) {
             header("location:admin/dashboard.php");
             exit();
           }
-
           exit();
         } else {
           echo "<script>alert('Votre compte a été bloqué, veuillez contacter l'administrateur');document.location ='index.php';</script>";
@@ -178,6 +176,7 @@ if (isset($_POST['login'])) {
   <script src="../assets/js/core/bootstrap.min.js"></script>
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
