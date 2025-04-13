@@ -69,7 +69,18 @@ if (isset($_POST['login'])) {
           $query->execute();
           $host = $_SERVER['HTTP_HOST'];
           $uri = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-          header("location:admin/dashboard.php");
+          // header("location:admin/dashboard.php");
+
+          if (isset($_COOKIE['redirect_after_login'])) {
+            $redirect_url = $_COOKIE['redirect_after_login'];
+            setcookie("redirect_after_login", "", time() - 3600, "/"); // Clear the cookie
+            header("location:" . $redirect_url);
+            exit();
+          } else {
+            header("location:admin/dashboard.php");
+            exit();
+          }
+
           exit();
         } else {
           echo "<script>alert('Votre compte a été bloqué, veuillez contacter l'administrateur');document.location ='index.php';</script>";

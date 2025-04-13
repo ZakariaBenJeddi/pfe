@@ -2,6 +2,9 @@
 session_start();
 require '../../includes/DatabaseConnexion.php';
 
+// Save redirect URL if it exists
+$redirect_url = isset($_SESSION['redirect_after_login']) ? $_SESSION['redirect_after_login'] : null;
+
 // Définir le fuseau horaire
 date_default_timezone_set('Africa/Kampala');
 
@@ -37,8 +40,11 @@ try {
 // Supprimer la session et rediriger
 $_SESSION['errmsg'] = "You have successfully logged out";
 unset($_SESSION['user']);
-session_destroy();
 
-// Attendre un peu pour voir l'alert avant redirection
-// echo "<script>setTimeout(function(){ window.location.href='../../index.php'; }, 2000);</script>";
+// Store redirect URL in a temporary cookie before destroying session
+if ($redirect_url) {
+  setcookie("redirect_after_login", $redirect_url, time() + 3600, "/");
+}
+
+session_destroy();
 header("location:../../index.php");
