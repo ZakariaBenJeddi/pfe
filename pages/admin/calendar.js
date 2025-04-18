@@ -89,14 +89,53 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Fonction mise à jour pour la gestion des événements
 
+    // function updateEvent(event) {
+    //     // Debug des données envoyées
+    //     console.log('Event data:', {
+    //         id: event.id,
+    //         start: event.start.toISOString(),
+    //         end: event.end ? event.end.toISOString() : null
+    //     });
+
+    //     fetch('update_schedule.php', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify({
+    //             id: event.id,
+    //             start: event.start.toISOString(),
+    //             end: event.end ? event.end.toISOString() : null
+    //         }),
+    //     })
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         console.log('Réponse serveur:', data);
+    //         if (data.status === 'success') {
+    //             console.log('Événement mis à jour avec succès');
+    //             calendar.refetchEvents();
+    //         } else {
+    //             console.error('Erreur:', data.message);
+    //             event.revert();
+    //         }
+    //     })
+    //     .catch(error => {
+    //         console.error('Erreur lors de la mise à jour:', error);
+    //         event.revert();
+    //     });
+    // }
+
     function updateEvent(event) {
-        // Debug des données envoyées
+        // Créer des dates formatées qui conservent le fuseau horaire
+        const startDate = moment(event.start).format('YYYY-MM-DD HH:mm:ss');
+        const endDate = event.end ? moment(event.end).format('YYYY-MM-DD HH:mm:ss') : null;
+        
         console.log('Event data:', {
             id: event.id,
-            start: event.start.toISOString(),
-            end: event.end ? event.end.toISOString() : null
+            start: startDate,
+            end: endDate
         });
-
+    
         fetch('update_schedule.php', {
             method: 'POST',
             headers: {
@@ -104,8 +143,8 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             body: JSON.stringify({
                 id: event.id,
-                start: event.start.toISOString(),
-                end: event.end ? event.end.toISOString() : null
+                start: startDate,
+                end: endDate
             }),
         })
         .then(response => response.json())

@@ -35,6 +35,9 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <!-- Moment.js (pour une heure debut et fin exacte lorsque le glissement des seance ) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+
 
     <!-- //!DATA -->
     <script src="calendar.js"></script>
