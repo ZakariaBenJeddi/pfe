@@ -72,10 +72,10 @@ if (isset($_GET['action'])) {
         <?php require('../../includes/admin/navbar_admin.php') ?>
         <div class="container-fluid py-4">
             <div class="container py-5 " style="margin-top: 13rem !important;" id="page-container">
-                <div class="row mb-5">
+                <div class="row mb-4">
                     <div class="col-lg-4">
                         <div class="filter-group">
-                            <label for="teacher-select" class="text-light">Professeur:</label>
+                            <label for="teacher-select" class="text-dark">Professeur:</label>
                             <select class="form-select" id="teacher-select">
                                 <option value="">Tous les professeurs</option>
                                 <?php foreach ($prfs as $prof) : ?>
@@ -86,7 +86,7 @@ if (isset($_GET['action'])) {
                     </div>
                     <div class="col-lg-4">
                         <div class="filter-group">
-                            <label for="group-select" class="text-light">Groupe:</label>
+                            <label for="group-select" class="text-dark">Groupe:</label>
                             <select class="form-select" id="group-select">
                                 <option value="">Tous les groupes</option>
                                 <?php foreach ($clss as $groupe) : ?>
@@ -97,7 +97,7 @@ if (isset($_GET['action'])) {
                     </div>
                     <div class="col-lg-4">
                         <div class="filter-group">
-                            <label for="room-select" class="text-light">Salle:</label>
+                            <label for="room-select" class="text-dark">Salle:</label>
                             <select class="form-select" id="room-select">
                                 <option value="">Toutes les salles</option>
                                 <?php foreach ($slls as $salle) : ?>
@@ -107,94 +107,116 @@ if (isset($_GET['action'])) {
                         </div>
                     </div>
                 </div>
-                <div class="row mb-5 mt-4">
-                    <div class="col-lg-4">
-                        <button class="btn btn-info w-auto copier">Copier emploi du temps</button>
-                    </div>
-                    <div class="col-lg-4">
-                        <button class="btn btn-warning w-auto coller">Coller emploi du temps</button>
+                <hr />
+                <div class="container my-4">
+                    <div class="row mb-3 text-center text-md-start">
+                        <div class="col-12 col-md-4 mb-2">
+                            <button type="button" class="btn btn-primary w-100 btn-sm" id="import-btn">Importer</button>
+                        </div>
+                        <div class="col-12 col-md-4 mb-2">
+                            <a href="export_excel.php" class="btn btn-primary w-100 btn-sm">Exporter</a>
+                        </div>
+                        <div class="col-12 col-md-4 mb-2">
+                            <a class="btn btn-primary w-100 btn-sm" data-bs-toggle="modal" data-bs-target="#CalendarModal">Ajouter Seance</a>
+                        </div>
                     </div>
                 </div>
+
                 <div class="row ">
-                    <div class="col-md-9">
+                    <div class="col-md-12">
                         <div id="loading-screen" style="display: none;">
                             <div class="spinner"></div>
                         </div>
                         <div id="calendar"></div>
                     </div>
-                    <div class="col-md-3 mt-lg-0 mt-5">
-                        <div class="d-flex justify-content-center mb-2">
-                            <button type="button" class="btn btn-primary btn-sm me-1" id="import-btn">Importer</button>
-                            <a href="export_excel.php" class="btn btn-primary btn-sm ms-1">Exporter</a>
-                        </div>
-                        <div class="cardt rounded-0 shadow">
-                            <div class="card-header bg-gradient bg-primary text-light">
-                                <h5 class="card-title text-center">Schedule Form</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="container-fluid">
-                                    <form action="save_schedule.php" method="post" id="schedule-form">
-                                        <div class="form-group mb-2">
-                                            <label for="classe-select" class="control-label">Classes</label><br>
-                                            <select class="form-select form-select-sm text-sm" name="classe-select" id="classe-select">
-                                                <option value="">Choisissez une Classe</option>
-                                                <?php foreach ($clss as $classe) : ?>
-                                                    <option value="<?= $classe['id_classe'] ?>"><?= htmlspecialchars($classe['nom_classe']) ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                        <div class="form-group mb-2">
-                                            <label for="matiere-select" class="control-label">Matière</label>
-                                            <select class="form-select form-select-sm text-sm" name="matiere_id" id="matiere-select" disabled>
-                                                <option value="">Sélectionnez une matière</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group mb-2">
-                                            <label for="professeur-select" class="control-label">Enseignant</label>
-                                            <select class="form-select form-select-sm text-sm" name="professeur_id" id="professeur-select" disabled>
-                                                <option value="">Choisissez un enseignant</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group mb-2">
-                                            <label for="salle-select" class="control-label">Salle</label>
-                                            <select class="form-select form-select-sm text-sm" name="salle" id="salle-select">
-                                                <option value="">Choisissez une salle</option>
-                                                <?php foreach ($slls as $salle) : ?>
-                                                    <option value="<?= $salle['id_salle'] ?>"><?= htmlspecialchars($salle['nom_salle']) ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                        <input type="hidden" name="id" value="">
-                                        <input type="hidden" name="professeur_value" id="professeur-value">
-                                        <input type="hidden" name="matiere_value" id="matiere-value">
-                                        <input type="hidden" name="classe_value" id="classe-value">
-                                        <input type="hidden" name="salle_value" id="salle-value">
+                    <div class="modal fade" id="CalendarModal" tabindex="-1" aria-labelledby="CalendarModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="cardt rounded-0 shadow">
+                                    <div class="card-header bg-gradient bg-primary text-light">
+                                        <h5 class="card-title text-center">Schedule Form</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="container-fluid">
 
-                                        <div class="form-group mb-2">
-                                            <label for="title" class="control-label">Title</label>
-                                            <input type="text" class="form-control form-control-sm rounded-0" name="title" id="title">
+                                            <form action="save_schedule.php" method="post" id="schedule-form">
+                                                <div class="form-group mb-2">
+                                                    <label for="classe-select" class="control-label">Classes</label><br>
+                                                    <select class="form-select form-select-sm text-sm" name="classe-select" id="classe-select">
+                                                        <option value="">Choisissez une Classe</option>
+                                                        <?php foreach ($clss as $classe) : ?>
+                                                            <option value="<?= $classe['id_classe'] ?>"><?= htmlspecialchars($classe['nom_classe']) ?></option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group mb-2">
+                                                    <label for="matiere-select" class="control-label">Matière</label>
+                                                    <select class="form-select form-select-sm text-sm" name="matiere_id" id="matiere-select" disabled>
+                                                        <option value="">Sélectionnez une matière</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group mb-2">
+                                                    <label for="professeur-select" class="control-label">Enseignant</label>
+                                                    <select class="form-select form-select-sm text-sm" name="professeur_id" id="professeur-select" disabled>
+                                                        <option value="">Choisissez un enseignant</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group mb-2">
+                                                    <label for="salle-select" class="control-label">Salle</label>
+                                                    <select class="form-select form-select-sm text-sm" name="salle" id="salle-select">
+                                                        <option value="">Choisissez une salle</option>
+                                                        <?php foreach ($slls as $salle) : ?>
+                                                            <option value="<?= $salle['id_salle'] ?>"><?= htmlspecialchars($salle['nom_salle']) ?></option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
+                                                <input type="hidden" name="id" value="">
+                                                <input type="hidden" name="professeur_value" id="professeur-value">
+                                                <input type="hidden" name="matiere_value" id="matiere-value">
+                                                <input type="hidden" name="classe_value" id="classe-value">
+                                                <input type="hidden" name="salle_value" id="salle-value">
+
+                                                <div class="form-group mb-2">
+                                                    <label for="title" class="control-label">Title</label>
+                                                    <input type="text" class="form-control form-control-sm rounded-0" name="title" id="title">
+                                                </div>
+                                                <div class="form-group mb-2">
+                                                    <label for="description" class="control-label">Description</label>
+                                                    <textarea rows="3" class="form-control form-control-sm rounded-0" name="description" id="description"></textarea>
+                                                </div>
+                                                <div class="form-group mb-2">
+                                                    <label for="start_datetime" class="control-label">Start</label>
+                                                    <input type="datetime-local" class="form-control form-control-sm rounded-0" name="start_datetime" id="start_datetime" required>
+                                                </div>
+                                                <div class="form-group mb-2">
+                                                    <label for="end_datetime" class="control-label">End</label>
+                                                    <input type="datetime-local" class="form-control form-control-sm rounded-0" name="end_datetime" id="end_datetime" required>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <div class="text-center">
+                                                        <button class="btn btn-primary btn-sm rounded-0" type="submit" form="schedule-form"><i class="fa fa-save"></i> Save</button>
+                                                        <button class="btn btn-default border btn-sm rounded-0" data-bs-dismiss="modal" type="reset" form="schedule-form"><i class="fa fa-reset"></i> Cancel</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+
                                         </div>
-                                        <div class="form-group mb-2">
-                                            <label for="description" class="control-label">Description</label>
-                                            <textarea rows="3" class="form-control form-control-sm rounded-0" name="description" id="description"></textarea>
-                                        </div>
-                                        <div class="form-group mb-2">
-                                            <label for="start_datetime" class="control-label">Start</label>
-                                            <input type="datetime-local" class="form-control form-control-sm rounded-0" name="start_datetime" id="start_datetime" required>
-                                        </div>
-                                        <div class="form-group mb-2">
-                                            <label for="end_datetime" class="control-label">End</label>
-                                            <input type="datetime-local" class="form-control form-control-sm rounded-0" name="end_datetime" id="end_datetime" required>
-                                        </div>
-                                        <div class="card-footer">
-                                            <div class="text-center">
-                                                <button class="btn btn-primary btn-sm rounded-0" type="submit" form="schedule-form"><i class="fa fa-save"></i> Save</button>
-                                                <button class="btn btn-default border btn-sm rounded-0" type="reset" form="schedule-form"><i class="fa fa-reset"></i> Cancel</button>
-                                            </div>
-                                        </div>
-                                    </form>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="row mb-3 text-center text-lg-start">
+                        <div class="col-12 col-md-6 col-lg-4 mb-2">
+                            <button class="btn btn-info w-100 copier">Copier emploi du temps</button>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-4 mb-2">
+                            <button class="btn btn-warning w-100 coller">Coller emploi du temps</button>
                         </div>
                     </div>
                 </div>

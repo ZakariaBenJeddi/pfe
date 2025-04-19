@@ -276,7 +276,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
                             // Fermer le modal après la suppression si nécessaire
                             if (document.querySelector('#event-details-modal')) {
-                                // Ajoutez ici le code pour fermer votre modal
+                                bootstrap.Modal.getInstance(document.getElementById('event-details-modal')).hide();
                             }
                         } else {
                             throw new Error(data.message);
@@ -358,6 +358,8 @@ document.addEventListener('DOMContentLoaded', function () {
             } catch (error) {
                 console.error('Erreur lors de la sélection des options:', error);
             }
+            // AJOUTER CETTE LIGNE POUR OUVRIR LE MODAL DU FORMULAIRE
+            new bootstrap.Modal(document.getElementById('CalendarModal')).show();
         };
 
         new bootstrap.Modal(document.getElementById('event-details-modal')).show();
