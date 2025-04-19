@@ -94,6 +94,32 @@ try {
 <!-- css -->
 <link rel="stylesheet" href="../../assets/css/timetableview.css">
 
+<style>
+table td {
+  height: 80px;
+  min-height: 80px;
+  max-height: 80px;
+  vertical-align: middle;
+}
+
+.time-slot {
+  height: 80px;
+  min-height: 80px;
+  max-height: 80px;
+}
+
+td[rowspan] {
+  height: calc(80px * attr(rowspan integer));
+}
+
+.class-info {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+</style>
+
 <body class="g-sidenav-show  bg-gray-100">
   <div class="min-height-300 bg-primary position-absolute w-100"></div>
   <?php require('../../includes/admin/aside_admin.php') ?>
