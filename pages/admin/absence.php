@@ -32,12 +32,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Requête SQL avec préparation
     $sql = "SELECT a.*, 
-           e.nom AS nom_eleve, 
-           e.prenom AS prenom_eleve, 
-           e.telephone_tuteur, 
-           c.nom_classe,
-           en.nom_enseignant AS nom_enseignant, 
-           en.prenom_enseignant AS prenom_enseignant
+            e.nom AS nom_eleve, 
+            e.prenom AS prenom_eleve, 
+            e.telephone_tuteur, 
+            c.nom_classe,
+            en.nom_enseignant AS nom_enseignant, 
+            en.prenom_enseignant AS prenom_enseignant
     FROM absences a
     LEFT JOIN eleves e ON a.id_eleve = e.id_eleve
     LEFT JOIN classe c ON e.id_classe = c.id_classe
@@ -149,10 +149,10 @@ try {
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Heure Debut</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Heure Fin</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Motif</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Justification</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Type Absence</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date Creation</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
                     </tr>
                   </thead>
@@ -191,6 +191,15 @@ try {
                           </td>
                           <td class="align-middle text-center">
                             <p class="text-xs font-weight-bold mb-0"><?= $result->motif; ?></p>
+                          </td>
+                          <td class="align-middle text-center">
+                            <?php if (!empty($result->justification)) : ?>
+                              <a href="<?= htmlspecialchars($result->justification) ?>" target="_blank" class="btn btn-xs btn-info px-4">
+                                Voir
+                              </a>
+                            <?php else : ?>
+                              <span class="text-muted">-</span>
+                            <?php endif; ?>
                           </td>
                           <td class="align-middle text-center">
                             <p class="text-xs font-weight-bold mb-0"><?= $result->type_absence; ?></p>

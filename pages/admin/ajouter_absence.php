@@ -10,7 +10,10 @@ require('../../includes/deconnexion_5s.php');
 
 //* CREATE
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
-  $resultat = ajouterAbsence($dbh, $_POST);
+  // Fusionner $_POST et $_FILES pour la fonction ajouterAbsence
+  $donnees_absence = $_POST;
+  
+  $resultat = ajouterAbsence($dbh, $donnees_absence);
 
   if ($resultat['success']) {
     echo "<script>
@@ -38,38 +41,39 @@ try {
 }
 
 
-function getElevesByClasse($dbh, $classe_id) {
+function getElevesByClasse($dbh, $classe_id)
+{
   try {
-      $sql = "SELECT id_eleve, nom, prenom FROM eleves 
+    $sql = "SELECT id_eleve, nom, prenom FROM eleves 
               WHERE id_classe = :classe_id 
               ORDER BY nom, prenom";
-      $stmt = $dbh->prepare($sql);
-      $stmt->bindParam(':classe_id', $classe_id, PDO::PARAM_INT);
-      $stmt->execute();
-      
-      // Assurez-vous que fetchAll renvoie un tableau indexé et non un tableau associatif
-      $results = $stmt->fetchAll(PDO::FETCH_OBJ);
-      
-      return $results; // Retourner simplement le tableau d'objets
+    $stmt = $dbh->prepare($sql);
+    $stmt->bindParam(':classe_id', $classe_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    // Assurez-vous que fetchAll renvoie un tableau indexé et non un tableau associatif
+    $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+    return $results; // Retourner simplement le tableau d'objets
   } catch (PDOException $e) {
-      error_log($e->getMessage());
-      return [];
+    error_log($e->getMessage());
+    return [];
   }
 }
 
-  if (isset($_GET['action']) && $_GET['action'] === 'getEleves' && isset($_GET['classe_id'])) {
-    $eleves = getElevesByClasse($dbh, intval($_GET['classe_id']));
-    
-    // Afficher les données pour le débogage
-    error_log('Elèves trouvés: ' . print_r($eleves, true));
-    
-    echo json_encode([
-        'success' => true,
-        'data' => $eleves, // Un tableau simple d'objets
-        'count' => count($eleves)
-    ]);
-    exit;
-  }
+if (isset($_GET['action']) && $_GET['action'] === 'getEleves' && isset($_GET['classe_id'])) {
+  $eleves = getElevesByClasse($dbh, intval($_GET['classe_id']));
+
+  // Afficher les données pour le débogage
+  error_log('Elèves trouvés: ' . print_r($eleves, true));
+
+  echo json_encode([
+    'success' => true,
+    'data' => $eleves, // Un tableau simple d'objets
+    'count' => count($eleves)
+  ]);
+  exit;
+}
 
 ?>
 
@@ -135,7 +139,7 @@ function getElevesByClasse($dbh, $classe_id) {
               </div>
             </div>
             <hr class="horizontal dark">
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-6">
@@ -199,6 +203,14 @@ function getElevesByClasse($dbh, $classe_id) {
                       </select>
                     </div>
                   </div>
+
+                  <!-- Après le select pour le statut, ajoutez ceci -->
+                  <div class="col-md-12" id="justification_container" style="display: none;">
+                    <div class="form-group">
+                      <label for="justification" class="form-control-label">Justification (PDF, JPG, PNG)</label>
+                      <input class="form-control" type="file" name="justification" id="justification">
+                    </div>
+                  </div>
                 </div>
 
                 <div class="row">
@@ -219,6 +231,29 @@ function getElevesByClasse($dbh, $classe_id) {
   </div>
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
+
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const typeAbsenceSelect = document.getElementById('type_absence');
+      const justificationContainer = document.getElementById('justification_container');
+
+      // Vérifier l'état initial
+      if (typeAbsenceSelect.value === 'excusee') {
+        justificationContainer.style.display = 'block';
+      }
+
+      // Ajouter un écouteur d'événement
+      typeAbsenceSelect.addEventListener('change', function() {
+        if (this.value === 'excusee') {
+          justificationContainer.style.display = 'block';
+        } else {
+          justificationContainer.style.display = 'none';
+        }
+      });
+    });
+  </script>
+
   <!-- FILIRE ET CLASSE SELON LE NIVEAU -->
   <script src="../../assets/js/niveau_filiere_classe.js"></script>
   <!--   Core JS Files   -->

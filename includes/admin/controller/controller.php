@@ -2127,6 +2127,7 @@ if (file_exists($filePath)) {
             ];
         }
     }
+
     function ajouterAbsence($dbh, $donnees_absence) {
         try {
             // Validation des données requises
@@ -2148,7 +2149,32 @@ if (file_exists($filePath)) {
                 ];
             }
             
-            // Appel de la procédure stockée
+            // Gestion du fichier de justification
+            $chemin_fichier = null;
+            if ($donnees_absence['type_absence'] === 'excusee' && isset($_FILES['justification']) && $_FILES['justification']['error'] === UPLOAD_ERR_OK) {
+                $dossier_destination = '../assets/justification_eleves/';
+                
+                // Créer le dossier s'il n'existe pas
+                if (!file_exists($dossier_destination)) {
+                    mkdir($dossier_destination, 0777, true);
+                }
+                
+                // Générer un nom de fichier unique
+                $extension = pathinfo($_FILES['justification']['name'], PATHINFO_EXTENSION);
+                $nom_fichier = 'justif_' . $donnees_absence['id_elevesX'] . '_' . date('Ymd_His') . '.' . $extension;
+                // $chemin_fichier = $dossier_destination . $nom_fichier;
+                $chemin_fichier = realpath(__DIR__ . '/../../..') . '/assets/justification_eleves/' . $nom_fichier;
+
+                // Déplacer le fichier
+                if (!move_uploaded_file($_FILES['justification']['tmp_name'], $chemin_fichier)) {
+                    return [
+                        'success' => false,
+                        'message' => "Erreur lors du téléchargement du fichier de justification."
+                    ];
+                }
+            }
+            
+            // Modification de la requête SQL pour inclure le champ de justification
             $sql = "CALL ajouter_absence(
                 :id_eleve, 
                 NULL, 
@@ -2157,7 +2183,8 @@ if (file_exists($filePath)) {
                 :heure_fin, 
                 :motif, 
                 :type_absence, 
-                :statut
+                :statut,
+                :justification
             )";
             
             $stmt = $dbh->prepare($sql);
@@ -2168,7 +2195,8 @@ if (file_exists($filePath)) {
                 ':heure_fin' => $donnees_absence['heure_fin'],
                 ':motif' => $donnees_absence['motif'] ?? null,
                 ':type_absence' => $donnees_absence['type_absence'],
-                ':statut' => $donnees_absence['statut']
+                ':statut' => $donnees_absence['statut'],
+                ':justification' => $chemin_fichier
             ]);
             
             // Récupérer l'ID de la nouvelle absence
