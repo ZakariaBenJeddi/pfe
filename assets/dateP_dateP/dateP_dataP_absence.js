@@ -65,7 +65,8 @@ $(function() {
                 <td>
                   <div class="d-flex px-2 py-1">
                     <div>
-                      <img src="../../assets/img/team-4.jpg" class="avatar avatar-sm me-3" alt="user1">
+                      <img src="<?= $result->genre === 'Masculin' ? '../../assets/img/team-4.jpg' : ($result->genre === 'Féminin' ? '../../assets/img/marie.jpg' : '../../assets/img/default.jpg') ?>"
+                                class="avatar avatar-sm me-3" alt="eleve">
                     </div>
                     <div class="d-flex flex-column justify-content-center">
                       <h6 class="mb-0 text-sm">${absence.nom_eleve || ''} ${absence.prenom_eleve || ''}</h6>
