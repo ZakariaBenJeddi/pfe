@@ -37,8 +37,8 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
       $html = $timeTableData->getSpecificTeacherSchedule($_GET['teacher']);
       echo $html ?: '<div class="alert alert-info">Aucun emploi du temps trouvé pour cet enseignant</div>';
     } elseif (isset($_GET['group'])) {
-      $html = $timeTableData->getClassSchedule($_GET['group']);
-      echo $html ?: '<div class="alert alert-info">Aucun emploi du temps trouvé pour ce groupe</div>';
+      $html = $timeTableData->getSpecificGroupSchedule($_GET['group']); 
+      echo $html ?: '<div class="alert alert-info">Aucun emploi du temps trouvé pour ce groupe</div>'; 
     } elseif (isset($_GET['room'])) {
       $html = $timeTableData->getSpecificRoomSchedule($_GET['room']);
       echo $html ?: '<div class="alert alert-info">Aucun emploi du temps trouvé pour cette salle</div>';
@@ -95,29 +95,29 @@ try {
 <link rel="stylesheet" href="../../assets/css/timetableview.css">
 
 <style>
-table td {
-  height: 80px;
-  min-height: 80px;
-  max-height: 80px;
-  vertical-align: middle;
-}
+  table td {
+    height: 80px;
+    min-height: 80px;
+    max-height: 80px;
+    vertical-align: middle;
+  }
 
-.time-slot {
-  height: 80px;
-  min-height: 80px;
-  max-height: 80px;
-}
+  .time-slot {
+    height: 80px;
+    min-height: 80px;
+    max-height: 80px;
+  }
 
-td[rowspan] {
-  height: calc(80px * attr(rowspan integer));
-}
+  td[rowspan] {
+    height: calc(80px * attr(rowspan integer));
+  }
 
-.class-info {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
+  .class-info {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 </style>
 
 <body class="g-sidenav-show  bg-gray-100">
@@ -195,6 +195,9 @@ td[rowspan] {
       </div>
     </div>
     <div class="px-0 pt-0 ">
+      <!-- Ajouter ce conteneur pour les résultats filtrés -->
+      <div id="teacher-schedule-container" class="mt-4 table-responsive"></div>
+
       <!-- section pour les classes -->
       <div id="classes-section" class="schedule-section active p-0">
         <?php foreach ($allSchedules as $classId => $data) : ?>
