@@ -291,7 +291,7 @@ function escape($data)
       <div class="row">
         <div class="col-md-8 mt-4">
           <div class="card">
-            <div class="card-header pb-0 text-center border-bottom">
+            <div class="card-header pb-0 border-bottom">
               <button class="btn btn-primary brn-rounded">Afficher l'emploi du temps de cette Filiere </button>
             </div>
             <div class="card-body pt-4 p-3">
@@ -300,8 +300,8 @@ function escape($data)
                 <?php foreach ($combined_results as $result) : ?>
                   <?php if (isset($result->code_matiere)) : ?>
                     <li class="list-group-item border-0 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center p-4 mb-2 bg-gray-100 border-radius-lg">
-                      <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center w-100">
-                        <span class="font-weight-bold text-dark mb-2 mb-md-0 me-md-4">
+                      <div class="d-md-flex d-block justify-content-md-around w-100">
+                        <span class="font-weight-bold text-dark mb-5 mb-md-0 me-md-4">
                           <?php echo htmlspecialchars($result->code_matiere); ?>
                         </span>
 
@@ -322,7 +322,7 @@ function escape($data)
 
                           if ($enseignant_affecte) :
                         ?>
-                            <input type="text" class="form-control w-100 w-md-auto ms-md-3 px-lg-5" value="<?= htmlspecialchars($enseignant_affecte->nom_enseignant . ' ' . $enseignant_affecte->prenom_enseignant) ?>" readonly>
+                            <input type="text" class="form-control w-100 w-md-auto ms-md-3 px-lg-5 mt-4 mt-md-0" value="<?= htmlspecialchars($enseignant_affecte->nom_enseignant . ' ' . $enseignant_affecte->prenom_enseignant) ?>" readonly>
                           <?php else : ?>
                             <select name="enseignant" class="form-select select-sm w-100 w-md-auto ms-md-3 px-lg-5" onchange="assignEnseignant('<?= htmlspecialchars($result->code_matiere, ENT_QUOTES, 'UTF-8') ?>', this.value)">
                               <option value="">Sélectionner un enseignant</option>
@@ -336,7 +336,7 @@ function escape($data)
                         }
                         ?>
                       </div>
-                      <form method="post" action="" class="mt-3 mt-md-0 w-100 w-md-auto text-end">
+                      <form method="post" action="" class="mt-3 mt-md-0 w-100 w-md-auto text-md-end text-start">
                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
                         <input type="hidden" name="code_matiere" value="<?= htmlspecialchars($result->code_matiere, ENT_QUOTES, 'UTF-8') ?>">
                         <input type="hidden" name="id_classe" value="<?= htmlspecialchars($id_classe, ENT_QUOTES, 'UTF-8') ?>">
