@@ -24,7 +24,7 @@
               <select class="form-select" id="id_enseignant" name="id_enseignant" required>
                 <option value="">Sélectionner Enseignant</option>
                 <?php
-                $eseignants = get_all_enseignant($dbh);
+                // $eseignants = get_all_enseignant($dbh);
                 foreach ($eseignants as $eseignant) {
                   echo "<option value='{$eseignant->id_enseignant}'>{$eseignant->nom_enseignant} {$eseignant->prenom_enseignant}</option>";
                 }
@@ -36,7 +36,7 @@
               <select class="form-select" id="id_classe" name="id_classe" required>
                 <option value="">Sélectionner Classe</option>
                 <?php
-                $classes = get_all_classes($dbh)['data'];
+                // $classes = get_all_classes($dbh)['data'];
                 foreach ($classes as $classe) {
                   echo "<option value='{$classe->id_classe}'>{$classe->nom_classe}</option>";
                 }
