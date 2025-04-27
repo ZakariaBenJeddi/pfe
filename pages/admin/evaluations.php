@@ -86,54 +86,14 @@ if ($evaluationsInfo['success']) {
     $total_pages = 0;
 }
 
-
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['save'])) {
-    // Récupérer les champs du formulaire
-    $titre = htmlspecialchars(trim($_POST['titre']));
-    $description = htmlspecialchars(trim($_POST['description']));
-    $type_evaluation = htmlspecialchars(trim($_POST['type_evaluation']));
-    $statut = htmlspecialchars(trim($_POST['statut']));
-    
-    // ATTENTION tu as utilisé plusieurs fois id_periode dans ton formulaire, il faut corriger dans ton HTML :
-    $id_enseignant = isset($_POST['id_enseignant']) ? intval($_POST['id_enseignant']) : null;
-    $id_classe = isset($_POST['id_classe']) ? intval($_POST['id_classe']) : null;
-    $id_matiere = isset($_POST['id_matiere']) ? intval($_POST['id_matiere']) : null;
-
-    // Gestion du fichier uploadé
-    if (isset($_FILES['fichier_path']) && $_FILES['fichier_path']['error'] == 0) {
-        $upload_dir = "../../assets/evaluation/";
-        $filename = basename($_FILES['fichier_path']['name']);
-        $target_file = $upload_dir . time() . '_' . $filename; // Pour éviter les doublons
-
-        // Déplacer le fichier
-        if (move_uploaded_file($_FILES['fichier_path']['tmp_name'], $target_file)) {
-            // Insertion dans la base de données
-            $stmt = $dbh->prepare("INSERT INTO evaluation (titre, description, fichier_path, id_matiere, id_enseignant, id_classe, type_evaluation, statut)
-                                   VALUES (:titre, :description, :fichier_path, :id_matiere, :id_enseignant, :id_classe, :type_evaluation, :statut)");
-
-            $stmt->bindParam(':titre', $titre);
-            $stmt->bindParam(':description', $description);
-            $stmt->bindParam(':fichier_path', $target_file);
-            $stmt->bindParam(':id_matiere', $id_matiere);
-            $stmt->bindParam(':id_enseignant', $id_enseignant);
-            $stmt->bindParam(':id_classe', $id_classe);
-            $stmt->bindParam(':type_evaluation', $type_evaluation);
-            $stmt->bindParam(':statut', $statut);
-
-            if ($stmt->execute()) {
-                echo "<script>alert('Évaluation ajoutée avec succès !');</script>";
-            } else {
-                echo "<script>alert('Erreur lors de l\'ajout de l\'évaluation.');</script>";
-            }
-        } else {
-            echo "<script>alert('Erreur lors du téléchargement du fichier.');</script>";
-        }
+    $result = ajouter_evaluation($dbh, $_POST, $_FILES);
+    if ($result['success']) {
+        echo "<script>alert('{$result['message']}'); window.location.href='{$result['redirect_url']}';</script>";
     } else {
-        echo "<script>alert('Veuillez sélectionner un fichier.');</script>";
+        echo "<script>alert('{$result['message']}');</script>";
     }
 }
-
-
 
 //* delete
 try {
@@ -250,23 +210,19 @@ try {
                                                         <i class="far fa-calendar-alt"></i>
                                                         <?= htmlspecialchars($result->date_creation) ?>
                                                     </p>
-
                                                     <?php if (!empty($result->description)) : ?>
                                                         <p class="text-xs font-weight-bold mb-1">
                                                             <i class="fas fa-info-circle"></i>
                                                             <?php echo $result->description === '' ? 'Aucun Description' : $result->description; ?>
                                                         </p>
                                                     <?php endif; ?>
-
                                                     <div class="mt-3 d-flex">
-                                                        <a href="assets/evaluations/<?= $result->fichier_path ?>" target="_blank" class="btn btn-xs btn-primary px-2">
+                                                        <a href="<?= $result->fichier_path ?>" target="_blank" class="btn btn-xs btn-primary px-2">
                                                             <i class="fas fa-download"></i> Télécharger
                                                         </a>
-
                                                         <a href="edit_evaluation.php?id=<?= $result->id ?>" class="btn btn-xs btn-info px-2 ms-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </a>
-
                                                         <a href="evaluations.php?id=<?= $result->id ?>&del=1" class="btn btn-xs btn-danger px-2 ms-1" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
                                                             <i class="fas fa-trash"></i>
                                                         </a>
