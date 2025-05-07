@@ -302,7 +302,9 @@ include '../../includes/admin/dashboard_data.php';
                     </div>
                   </div>
                   <div class="d-flex">
-                    <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i class="ni ni-bold-right" aria-hidden="true"></i></button>
+                    <a href="absence.php" class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto">
+                      <i class="ni ni-bold-right" aria-hidden="true"></i>
+                    </a>
                   </div>
                 </li>
                 <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
@@ -316,7 +318,9 @@ include '../../includes/admin/dashboard_data.php';
                     </div>
                   </div>
                   <div class="d-flex">
-                    <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i class="ni ni-bold-right" aria-hidden="true"></i></button>
+                    <a href="evaluations.php" class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto">
+                      <i class="ni ni-bold-right" aria-hidden="true"></i>
+                    </a>
                   </div>
                 </li>
                 <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
@@ -330,21 +334,9 @@ include '../../includes/admin/dashboard_data.php';
                     </div>
                   </div>
                   <div class="d-flex">
-                    <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i class="ni ni-bold-right" aria-hidden="true"></i></button>
-                  </div>
-                </li>
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
-                  <div class="d-flex align-items-center">
-                    <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
-                      <i class="ni ni-satisfied text-white opacity-10"></i>
-                    </div>
-                    <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">Happy users</h6>
-                      <span class="text-xs font-weight-bold">+ 430</span>
-                    </div>
-                  </div>
-                  <div class="d-flex">
-                    <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i class="ni ni-bold-right" aria-hidden="true"></i></button>
+                    <a href="paiements_eleves.php" class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto">
+                      <i class="ni ni-bold-right" aria-hidden="true"></i>
+                    </a>
                   </div>
                 </li>
               </ul>
