@@ -11,31 +11,38 @@ require('../../includes/deconnexion_5s.php');
 
 //* update
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
-  $resultat = modifierEleve($dbh, $_POST, $_FILES['image_eleve'] ?? null);
-  
-  if ($resultat['success']) {
-      echo "<script>
-          alert('Les informations de l\'élève ont été mises à jour avec succès.');
-          window.location.href = 'eleves.php';
-      </script>";
+  $result = modifierEleve($dbh, $_POST, $_FILES['image_eleve'] ?? null);
+
+  if ($result['success']) {
+    header("Location: eleves.php?success=1");
+    exit();
   } else {
-      echo "<script>
-          alert('Erreur: " . addslashes($resultat['message']) . "');
-      </script>";
+    // throw new Exception($result['message']);
+    echo "<script>
+      alert('Erreur: " . addslashes($result['message']) . "');
+    </script>";
+
   }
 }
 
 //* get eleve by id
 if (isset($_GET['id_eleve'])) {
   $resultat = getEleveById($dbh, $_GET['id_eleve']);
-  
+
   if (!$resultat['success']) {
-      echo $resultat['message'];
-      exit;
+    echo $resultat['message'];
+    exit;
   }
-  
+
   $eleve = $resultat['data'];
 }
+
+$all_niveaux = get_all_niveau($dbh);
+$niveau_courant = get_niveau_by_id($dbh, $eleve->id_niveau)['data'];
+$filieres = get_filieres_with_niveaux($dbh)['data'];
+$filiere_courante = get_filiere_by_id($dbh, $eleve->id_filiere)['data'];
+$classes = get_all_classes($dbh)['data'];
+$classe_courante = get_classe_by_id($dbh, $eleve->id_classe)['data'];
 ?>
 
 <!-- HEAD -->
@@ -55,7 +62,7 @@ if (isset($_GET['id_eleve'])) {
     </div>
     <div class="container-fluid py-4">
       <div class="row">
-        <div class="col-md-8">
+        <div class="col-12">
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
@@ -140,7 +147,11 @@ if (isset($_GET['id_eleve'])) {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="statut_eleve" class="form-control-label">Statut</label>
-                      <input class="form-control" type="text" name="statut_eleve" id="statut_eleve" value="<?= $eleve->statut ?>" required>
+                      <select class="form-control" name="statut_eleve" id="statut_eleve" required>
+                        <option value="">-- Sélectionner un statut --</option>
+                        <option value="Actif" <?= $eleve->statut == 'Actif' ? 'selected' : '' ?>>Actif</option>
+                        <option value="Inactif" <?= $eleve->statut == 'Inactif' ? 'selected' : '' ?>>Inactif</option>
+                      </select>
                     </div>
                   </div>
 
@@ -186,10 +197,52 @@ if (isset($_GET['id_eleve'])) {
                     </div>
                   </div>
 
+                  <!-- Niveau scolaire -->
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="niveau_scolaire_eleve" class="form-control-label">Niveau Scolaire</label>
-                      <input class="form-control" type="text" name="niveau_scolaire_eleve" id="niveau_scolaire_eleve" value="<?= $eleve->niveau_scolaire ?>" required>
+                      <select class="form-control" name="niveau_scolaire_eleve" id="niveau_scolaire_eleve" required>
+                        <option value="">-- Sélectionner un niveau --</option>
+                        <?php foreach ($all_niveaux as $niveau) : ?>
+                          <option value="<?= $niveau->id_niveau ?>" <?= $niveau->id_niveau == $eleve->id_niveau ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($niveau->nom_niveau) ?>
+                          </option>
+                        <?php endforeach; ?>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Filière -->
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="filiere_eleve" class="form-control-label">Filière</label>
+                      <select class="form-select" name="filiere_eleve" id="filiere_eleve" disabled required>
+                        <option value="">Sélectionner une filière</option>
+                        <?php foreach ($filieres as $filiere) : ?>
+                          <?php if ($filiere->id_niveau == $eleve->id_niveau) : ?>
+                            <option value="<?= $filiere->id_filiere ?>" <?= $filiere->id_filiere == $eleve->id_filiere ? 'selected' : '' ?>>
+                              <?= htmlspecialchars($filiere->nom_filiere) ?>
+                            </option>
+                          <?php endif; ?>
+                        <?php endforeach; ?>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Classe -->
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="classe_eleve" class="form-control-label">Classe</label>
+                      <select class="form-select" name="classe_eleve" id="classe_eleve" disabled required>
+                        <option value="">Sélectionner une classe</option>
+                        <?php foreach ($classes as $classe) : ?>
+                          <?php if ($classe->id_filiere == $eleve->id_filiere) : ?>
+                            <option value="<?= $classe->id_classe ?>" <?= $classe->id_classe == $eleve->id_classe ? 'selected' : '' ?>>
+                              <?= htmlspecialchars($classe->nom_classe) ?>
+                            </option>
+                          <?php endif; ?>
+                        <?php endforeach; ?>
+                      </select>
                     </div>
                   </div>
 
@@ -214,7 +267,7 @@ if (isset($_GET['id_eleve'])) {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="image_eleve" class="form-control-label">Image</label>
-                      <input class="form-control" type="file" name="image_eleve" id="image_eleve" value="<?= $eleve->photo ?>" >
+                      <input class="form-control" type="file" name="image_eleve" id="image_eleve" value="<?= $eleve->photo ?>">
                     </div>
                   </div>
 
@@ -227,56 +280,6 @@ if (isset($_GET['id_eleve'])) {
             </form>
           </div>
         </div>
-        <div class="col-md-4">
-          <div class="card card-profile">
-            <img src="../../assets/img/bg-profile.jpg" alt="Image placeholder" class="card-img-top">
-            <div class="row justify-content-center">
-              <div class="col-4 col-lg-4 order-lg-2">
-                <div class="mt-n4 mt-lg-n6 mb-4 mb-lg-0">
-                  <a href="javascript:;">
-                    <img src="../../assets/img/team-2.jpg" class="rounded-circle img-fluid border border-2 border-white">
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div class="card-body pt-0 mb-5">
-              <div class="row">
-                <div class="col">
-                  <div class="d-flex justify-content-center">
-                    <div class="d-grid text-center">
-                      <span class="text-lg font-weight-bolder" id="chaise_value"></span>
-                      <span class="text-sm opacity-8">Chaise </span>
-                    </div>
-                    <div class="d-grid text-center mx-4">
-                      <span class="text-lg font-weight-bolder" id="bureau_value"></span>
-                      <span class="text-sm opacity-8">Bureau </span>
-                    </div>
-                    <div class="d-grid text-center">
-                      <span class="text-lg font-weight-bolder" id="tableau_value"></span>
-                      <span class="text-sm opacity-8">Tableau</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="text-center mt-4">
-                <h5>
-                  Nom Salle :<span class="font-weight-light" id="nom_salle_value"></span>
-                </h5>
-                <div class="h6 font-weight-300">
-                  <i class="ni location_pin mr-2"></i>Etage : <span class="font-weight-light" id="etage_value"></span>
-                </div>
-                <div class="h6 font-weight-300">
-                  <i class="ni location_pin mr-2"></i>
-                  Equipement : <span class="font-weight-light" id="equipement_value"></span>
-                </div>
-                <div class="h6 font-weight-300">
-                  <i class="ni location_pin mr-2"></i>
-                  Capacite Eleve : <span class="font-weight-light" id="capacite_value"></span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
       <!-- FOOTER -->
       <?php include '../../includes/footer.php' ?>
@@ -285,6 +288,10 @@ if (isset($_GET['id_eleve'])) {
   </div>
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
+
+  <!-- FILIRE ET CLASSE SELON LE NIVEAU -->
+  <script src="../../assets/js/niveau_filiere_classe.js"></script>
+
   <!--   Core JS Files   -->
   <script src="../../assets/js/core/popper.min.js"></script>
   <script src="../../assets/js/core/bootstrap.min.js"></script>
