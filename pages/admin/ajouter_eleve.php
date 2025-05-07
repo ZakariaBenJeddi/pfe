@@ -4,24 +4,23 @@ if (empty($_SESSION['user'])) {
   header('location:../sign-in.php');
 }
 
-// require '../../includes/DatabaseConnexion.php';
 include('../../includes/admin/controller/controller.php');
 //* deconnexion
-// require('../../includes/deconnexion_5s.php');
+require('../../includes/deconnexion_5s.php');
 
 //* CREATE
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
-  $resultat = ajouterEleve($dbh, $_POST);
-  
-  if ($resultat['success']) {
-      echo "<script>
-          alert('Élève ajouté avec succès.');
-          window.location.href = 'eleves.php';
-      </script>";
+  $result = ajouterEleve($dbh, $_POST);
+
+  if ($result['success']) {
+    header("Location: eleves.php?success=1");
+    exit();
   } else {
-      echo "<script>
-          alert('Erreur: " . addslashes($resultat['message']) . "');
-      </script>";
+    header("Location: eleves.php?error=1");
+    // echo "<script>
+    //   alert('Erreur: " . addslashes($result['message']) . "');
+    // </script>";
+
   }
 }
 
@@ -53,8 +52,8 @@ try {
 
     </div>
     <div class="container-fluid py-4">
-      <div class="row">
-        <div class="col-md-8">
+      <div class="row d-flex justify-content-center align-items-center">
+        <div class="col-md-12">
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
@@ -97,9 +96,9 @@ try {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="genre_eleve" class="form-control-label">Genre</label>
-                      <select class="form-select"  name="genre_eleve" id="genre_eleve">
-                        <option value="Masculin">Masculin</option>  
-                        <option value="Féminin">Féminin</option>  
+                      <select class="form-select" name="genre_eleve" id="genre_eleve">
+                        <option value="Masculin">Masculin</option>
+                        <option value="Féminin">Féminin</option>
                       </select>
                     </div>
                   </div>
@@ -142,7 +141,7 @@ try {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="statut_eleve" class="form-control-label">Statut</label>
-                      <select class="form-select"  name="statut_eleve" id="statut_eleve" required>
+                      <select class="form-select" name="statut_eleve" id="statut_eleve" required>
                         <option value="Actif">Actif</option>
                         <option value="Inactif">Inactif</option>
                         <option value="Retraité">Retraité</option>
@@ -153,7 +152,7 @@ try {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="historique_scolaire_eleve" class="form-control-label">Historique Scolaire</label>
-                      <input class="form-control" type="text" name="historique_scolaire_eleve" id="historique_scolaire_eleve" >
+                      <input class="form-control" type="text" name="historique_scolaire_eleve" id="historique_scolaire_eleve">
                     </div>
                   </div>
 
@@ -174,7 +173,7 @@ try {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="telephone_tuteur_eleve" class="form-control-label">Téléphone Tuteur</label>
-                      <input class="form-control" type="text" name="telephone_tuteur_eleve" id="telephone_tuteur_eleve" value="+212" required >
+                      <input class="form-control" type="text" name="telephone_tuteur_eleve" id="telephone_tuteur_eleve" value="+212" required>
                     </div>
                   </div>
 
@@ -195,11 +194,11 @@ try {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="niveau_scolaire_eleve" class="form-control-label">Niveau Scolaire</label>
-                        <select class="form-select" name="niveau_scolaire_eleve" id="niveau_scolaire_eleve" required>
-                          <?php foreach($niveaux as $niveau): ?>
-                            <option value="<?= $niveau->id_niveau ?>"><?= $niveau->nom_niveau ?></option>
-                          <?php endforeach ?>
-                        </select>
+                      <select class="form-select" name="niveau_scolaire_eleve" id="niveau_scolaire_eleve" required>
+                        <?php foreach ($niveaux as $niveau) : ?>
+                          <option value="<?= $niveau->id_niveau ?>"><?= $niveau->nom_niveau ?></option>
+                        <?php endforeach ?>
+                      </select>
                     </div>
                   </div>
                   <div class="col-md-6">
@@ -223,7 +222,7 @@ try {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="besoins_speciaux_eleve" class="form-control-label">Besoins Spéciaux</label>
-                      <input class="form-control" type="text" name="besoins_speciaux_eleve" id="besoins_speciaux_eleve" >
+                      <input class="form-control" type="text" name="besoins_speciaux_eleve" id="besoins_speciaux_eleve">
                     </div>
                   </div>
 
@@ -254,56 +253,6 @@ try {
             </form>
           </div>
         </div>
-        <div class="col-md-4">
-          <div class="card card-profile">
-            <img src="../../assets/img/bg-profile.jpg" alt="Image placeholder" class="card-img-top">
-            <div class="row justify-content-center">
-              <div class="col-4 col-lg-4 order-lg-2">
-                <div class="mt-n4 mt-lg-n6 mb-4 mb-lg-0">
-                  <a href="javascript:;">
-                    <img src="../../assets/img/team-2.jpg" class="rounded-circle img-fluid border border-2 border-white">
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div class="card-body pt-0 mb-5">
-              <div class="row">
-                <div class="col">
-                  <div class="d-flex justify-content-center">
-                    <div class="d-grid text-center">
-                      <span class="text-lg font-weight-bolder" id="chaise_value"></span>
-                      <span class="text-sm opacity-8">Chaise </span>
-                    </div>
-                    <div class="d-grid text-center mx-4">
-                      <span class="text-lg font-weight-bolder" id="bureau_value"></span>
-                      <span class="text-sm opacity-8">Bureau </span>
-                    </div>
-                    <div class="d-grid text-center">
-                      <span class="text-lg font-weight-bolder" id="tableau_value"></span>
-                      <span class="text-sm opacity-8">Tableau</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="text-center mt-4">
-                <h5>
-                  Nom Salle :<span class="font-weight-light" id="nom_salle_value"></span>
-                </h5>
-                <div class="h6 font-weight-300">
-                  <i class="ni location_pin mr-2"></i>Etage : <span class="font-weight-light" id="etage_value"></span>
-                </div>
-                <div class="h6 font-weight-300">
-                  <i class="ni location_pin mr-2"></i>
-                  Equipement : <span class="font-weight-light" id="equipement_value"></span>
-                </div>
-                <div class="h6 font-weight-300">
-                  <i class="ni location_pin mr-2"></i>
-                  Capacite Eleve : <span class="font-weight-light" id="capacite_value"></span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
       <!-- FOOTER -->
       <?php include '../../includes/footer.php' ?>
@@ -312,8 +261,12 @@ try {
   </div>
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
-    <!-- FILIRE ET CLASSE SELON LE NIVEAU -->
-    <script src="../../assets/js/niveau_filiere_classe.js"></script>
+  <!-- FILIRE ET CLASSE SELON LE NIVEAU -->
+  <script src="../../assets/js/niveau_filiere_classe.js"></script>
+
+  <!-- sweet alert -->
+  <script src="../../assets/js/alerts/sweet_alert.js"></script>
+
   <!--   Core JS Files   -->
   <script src="../../assets/js/core/popper.min.js"></script>
   <script src="../../assets/js/core/bootstrap.min.js"></script>

@@ -140,14 +140,14 @@ function get_pagination_url($page)
 
 
 //* create
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['save'])) {
-  $result = ajouter_evaluation($dbh, $_POST, $_FILES);
-  if ($result['success']) {
-    echo "<script>alert('{$result['message']}'); window.location.href='{$result['redirect_url']}';</script>";
-  } else {
-    echo "<script>alert('{$result['message']}');</script>";
-  }
-}
+// if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['save'])) {
+//   $result = ajouter_evaluation($dbh, $_POST, $_FILES);
+//   if ($result['success']) {
+//     echo "<script>alert('{$result['message']}'); window.location.href='{$result['redirect_url']}';</script>";
+//   } else {
+//     echo "<script>alert('{$result['message']}');</script>";
+//   }
+// }
 
 //* delete
 try {
@@ -178,6 +178,110 @@ try {
   </script>";
   exit;
 }
+
+
+//* update
+// Gestion de la sauvegarde ou de la mise à jour
+if (isset($_POST['save'])) {
+  $id_evaluation = isset($_POST['id_evaluation']) ? (int)$_POST['id_evaluation'] : null;
+  $titre = htmlspecialchars($_POST['titre']);
+  $description = htmlspecialchars($_POST['description']);
+  $id_enseignant = (int)$_POST['id_enseignant'];
+  $id_classe = (int)$_POST['id_classe'];
+  $id_matiere = (int)$_POST['id_matiere'];
+  $type_evaluation = htmlspecialchars($_POST['type_evaluation']);
+  $statut = htmlspecialchars($_POST['statut']);
+
+  // Gestion du fichier
+  $fichier_path = '';
+  $new_file_uploaded = false;
+
+  if ($_FILES['fichier_path']['size'] > 0) {
+    $upload_dir = 'uploads/evaluations/';
+    $file_name = time() . '_' . $_FILES['fichier_path']['name'];
+    $target_file = $upload_dir . $file_name;
+
+    // Vérifier si le dossier existe, sinon le créer
+    if (!file_exists($upload_dir)) {
+      mkdir($upload_dir, 0777, true);
+    }
+
+    if (move_uploaded_file($_FILES['fichier_path']['tmp_name'], $target_file)) {
+      $fichier_path = $target_file;
+      $new_file_uploaded = true;
+    } else {
+      $error_message = "Erreur lors du téléchargement du fichier.";
+    }
+  }
+
+  try {
+    if ($id_evaluation) {
+      // Mise à jour d'une évaluation existante
+
+      // Si un nouveau fichier a été téléchargé, on met à jour le chemin du fichier
+      if ($new_file_uploaded) {
+        // Obtenir l'ancien chemin de fichier pour le supprimer plus tard
+        $stmt = $dbh->prepare("SELECT fichier_path FROM evaluation WHERE id = ?");
+        $stmt->execute([$id_evaluation]);
+        $old_file = $stmt->fetchColumn();
+
+        $sql = "UPDATE evaluation SET 
+                      titre = ?, 
+                      description = ?, 
+                      id_enseignant = ?, 
+                      id_classe = ?, 
+                      id_matiere = ?, 
+                      type_evaluation = ?, 
+                      statut = ?, 
+                      fichier_path = ?, 
+                      date_modification = NOW() 
+                      WHERE id = ?";
+        $stmt = $dbh->prepare($sql);
+        $stmt->execute([$titre, $description, $id_enseignant, $id_classe, $id_matiere, $type_evaluation, $statut, $fichier_path, $id_evaluation]);
+
+        // Supprimer l'ancien fichier s'il existe
+        if (file_exists($old_file)) {
+          unlink($old_file);
+        }
+      } else {
+        // Pas de nouveau fichier, on ne met pas à jour le chemin du fichier
+        $sql = "UPDATE evaluation SET 
+                      titre = ?, 
+                      description = ?, 
+                      id_enseignant = ?, 
+                      id_classe = ?, 
+                      id_matiere = ?, 
+                      type_evaluation = ?, 
+                      statut = ?, 
+                      date_modification = NOW() 
+                      WHERE id = ?";
+        $stmt = $dbh->prepare($sql);
+        $stmt->execute([$titre, $description, $id_enseignant, $id_classe, $id_matiere, $type_evaluation, $statut, $id_evaluation]);
+      }
+
+      $success_message = "Évaluation mise à jour avec succès.";
+    } else {
+      // Ajout d'une nouvelle évaluation
+      if ($new_file_uploaded) {
+        $result = ajouter_evaluation($dbh, $_POST, $_FILES);
+        if ($result['success']) {
+          echo "<script>alert('{$result['message']}'); window.location.href='{$result['redirect_url']}';</script>";
+        } else {
+          echo "<script>alert('{$result['message']}');</script>";
+        }
+      } else {
+        $error_message = "Veuillez sélectionner un fichier.";
+      }
+    }
+  } catch (PDOException $e) {
+    $error_message = "Erreur lors de l'enregistrement: " . $e->getMessage();
+  }
+
+  // Redirection pour éviter la soumission du formulaire en cas de rafraîchissement
+  header("Location: evaluations.php" . (isset($error_message) ? "?error=" . urlencode($error_message) : "?success=" . urlencode($success_message)));
+  exit;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

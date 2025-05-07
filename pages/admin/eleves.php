@@ -76,17 +76,11 @@ try {
     // Appeler la fonction du controller
     $result = supprimerEleve($dbh, $_GET['id']);
     if ($result['success']) {
-      echo "<script>
-              alert('Élève bien supprimé');
-              window.location.href = 'eleves.php';
-          </script>";
-      exit;
+      header("Location: eleves.php?success=1");
+      exit();
     } else {
-      echo "<script>
-              alert('" . $result['message'] . "');
-              window.location.href = 'eleves.php';
-          </script>";
-      exit;
+      header("Location: eleves.php?error=1");
+      // throw new Exception($result['message']);
     }
   }
 } catch (Exception $e) {
@@ -147,8 +141,7 @@ try {
                           <td>
                             <div class="d-flex px-2 py-1">
                               <div>
-                                <img src="<?= $result->genre === 'Masculin' ? '../../assets/img/team-4.jpg' : ($result->genre === 'Féminin' ? '../../assets/img/marie.jpg' : '../../assets/img/default.jpg') ?>"
-                                class="avatar avatar-sm me-3" alt="eleve">
+                                <img src="<?= $result->genre === 'Masculin' ? '../../assets/img/team-4.jpg' : ($result->genre === 'Féminin' ? '../../assets/img/marie.jpg' : '../../assets/img/default.jpg') ?>" class="avatar avatar-sm me-3" alt="eleve">
                               </div>
                               <div class="d-flex flex-column justify-content-center">
                                 <h6 class="mb-0 text-sm"><?= $result->nom . ' ' . $result->prenom ?></h6>
@@ -195,7 +188,7 @@ try {
                               <a href="description_eleve.php?id=<?= $result->id_eleve ?>" class="dropdown-item">
                                 <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                               </a>
-                              <a href="eleves.php?id=<?= $result->id_eleve ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                              <a href="eleves.php?id=<?= $result->id_eleve ?>&del=1" class="dropdown-item" onClick="return confirmDelete(event, this)">
                                 <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_eleve ?>"></i>
                               </a>
                             </div>
@@ -225,6 +218,9 @@ try {
   <script src="../../assets/js/datatable.js"></script>
   <!-- Export Functio -->
   <script src="../../assets/js/export.js"></script>
+
+  <!-- sweet alert -->
+  <script src="../../assets/js/alerts/sweet_alert.js"></script>
 
   <!-- //* Date Picker + AJAX eleves intervalle date  -->
   <script src="../../assets/dateP_dateP/dateP_dataP_eleve.js"></script>

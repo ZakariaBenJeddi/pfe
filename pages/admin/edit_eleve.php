@@ -17,11 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
     header("Location: eleves.php?success=1");
     exit();
   } else {
-    // throw new Exception($result['message']);
-    echo "<script>
-      alert('Erreur: " . addslashes($result['message']) . "');
-    </script>";
-
+    header("Location: eleves.php?error=1");
   }
 }
 

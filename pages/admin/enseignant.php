@@ -207,6 +207,9 @@ try {
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
 
+  <!-- sweet alert -->
+  <script src="../../assets/js/alerts/sweet_alert.js"></script>
+
   <!-- script export -->
   <script src="../../assets/js/datatable.js"></script>
   <!-- Export -->

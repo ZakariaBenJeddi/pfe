@@ -73,6 +73,9 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
   if ($result['success'] && $result['redirect']) {
     header("Location: " . $result['redirect_url'] . "?success=1");
     exit;
+  }else{
+    header("Location: " . $result['redirect_url'] . "?error=1");
+
   }
 }
 
@@ -142,7 +145,8 @@ if (isset($_POST['save'])) {
     header("Location: matiere.php?success=1");
     exit();
   } catch (Exception $e) {
-    echo "<script>alert('Erreur: " . htmlspecialchars($e->getMessage()) . "');</script>";
+    header("Location: matiere.php?error=1");
+    // echo "<script>alert('Erreur: " . htmlspecialchars($e->getMessage()) . "');</script>";
   }
 }
 
@@ -218,6 +222,7 @@ if (isset($_POST['update'])) {
       header("Location: matiere.php?success=1");
       exit();
     } else {
+      header("Location: matiere.php?error=1");
       throw new Exception($result['message']);
     }
   } catch (Exception $e) {
