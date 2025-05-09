@@ -1,3 +1,8 @@
+<?php
+$all_niveaux = get_all_niveau($dbh);
+$filieres = get_filieres_with_niveaux($dbh)['data'];
+$classes = get_all_classes($dbh)['data'];
+?>
 <div class="modal fade" id="paiementModal" tabindex="-1" aria-labelledby="paiementModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -9,6 +14,50 @@
         <div class="modal-body">
           <input type="hidden" id="id_paiement" name="id_paiement">
           <div class="row">
+            <!-- Niveau scolaire -->
+            <div class="col-md-6 mb-3">
+              <div class="form-group">
+                <label for="niveau_scolaire_eleve" class="form-control-label">Niveau Scolaire</label>
+                <select class="form-control" name="niveau_scolaire_eleve" id="niveau_scolaire_eleve" required>
+                  <option value="">-- Sélectionner un niveau --</option>
+                  <?php foreach ($all_niveaux as $niveau) : ?>
+                    <option value="<?= $niveau->id_niveau ?>">
+                      <?= htmlspecialchars($niveau->nom_niveau) ?>
+                    </option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+            </div>
+
+            <!-- Filière -->
+            <div class="col-md-6 mb-3">
+              <div class="form-group">
+                <label for="filiere_eleve" class="form-control-label">Filière</label>
+                <select class="form-select" name="filiere_eleve" id="filiere_eleve" disabled required>
+                  <option value="">Sélectionner une filière</option>
+                  <?php foreach ($filieres as $filiere) : ?>
+                      <option value="<?= $filiere->id_filiere ?>" >
+                        <?= htmlspecialchars($filiere->nom_filiere) ?>
+                      </option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+            </div>
+
+            <!-- Classe -->
+            <div class="col-md-6 mb-3">
+              <div class="form-group">
+                <label for="classe_eleve" class="form-control-label">Classe</label>
+                <select class="form-select" name="classe_eleve" id="classe_eleve" disabled required>
+                  <option value="">Sélectionner une classe</option>
+                  <?php foreach ($classes as $classe) : ?>
+                      <option value="<?= $classe->id_classe ?>">
+                        <?= htmlspecialchars($classe->nom_classe) ?>
+                      </option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+            </div>
             <div class="col-md-6 mb-3">
               <label for="id_eleve" class="form-label">Élève</label>
               <select class="form-select" id="id_eleve" name="id_eleve" required>
@@ -16,11 +65,12 @@
                 <?php
                 $eleves = getElevesInfo($dbh)['data'];
                 foreach ($eleves as $eleve) {
-                echo "<option value='{$eleve->id_eleve}' 
+                  echo "<option value='{$eleve->id_eleve}' 
                   data-niveau='{$eleve->id_niveau}' 
                   data-filiere='{$eleve->id_filiere}'>
                   {$eleve->nom} {$eleve->prenom} 
-                </option>";}
+                </option>";
+                }
                 ?>
               </select>
             </div>
@@ -120,3 +170,5 @@
     </div>
   </div>
 </div>
+<!-- FILIRE ET CLASSE SELON LE NIVEAU -->
+<script src="../../../assets/js/niveau_filiere_classe.js"></script>

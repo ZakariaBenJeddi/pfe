@@ -34,14 +34,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
   $result = ajouterEnseignant($dbh, $enseignantData);
 
   if ($result['success']) {
-    echo "<script>
-          alert('Enseignant ajouté avec succès.');
-          window.location.href = 'enseignant.php';
-      </script>";
+    header("Location: enseignant.php?success=1");
   } else {
-    echo "<script>
-          alert('" . $result['message'] . "');
-      </script>";
+    header("Location: enseignant.php?error=1");
   }
 }
 
@@ -103,14 +98,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="genre" class="form-control-label">Genre</label>
-                      <input class="form-control" type="text" name="genre" id="genre">
+                      <!-- <input class="form-control" type="text" name="genre" id="genre"> -->
+                       <select name="genre" id="genre" class="form-select form-control ">
+                        <option value="">Selectionner Genre</option>
+                        <option value="Homme">Homme</option>
+                        <option value="Femme">Femme</option>
+                       </select>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="masse_horaire" class="form-control-label">Masse Horaire</label>
-                      <input class="form-control" type="number" name="masse_horaire" id="masse_horaire">
+                      <input class="form-control" type="number" name="masse_horaire" id="masse_horaire" min="0">
                     </div>
                   </div>
 

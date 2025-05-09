@@ -54,17 +54,9 @@ try {
       $result = supprimerEnseignant($dbh, $_GET['id']);
 
       if ($result['success']) {
-          echo "<script>
-              alert('Enseignant bien supprimé');
-              window.location.href = 'enseignant.php';
-          </script>";
-          exit;
+        header("Location: enseignant.php?success=1");
       } else {
-          echo "<script>
-              alert('" . $result['message'] . "');
-              window.location.href = 'enseignant.php';
-          </script>";
-          exit;
+        header("Location: enseignant.php?error=1");
       }
   }
 } catch (Exception $e) {

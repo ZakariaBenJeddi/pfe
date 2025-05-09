@@ -41,6 +41,9 @@ if (isset($_GET['id'])) {
         echo htmlspecialchars($classe_info_par_id['message']);
         exit();
       }
+
+      // paiement eleves
+      $paiements_eleves = getPaiementsByEleveId($dbh, $_GET['id']);
     } else {
       echo "No data found or operation failed.";
     }
@@ -54,16 +57,16 @@ if (isset($_GET['id'])) {
 try {
   $eleve_id = $_GET['id']; // Remplacez par l'ID de l'élève souhaité
   $result = getHeuresAbsenceEleve($dbh, $eleve_id);
-  
+
   if ($result['success']) {
-      $donnees_absence = $result['data'];
-      // Utiliser les données ici, par exemple:
-      if (count($donnees_absence) > 0) {
-          $total_heures = $donnees_absence[0]->{'Total Heures Absence'};
-          // echo "L'élève a été absent pendant " . $total_heures . " heures.";
-      }
+    $donnees_absence = $result['data'];
+    // Utiliser les données ici, par exemple:
+    if (count($donnees_absence) > 0) {
+      $total_heures = $donnees_absence[0]->{'Total Heures Absence'};
+      // echo "L'élève a été absent pendant " . $total_heures . " heures.";
+    }
   } else {
-      echo "<script>alert('" . $result['message'] . "');</script>";
+    echo "<script>alert('" . $result['message'] . "');</script>";
   }
 } catch (Exception $e) {
   echo "<script>alert('Une erreur est survenue lors du calcul des heures d\'absence.');</script>";
@@ -171,13 +174,11 @@ try {
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
-                      <h6 class="text-center mb-0">Notes</h6>
-                      <span class="text-xs">Decouvrir notes</span>
+                      <h6 class="text-center mb-0">Evaluation</h6>
+                      <span class="text-xs">Decouvrir</span>
                       <hr class="horizontal dark my-3">
-                      <!-- <h5 class="mb-0"><?php //$results->nom_tuteur 
-                                            ?></h5> -->
                       <div class="icon icon-shape icon-sm bg-gradient-primary shadow text-center cursor-pointer" style="border-radius:100%;">
-                        <a href="notes.php?id_eleves=0"><i class="fas fa-arrow-right"></i></a>
+                        <a href="evaluations.php"><i class="fas fa-arrow-right"></i></a>
                       </div>
                     </div>
                   </div>
@@ -187,11 +188,12 @@ try {
           </div>
           <div class="row"> <!-- Delete this ligne if something wrong-->
             <div class="col-md-8 mb-lg-0 mb-4">
-              <div class="card mt-4">
+              <div class="card mt-4 locked-card position-relative" style="opacity: 0.6; pointer-events: none;">
                 <div class="card-header pb-0 p-3">
                   <div class="row">
                     <div class="col-6 d-flex align-items-center">
-                      <h6 class="mb-0">Dernier notes :</h6>&nbsp;&nbsp;<i class="fas fa-users text-primary"></i>
+                      <h6 class="mb-0">Dernières notes :</h6>&nbsp;&nbsp;
+                      <i class="fas fa-lock text-danger"></i> <!-- icône de cadenas -->
                     </div>
                   </div>
                 </div>
@@ -285,6 +287,14 @@ try {
                     </div>
                   </div>
                 </div>
+                <!-- Overlay verrouillé -->
+                <div class="locked-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(255,255,255,0.6);">
+                  <div class="text-center">
+                    <i class="fas fa-lock fa-2x text-secondary mb-2"></i>
+                    <p class="text-muted mb-0">Contenu verrouillé</p>
+                    <small class="text-muted">Disponible bientôt</small>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="col-md-3 mb-lg-0 mb-2">
@@ -315,41 +325,60 @@ try {
               </div>
               <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
                 <div class="d-flex flex-row justify-content-center justify-content-md-start align-items-center gap-2 w-100 w-md-auto mt-0 mt-md-4">
-                  <a class="btn btn-primary btn-sm" href="ajouter_classe.php">Ajouter Payement</a>
-                  <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
+                  <a class="btn btn-primary btn-sm" href="paiements_eleves.php">Ajouter Payement</a>
                 </div>
                 <div class="w-100 w-md-auto text-center text-md-end mt-2 mt-md-0">
-                  <input type="text" class="form-control w-100 w-md-auto" id="daterange" name="daterange" value="" />
+                  <!-- <input type="text" class="form-control w-100 w-md-auto mb-3" id="daterange" name="daterange" value="" /> -->
                 </div>
               </div>
             </div>
-            <div class="card-body pt-4 p-3">
-              <table class="table align-items-center mb-0" id="table_payement">
+            <div class="card-body pt-4 p-3 table-responsive">
+              <table class="table align-items-center mb-0" id="table_description_eleve_payement">
                 <thead>
                   <tr>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Classe</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Niveau</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Niveau</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Niveau</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Payment Methode</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">#</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Période</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Type de Frais</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Montant Final</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Mode Paiement</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date Paiement</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Statut</th>
                   </tr>
                 </thead>
                 <tbody id="tableBody">
-                  <td class="align-middle text-center">
-                    <p class="text-secondary text-xs font-weight-bold"></p>
-                  </td>
-                  <td class="align-middle text-center">
-                    <p class="text-secondary text-xs font-weight-bold"></p>
-                  </td>
-                  <td class="align-middle text-center">
-                    <p class="text-secondary text-xs font-weight-bold"></p>
-                  </td>
-                  <td class="align-middle text-center">
-                    <p class="text-secondary text-xs font-weight-bold"></p>
-                  </td>
-                  <td class="align-middle text-center">
-                    <p class="text-secondary text-xs font-weight-bold"></p>
-                  </td>
+                  <?php foreach ($paiements_eleves['data'] as $result) : ?>
+                    <tr>
+                      <td style="cursor:pointer" <?php if ($result->statut_paiement === "Validé") { ?>
+                        onclick="genererPDFPaiement(<?= $result->id_paiement ?>)" <?php } else { ?> onclick="window.location.href='paiements_eleves.php?error=<?= urlencode('Paiement non validé') ?>'" <?php } ?>>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-center">
+                            <h6 class="mb-0 text-sm"><?= $result->id_paiement ?></h6>
+                          </div>
+                          <?php if ($result->statut_paiement === "Validé") { ?>
+                            <i class="fas fa-file-pdf text-primary ms-2"></i> <!-- Icône PDF -->
+                          <?php } ?>
+                        </div>
+                      </td>
+                      <td><?= htmlspecialchars($result->nom_periode) ?></td>
+                      <td><?= htmlspecialchars($result->nom_frais) ?></td>
+                      <td><?= number_format($result->montant_final, 2) ?> MAD</td>
+                      <td><?= htmlspecialchars($result->mode_paiement) ?></td>
+                      <td><?= htmlspecialchars($result->date_paiement) ?></td>
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                          <?php if ($result->statut_paiement === "En attente") { ?>
+                            <span class="badge badge-md bg-gradient-secondary"><?= $result->statut_paiement ?></span>
+                          <?php } ?>
+                          <?php if ($result->statut_paiement === "Validé") { ?>
+                            <span class="badge badge-md bg-gradient-success"><?= $result->statut_paiement ?></span>
+                          <?php } ?>
+                          <?php if ($result->statut_paiement === "Annulé") { ?>
+                            <span class="badge badge-md bg-gradient-danger"><?= $result->statut_paiement ?></span>
+                          <?php } ?>
+                        </p>
+                      </td>
+                    </tr>
+                  <?php endforeach; ?>
                 </tbody>
               </table>
             </div>
@@ -357,11 +386,11 @@ try {
           </div>
         </div>
         <div class="col-md-4 mt-4">
-          <div class="card h-100 mb-4">
+          <div class="card h-100 mb-4 position-relative locked-card" style="opacity: 0.6; pointer-events: none;">
             <div class="card-header pb-0 px-3">
               <div class="row">
                 <div class="col-md-6">
-                  <h6 class="mb-0">Notes</h6>
+                  <h6 class="mb-0">Notes <i class="fas fa-lock text-danger ms-2"></i></h6>
                 </div>
                 <div class="col-md-6 d-flex justify-content-end align-items-center">
                   <i class="far fa-calendar-alt me-2"></i>
@@ -385,7 +414,17 @@ try {
                 </li>
               </ul>
             </div>
+
+            <!-- Overlay verrouillé -->
+            <div class="locked-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(255,255,255,0.6);">
+              <div class="text-center">
+                <i class="fas fa-lock fa-2x text-secondary mb-2"></i>
+                <p class="text-muted mb-0">Contenu verrouillé</p>
+                <small class="text-muted">Disponible bientôt</small>
+              </div>
+            </div>
           </div>
+
         </div>
       </div>
       <!-- FOOTER -->
@@ -394,12 +433,16 @@ try {
   </main>
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
+
+  <!-- pdf generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="../../assets/js/generation_pdf.js"></script>
+
   <!-- Data table -->
   <script src="../../assets/js/datatable.js"></script>
-  <!-- Export Functio -->
-  <script src="../../assets/js/export.js"></script>
+
   <!-- //* Date Picker + AJAX eleves intervalle date  -->
-  <script src="../../assets/dateP_dateP/dateP_dataP_classe.js"></script>
+  <script src="../../assets/dateP_dateP/dateP_dataP_paiement.js"></script>
 
   <!--   Core JS Files   -->
   <script src="../../assets/js/core/popper.min.js"></script>

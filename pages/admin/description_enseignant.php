@@ -195,7 +195,7 @@ if (isset($_GET['delete_affectation']) && $_GET['delete_affectation'] == 1) {
                       <h6 class="text-center mb-0">Masse Horaire </h6>
                       <span class="text-xs">Par Semaine</span>
                       <hr class="horizontal dark my-3">
-                      <h5 class="mb-0"><?= $results[0]->masse_horaire ?></h5>
+                      <h5 class="mb-0"><?= $results[0]->masse_horaire ?> h</h5>
                     </div>
                   </div>
                 </div>
@@ -207,14 +207,15 @@ if (isset($_GET['delete_affectation']) && $_GET['delete_affectation'] == 1) {
                       </div>
                     </div>
                     <div class="card-body pt-0 p-3 text-center">
-                      <h6 class="text-center mb-0">Notes</h6>
-                      <span class="text-xs">Decouvrir notes</span>
+                      <h6 class="text-center mb-0">Specialite</h6>
+                      <span class="text-xs">Decouvrir</span>
                       <hr class="horizontal dark my-3">
-                      <!-- <h5 class="mb-0"><?php //$results[0]->nom_tuteur 
-                                            ?></h5> -->
-                      <div class="icon icon-shape icon-sm bg-gradient-primary shadow text-center cursor-pointer" style="border-radius:100%;">
+                      <h5 class="mb-0">
+                        <?= $results[0]->specialite?>
+                      </h5>
+                      <!-- <div class="icon icon-shape icon-sm bg-gradient-primary shadow text-center cursor-pointer" style="border-radius:100%;">
                         <a href="notes.php?id_eleves=0"><i class="fas fa-arrow-right"></i></a>
-                      </div>
+                      </div> -->
                     </div>
                   </div>
                 </div>
@@ -223,11 +224,12 @@ if (isset($_GET['delete_affectation']) && $_GET['delete_affectation'] == 1) {
           </div>
           <div class="row"> <!-- Delete this ligne if something wrong-->
             <div class="col-md-8 mb-lg-0 mb-4">
-              <div class="card mt-4">
+              <div class="card mt-4 locked-card position-relative" style="opacity: 0.6; pointer-events: none;">
                 <div class="card-header pb-0 p-3">
                   <div class="row">
                     <div class="col-6 d-flex align-items-center">
-                      <h6 class="mb-0">Dernier notes :</h6>&nbsp;&nbsp;<i class="fas fa-users text-primary"></i>
+                      <h6 class="mb-0">Dernières notes :</h6>&nbsp;&nbsp;
+                      <i class="fas fa-lock text-danger"></i> <!-- icône de cadenas -->
                     </div>
                   </div>
                 </div>
@@ -296,6 +298,7 @@ if (isset($_GET['delete_affectation']) && $_GET['delete_affectation'] == 1) {
                                 <p class="text-xs font-weight-bold mb-0">Manager</p>
                                 <p class="text-xs text-secondary mb-0">Organization</p>
                               </td>
+
                             </tr>
                             <tr>
                               <td>
@@ -320,6 +323,14 @@ if (isset($_GET['delete_affectation']) && $_GET['delete_affectation'] == 1) {
                     </div>
                   </div>
                 </div>
+                <!-- Overlay verrouillé -->
+                <div class="locked-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(255,255,255,0.6);">
+                  <div class="text-center">
+                    <i class="fas fa-lock fa-2x text-secondary mb-2"></i>
+                    <p class="text-muted mb-0">Contenu verrouillé</p>
+                    <small class="text-muted">Disponible bientôt</small>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="col-md-3 mb-lg-0 mb-2">
@@ -342,15 +353,15 @@ if (isset($_GET['delete_affectation']) && $_GET['delete_affectation'] == 1) {
         <div class="col-md-8 mt-4">
           <div class="card">
 
-            <div class="card-header pb-0 px-3">
+            <!-- <div class="card-header pb-0 px-3">
               <button class="btn btn-primary brn-rounded">Afficher l'emploi du temps de ce Composant</button>
-            </div>
+            </div> -->
             <div class="card-body pt-4 p-3">
+              <h4 class="text-center text-primary">affecter une matiere</h4>
               <ul class="list-group">
                 <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
                   <div class="d-flex">
                     <h6 class="me-5 text-sm"><?= $results[0]->nom_enseignant . ' ' . $results[0]->prenom_enseignant ?></h6>
-
                     <?php if ($result_EM === false) { ?>
                       <select name="matiere_select" id="matiere_select" class="form-select ml-3">
                         <option value="">Choisir Matiere</option>
@@ -382,7 +393,7 @@ if (isset($_GET['delete_affectation']) && $_GET['delete_affectation'] == 1) {
           </div>
         </div>
         <div class="col-md-4 mt-4">
-          <div class="card h-100 mb-4">
+          <div class="card h-100 mb-4 position-relative locked-card" style="opacity: 0.6; pointer-events: none;">
             <div class="card-header pb-0 px-3">
               <div class="row">
                 <div class="col-md-6">
@@ -461,6 +472,16 @@ if (isset($_GET['delete_affectation']) && $_GET['delete_affectation'] == 1) {
                 </li>
               </ul>
             </div>
+            
+            <!-- Overlay verrouillé -->
+            <div class="locked-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(255,255,255,0.6);">
+              <div class="text-center">
+                <i class="fas fa-lock fa-2x text-secondary mb-2"></i>
+                <p class="text-muted mb-0">Contenu verrouillé</p>
+                <small class="text-muted">Disponible bientôt</small>
+              </div>
+            </div>
+          </div>
           </div>
         </div>
       </div>
