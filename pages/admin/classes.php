@@ -52,13 +52,14 @@ try {
   if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
       $result = delete_classe($dbh, $_GET['id']);
       
-      if ($result['success']) {
-          echo "<script>alert('Classe Bien Supprimée');</script>";
-          header("Location: classes.php");
-          exit;
-      } else {
-          echo "<script>alert('" . htmlspecialchars($result['message']) . "');</script>";
-      }
+    if ($result['success']) {
+        header("Location: classes.php?success=1");
+        exit();
+    } else {
+        $errorMessage = urlencode($result['message']);
+        header("Location: classes.php?error={$errorMessage}");
+        exit();
+    }
   }
 } catch (Exception $e) {
   error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
@@ -115,7 +116,7 @@ try {
                           <td>
                             <div class="d-flex px-2 py-1">
                               <div>
-                                <img src="../../assets/img/team-2.jpg" class="avatar avatar-sm me-3" alt="user1">
+                                <img src="../../assets/img/small-logos/logo-invision.svg" class="avatar avatar-sm me-3" alt="user1">
                               </div>
                               <div class="d-flex flex-column justify-content-center">
                                 <p class="text-secondary text-xs font-weight-bold"><?= $result->nom_classe ?></p>
@@ -134,7 +135,7 @@ try {
                             </td>
                           <?php } else { ?>
                             <td class="align-middle text-center text-sm">
-                              <span class="badge badge-sm bg-gradient-success">Inactive</span>
+                              <span class="badge badge-sm bg-secondary">Inactive</span>
                             </td>
                           <?php } ?>
                           <td class="align-middle text-center">
@@ -145,13 +146,13 @@ try {
                           </td>
                           <td class="align-middle text-center">
                             <div class="d-flex">
-                              <a href="edit_classe.php?id=<?= $result->id_classe ?>" class="dropdown-item">
+                              <a href="edit_classe.php?id_classe=<?= $result->id_classe ?>" class="dropdown-item">
                                 <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                               </a>
                               <a href="description_classe.php?id=<?= $result->id_classe ?>" class="dropdown-item">
                                 <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                               </a>
-                              <a href="classes.php?id=<?= $result->id_classe ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                              <a href="classes.php?id=<?= $result->id_classe ?>&del=1" class="dropdown-item" onClick="return confirmDelete(event, this)">
                                 <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_classe ?>"></i>
                               </a>
                             </div>
@@ -174,6 +175,9 @@ try {
 
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
+
+  <!-- sweet alert -->
+  <script src="../../assets/js/alerts/sweet_alert.js"></script>
 
   <!-- Data table -->
   <script src="../../assets/js/datatable.js"></script>

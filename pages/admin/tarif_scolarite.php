@@ -53,7 +53,6 @@ if (isset($_POST['save'])) {
     header("Location: tarif_scolarite.php?success=1");
     exit();
   } else {
-    header("Location: tarif_scolarite.php?error=1");
     header("Location: tarif_scolarite.php?error=" . urlencode($result['message']));
     exit();
   }

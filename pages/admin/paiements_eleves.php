@@ -88,8 +88,9 @@ if (isset($_POST['save'])) {
     header("Location: paiements_eleves.php?success=1");
     exit();
   } else {
-    header("Location: paiements_eleves.php?error=1");
-    // header("Location: paiements_eleves.php?error=" . urlencode($result['message']));
+      $errorMessage = urlencode($result['message']);
+      header("Location: paiements_eleves.php?error={$errorMessage}");
+      exit();
     exit();
   }
 }

@@ -1,87 +1,37 @@
 <?php
 session_start();
 if (empty($_SESSION['user'])) {
-  header('location:../sign-in.php');
+  header('../location:sign-in.php');
 }
+include('../../includes/admin/controller/controller.php');
 
-require '../../includes/DatabaseConnexion.php';
-
-//* deconnexion
+//* Gestion de l'inactivité
 require('../../includes/deconnexion_5s.php');
 
-// update
-// Vérifier si le formulaire a été soumis
+// create
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
-  // Récupérer les données du formulaire
-  $nom = $_POST['nom_eleve'];
-  $prenom = $_POST['prenom_eleve'];
-  $date_naissance = $_POST['date_naissance_eleve'];
-  $genre = $_POST['genre_eleve'];
-  $nationalite = $_POST['nationalite_eleve'];
-  $adresse = $_POST['adresse_eleve'];
-  $telephone = $_POST['telephone_eleve'];
-  $email = $_POST['email_eleve'];
-  $date_inscription = $_POST['date_inscription_eleve'];
-  $statut = $_POST['statut_eleve'];
-  $historique_scolaire = $_POST['historique_scolaire_eleve'];
-  $langues_parlees = $_POST['langues_parlees_eleve'];
-  $nom_tuteur = $_POST['nom_tuteur_eleve'];
-  $telephone_tuteur = $_POST['telephone_tuteur_eleve'];
-  $email_tuteur = $_POST['email_tuteur_eleve'];
-  $profession_tuteur = $_POST['profession_tuteur_eleve'];
-  $niveau_scolaire = $_POST['niveau_scolaire_eleve'];
-  $besoins_speciaux = $_POST['besoins_speciaux_eleve'];
-  $langue_etrangere = $_POST['langue_etrangere_eleve'];
-  $niveau_de_satisfaction = $_POST['niveau_de_satisfaction_eleve'];
+    $result = add_classe(
+        $dbh,
+        $_POST['nom_classe'],
+        $_POST['niveau_id'],
+        $_POST['filiere_id'],
+        $_POST['annee_scolaire'],
+        $_POST['capacite'],
+        $_POST['statut'],
+        $_POST['nom_responsable']
+    );
 
-  // Préparer la requête de mise à jour
-  $sql = "INSERT INTO eleves (
-              nom,prenom,date_naissance,genre,nationalite,adresse,telephone,email,date_inscription,
-              statut,historique_scolaire,langues_parlees,nom_tuteur,telephone_tuteur,email_tuteur,
-              profession_tuteur,niveau_scolaire,besoins_speciaux,langue_etrangere,
-              niveau_de_satisfaction,date_derniere_mise_a_jour
-          )
-          VALUES (
-              :nom,:prenom,:date_naissance,:genre,:nationalite,:adresse,:telephone,
-              :email,:date_inscription,:statut,:historique_scolaire,:langues_parlees,
-              :nom_tuteur,:telephone_tuteur,:email_tuteur,:profession_tuteur,:niveau_scolaire,
-              :besoins_speciaux,:langue_etrangere,:niveau_de_satisfaction,NOW()
-          )";
-
-
-  try {
-    $stmt = $dbh->prepare($sql);
-    $stmt->execute([
-      ':nom' => $nom,
-      ':prenom' => $prenom,
-      ':date_naissance' => $date_naissance,
-      ':genre' => $genre,
-      ':nationalite' => $nationalite,
-      ':adresse' => $adresse,
-      ':telephone' => $telephone,
-      ':email' => $email,
-      ':date_inscription' => $date_inscription,
-      ':statut' => $statut,
-      ':historique_scolaire' => $historique_scolaire,
-      ':langues_parlees' => $langues_parlees,
-      ':nom_tuteur' => $nom_tuteur,
-      ':telephone_tuteur' => $telephone_tuteur,
-      ':email_tuteur' => $email_tuteur,
-      ':profession_tuteur' => $profession_tuteur,
-      ':niveau_scolaire' => $niveau_scolaire,
-      ':besoins_speciaux' => $besoins_speciaux,
-      ':langue_etrangere' => $langue_etrangere,
-      ':niveau_de_satisfaction' => $niveau_de_satisfaction,
-    ]);
-
-    echo "<script>
-        alert('élève ajouter avec succès.');
-        window.location.href = 'eleves.php';
-      </script>";
-  } catch (PDOException $e) {
-    echo "Erreur lors de la mise à jour : " . $e->getMessage();
-  }
+    if ($result['success']) {
+        header("Location: classes.php?success=1");
+        exit();
+    } else {
+        $errorMessage = urlencode($result['message']);
+        header("Location: classes.php?error={$errorMessage}");
+        exit();
+    }
 }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -104,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
     </div>
     <div class="container-fluid py-4">
       <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
@@ -119,143 +69,68 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="nom_eleve" class="form-control-label">Nom Classe</label>
-                      <input class="form-control" type="text" name="nom_eleve" id="nom_eleve" required>
+                      <input type="text" name="nom_classe" class="form-control" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="prenom_eleve" class="form-control-label">Prénom Élève</label>
-                      <input class="form-control" type="text" name="prenom_eleve" id="prenom_eleve" required>
+                      <label class="form-control-label">Niveau</label>
+                      <select name="niveau_id" class="form-select" required>
+                        <?php
+                        $niv_stmt = $dbh->query("SELECT id_niveau, nom_niveau FROM niveau");
+                        while ($niveau = $niv_stmt->fetch()) {
+                          echo "<option value='{$niveau['id_niveau']}'>{$niveau['nom_niveau']}</option>";
+                        }
+                        ?>
+                      </select>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="date_naissance_eleve" class="form-control-label">Date de Naissance</label>
-                      <input class="form-control" type="date" name="date_naissance_eleve" id="date_naissance_eleve" required>
+                      <label for="filiere_id" class="form-control-label">Filière</label>
+                      <select name="filiere_id" id="filiere_id" class="form-select">
+                        <?php
+                        $fil_stmt = $dbh->query("SELECT id_filiere, nom_filiere FROM filiere");
+                        while ($filiere = $fil_stmt->fetch()) {
+                          echo "<option value='{$filiere['id_filiere']}'>{$filiere['nom_filiere']}</option>";
+                        }
+                        ?>
+                      </select>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="genre_eleve" class="form-control-label">Genre</label>
-                      <input class="form-control" type="text" name="genre_eleve" id="genre_eleve" required>
+                      <label for="annee_scolaire" class="form-control-label">Année Scolaire</label>
+                      <input type="text" name="annee_scolaire" id="annee_scolaire" class="form-control" value="2024-2025" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="nationalite_eleve" class="form-control-label">Nationalité</label>
-                      <input class="form-control" type="text" name="nationalite_eleve" id="nationalite_eleve" required>
+                      <label for="capacite" class="form-control-label">Capacité</label>
+                      <input type="number" min="0" name="capacite" id="capacite" class="form-control" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="adresse_eleve" class="form-control-label">Adresse</label>
-                      <input class="form-control" type="text" name="adresse_eleve" id="adresse_eleve" required>
+                      <label for="statut" class="form-control-label">Statut</label>
+                      <select name="statut" id="statut" class="form-select">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="telephone_eleve" class="form-control-label">Téléphone</label>
-                      <input class="form-control" type="text" name="telephone_eleve" id="telephone_eleve" required>
+                      <label for="nom_responsable" class="form-control-label">Nom Responsable</label>
+                        <input type="text" name="nom_responsable" id="nom_responsable" class="form-control">
                     </div>
                   </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="email_eleve" class="form-control-label">Email</label>
-                      <input class="form-control" type="email" name="email_eleve" id="email_eleve" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="date_inscription_eleve" class="form-control-label">Date d'Inscription</label>
-                      <input class="form-control" type="date" name="date_inscription_eleve" id="date_inscription_eleve" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="statut_eleve" class="form-control-label">Statut</label>
-                      <input class="form-control" type="text" name="statut_eleve" id="statut_eleve" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="historique_scolaire_eleve" class="form-control-label">Historique Scolaire</label>
-                      <input class="form-control" type="text" name="historique_scolaire_eleve" id="historique_scolaire_eleve" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="langues_parlees_eleve" class="form-control-label">Langues Parlées</label>
-                      <input class="form-control" type="text" name="langues_parlees_eleve" id="langues_parlees_eleve" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="nom_tuteur_eleve" class="form-control-label">Nom Tuteur</label>
-                      <input class="form-control" type="text" name="nom_tuteur_eleve" id="nom_tuteur_eleve" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="telephone_tuteur_eleve" class="form-control-label">Téléphone Tuteur</label>
-                      <input class="form-control" type="text" name="telephone_tuteur_eleve" id="telephone_tuteur_eleve" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="email_tuteur_eleve" class="form-control-label">Email Tuteur</label>
-                      <input class="form-control" type="email" name="email_tuteur_eleve" id="email_tuteur_eleve" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="profession_tuteur_eleve" class="form-control-label">Profession Tuteur</label>
-                      <input class="form-control" type="text" name="profession_tuteur_eleve" id="profession_tuteur_eleve" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="niveau_scolaire_eleve" class="form-control-label">Niveau Scolaire</label>
-                      <input class="form-control" type="text" name="niveau_scolaire_eleve" id="niveau_scolaire_eleve" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="besoins_speciaux_eleve" class="form-control-label">Besoins Spéciaux</label>
-                      <input class="form-control" type="text" name="besoins_speciaux_eleve" id="besoins_speciaux_eleve" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="langue_etrangere_eleve" class="form-control-label">Langue Étrangère</label>
-                      <input class="form-control" type="text" name="langue_etrangere_eleve" id="langue_etrangere_eleve" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="niveau_de_satisfaction_eleve" class="form-control-label">Niveau de Satisfaction</label>
-                      <input class="form-control" type="text" name="niveau_de_satisfaction_eleve" id="niveau_de_satisfaction_eleve" required>
-                    </div>
-                  </div>
-
                 </div>
                 <!-- Ajoutez d'autres champs ici -->
                 <div class="row">
@@ -263,56 +138,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
                 </div>
               </div>
             </form>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card card-profile">
-            <img src="../../assets/img/bg-profile.jpg" alt="Image placeholder" class="card-img-top">
-            <div class="row justify-content-center">
-              <div class="col-4 col-lg-4 order-lg-2">
-                <div class="mt-n4 mt-lg-n6 mb-4 mb-lg-0">
-                  <a href="javascript:;">
-                    <img src="../../assets/img/team-2.jpg" class="rounded-circle img-fluid border border-2 border-white">
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div class="card-body pt-0 mb-5">
-              <div class="row">
-                <div class="col">
-                  <div class="d-flex justify-content-center">
-                    <div class="d-grid text-center">
-                      <span class="text-lg font-weight-bolder" id="chaise_value"></span>
-                      <span class="text-sm opacity-8">Chaise </span>
-                    </div>
-                    <div class="d-grid text-center mx-4">
-                      <span class="text-lg font-weight-bolder" id="bureau_value"></span>
-                      <span class="text-sm opacity-8">Bureau </span>
-                    </div>
-                    <div class="d-grid text-center">
-                      <span class="text-lg font-weight-bolder" id="tableau_value"></span>
-                      <span class="text-sm opacity-8">Tableau</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="text-center mt-4">
-                <h5>
-                  Nom Salle :<span class="font-weight-light" id="nom_salle_value"></span>
-                </h5>
-                <div class="h6 font-weight-300">
-                  <i class="ni location_pin mr-2"></i>Etage : <span class="font-weight-light" id="etage_value"></span>
-                </div>
-                <div class="h6 font-weight-300">
-                  <i class="ni location_pin mr-2"></i>
-                  Equipement : <span class="font-weight-light" id="equipement_value"></span>
-                </div>
-                <div class="h6 font-weight-300">
-                  <i class="ni location_pin mr-2"></i>
-                  Capacite Eleve : <span class="font-weight-light" id="capacite_value"></span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

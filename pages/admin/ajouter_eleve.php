@@ -16,11 +16,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
     header("Location: eleves.php?success=1");
     exit();
   } else {
-    header("Location: eleves.php?error=1");
-    // echo "<script>
-    //   alert('Erreur: " . addslashes($result['message']) . "');
-    // </script>";
-
+    $errorMessage = urlencode($result['message']);
+    header("Location: eleves.php?error={$errorMessage}");
+    exit();
   }
 }
 

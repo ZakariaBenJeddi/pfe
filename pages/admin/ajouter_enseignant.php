@@ -35,8 +35,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
 
   if ($result['success']) {
     header("Location: enseignant.php?success=1");
+    exit();
   } else {
-    header("Location: enseignant.php?error=1");
+    $errorMessage = urlencode($result['message']);
+    header("Location: enseignant.php?error={$errorMessage}");
+    exit();
   }
 }
 
@@ -62,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
     </div>
     <div class="container-fluid py-4">
       <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
@@ -189,56 +192,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
                 </div>
               </div>
             </form>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card card-profile">
-            <img src="../../assets/img/bg-profile.jpg" alt="Image placeholder" class="card-img-top">
-            <div class="row justify-content-center">
-              <div class="col-4 col-lg-4 order-lg-2">
-                <div class="mt-n4 mt-lg-n6 mb-4 mb-lg-0">
-                  <a href="javascript:;">
-                    <img src="../../assets/img/team-2.jpg" class="rounded-circle img-fluid border border-2 border-white">
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div class="card-body pt-0 mb-5">
-              <div class="row">
-                <div class="col">
-                  <div class="d-flex justify-content-center">
-                    <div class="d-grid text-center">
-                      <span class="text-lg font-weight-bolder" id="chaise_value"></span>
-                      <span class="text-sm opacity-8">Chaise </span>
-                    </div>
-                    <div class="d-grid text-center mx-4">
-                      <span class="text-lg font-weight-bolder" id="bureau_value"></span>
-                      <span class="text-sm opacity-8">Bureau </span>
-                    </div>
-                    <div class="d-grid text-center">
-                      <span class="text-lg font-weight-bolder" id="tableau_value"></span>
-                      <span class="text-sm opacity-8">Tableau</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="text-center mt-4">
-                <h5>
-                  Nom Salle :<span class="font-weight-light" id="nom_salle_value"></span>
-                </h5>
-                <div class="h6 font-weight-300">
-                  <i class="ni location_pin mr-2"></i>Etage : <span class="font-weight-light" id="etage_value"></span>
-                </div>
-                <div class="h6 font-weight-300">
-                  <i class="ni location_pin mr-2"></i>
-                  Equipement : <span class="font-weight-light" id="equipement_value"></span>
-                </div>
-                <div class="h6 font-weight-300">
-                  <i class="ni location_pin mr-2"></i>
-                  Capacite Eleve : <span class="font-weight-light" id="capacite_value"></span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

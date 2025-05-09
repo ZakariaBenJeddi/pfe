@@ -79,8 +79,9 @@ try {
       header("Location: eleves.php?success=1");
       exit();
     } else {
-      header("Location: eleves.php?error=1");
-      // throw new Exception($result['message']);
+      $errorMessage = urlencode($result['message']);
+      header("Location: eleves.php?error={$errorMessage}");
+      exit();
     }
   }
 } catch (Exception $e) {

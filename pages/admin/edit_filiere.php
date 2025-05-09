@@ -35,16 +35,13 @@ $AllNiveau = get_all_niveau($dbh);
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
   try {
     $result = update_filiere($dbh, $_POST);
-
     if ($result['success']) {
-      echo "<script>
-              alert('Filière modifiée avec succès.');
-              window.location.href = 'filiere.php';
-          </script>";
+      header("Location: filiere.php?success=1");
+      exit();
     } else {
-      echo "<script>
-              alert('" . htmlspecialchars($result['message']) . "');
-          </script>";
+      $errorMessage = urlencode($result['message']);
+      header("Location: filiere.php?error={$errorMessage}");
+      exit();
     }
   } catch (Exception $e) {
     error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');

@@ -17,7 +17,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
     header("Location: eleves.php?success=1");
     exit();
   } else {
-    header("Location: eleves.php?error=1");
+    $errorMessage = urlencode($result['message']);
+    header("Location: eleves.php?error={$errorMessage}");
+    exit();
   }
 }
 

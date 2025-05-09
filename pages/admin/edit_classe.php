@@ -1,143 +1,61 @@
 <?php
-require '../../includes/DatabaseConnexion.php';
 session_start();
-
 if (empty($_SESSION['user'])) {
-  header('location:../sign-in.php');
+  header('../location:sign-in.php');
 }
+include('../../includes/admin/controller/controller.php');
 
-//* deconnexion
+//* Gestion de l'inactivité
 require('../../includes/deconnexion_5s.php');
 
 // update
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
-  // Récupérer les données du formulaire
-  $id_eleve = $_POST['id_eleve'];
-  $nom = $_POST['nom_eleve'];
-  $prenom = $_POST['prenom_eleve'];
-  $date_naissance = $_POST['date_naissance_eleve'];
-  $genre = $_POST['genre_eleve'];
-  $nationalite = $_POST['nationalite_eleve'];
-  $adresse = $_POST['adresse_eleve'];
-  $telephone = $_POST['telephone_eleve'];
-  $email = $_POST['email_eleve'];
-  $date_inscription = $_POST['date_inscription_eleve'];
-  $statut = $_POST['statut_eleve'];
-  $historique_scolaire = $_POST['historique_scolaire_eleve'];
-  $langues_parlees = $_POST['langues_parlees_eleve'];
-  $nom_tuteur = $_POST['nom_tuteur_eleve'];
-  $telephone_tuteur = $_POST['telephone_tuteur_eleve'];
-  $email_tuteur = $_POST['email_tuteur_eleve'];
-  $profession_tuteur = $_POST['profession_tuteur_eleve'];
-  $niveau_scolaire = $_POST['niveau_scolaire_eleve'];
-  $besoins_speciaux = $_POST['besoins_speciaux_eleve'];
-  $langue_etrangere = $_POST['langue_etrangere_eleve'];
-  $niveau_de_satisfaction = $_POST['niveau_de_satisfaction_eleve'];
-  // Gestion de l'upload de l'image
-  $photo = null; // Par défaut, pas d'image uploadée
-  if (!empty($_FILES['image_eleve']['name'])) {
-    $targetDir = "../../assets/img/school/eleve/";
-    $fileName = uniqid('eleve_', true) . '.' . pathinfo($_FILES['image_eleve']['name'], PATHINFO_EXTENSION);
-    $targetFilePath = $targetDir . $fileName;
+if (isset($_GET['id_classe'])) {
+  $id_classe = intval($_GET['id_classe']);
+  $stmt = $dbh->prepare("SELECT * FROM classe WHERE id_classe = :id_classe");
+  $stmt->bindParam(':id_classe', $id_classe, PDO::PARAM_INT);
+  $stmt->execute();
+  $classeSelected = $stmt->fetch(PDO::FETCH_OBJ);
 
-    // Type MIME pour validation
-    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    $fileMime = finfo_file($finfo, $_FILES['image_eleve']['tmp_name']);
-    finfo_close($finfo);
-
-    $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
-
-    if (in_array($fileMime, $allowedMimeTypes)) {
-      if (move_uploaded_file($_FILES['image_eleve']['tmp_name'], $targetFilePath)) {
-        $photo = $fileName; // Enregistrer le nom unique du fichier
-      } else {
-        $error = $_FILES['image_eleve']['error'];
-        echo "<script>alert('Erreur lors du téléchargement de l\'image. Code : $error');</script>";
-      }
-    } else {
-      echo "<script>alert('Type de fichier non autorisé.');</script>";
-    }
-  }
-
-
-
-  // Préparer la requête de mise à jour
-  $sql = "UPDATE eleves 
-            SET nom = :nom,
-                prenom = :prenom,
-                date_naissance = :date_naissance,
-                genre = :genre,
-                nationalite = :nationalite,
-                adresse = :adresse,
-                telephone = :telephone,
-                email = :email,
-                date_inscription = :date_inscription,
-                statut = :statut,
-                historique_scolaire = :historique_scolaire,
-                langues_parlees = :langues_parlees,
-                nom_tuteur = :nom_tuteur,
-                telephone_tuteur = :telephone_tuteur,
-                email_tuteur = :email_tuteur,
-                profession_tuteur = :profession_tuteur,
-                niveau_scolaire = :niveau_scolaire,
-                besoins_speciaux = :besoins_speciaux ,
-                langue_etrangere = :langue_etrangere,
-                niveau_de_satisfaction = :niveau_de_satisfaction,
-                photo = COALESCE(:photo, photo), -- Met à jour la photo uniquement si une nouvelle image est téléchargée
-                date_derniere_mise_a_jour = NOW()
-            WHERE id_eleve = :id_eleve";
-
-  try {
-    $stmt = $dbh->prepare($sql);
-    $stmt->execute([
-      ':nom' => $nom,
-      ':prenom' => $prenom,
-      ':date_naissance' => $date_naissance,
-      ':genre' => $genre,
-      ':nationalite' => $nationalite,
-      ':adresse' => $adresse,
-      ':telephone' => $telephone,
-      ':email' => $email,
-      ':id_eleve' => $id_eleve,
-      ':date_inscription' => $date_inscription,
-      ':statut' => $statut,
-      ':historique_scolaire' => $historique_scolaire,
-      ':langues_parlees' => $langues_parlees,
-      ':nom_tuteur' => $nom_tuteur,
-      ':telephone_tuteur' => $telephone_tuteur,
-      ':email_tuteur' => $email_tuteur,
-      ':profession_tuteur' => $profession_tuteur,
-      ':niveau_scolaire' => $niveau_scolaire,
-      ':besoins_speciaux' => $besoins_speciaux,
-      ':langue_etrangere' => $langue_etrangere,
-      ':niveau_de_satisfaction' => $niveau_de_satisfaction,
-      ':photo' => $photo, // Le nom de l'image ou NULL
-    ]);
-
-    echo "<script>
-        alert('Les informations de l\'élève ont été mises à jour avec succès.');
-        window.location.href = 'eleves.php';
-      </script>";
-  } catch (PDOException $e) {
-    echo "Erreur lors de la mise à jour : " . $e->getMessage();
-  }
-}
-
-if (isset($_GET['id_eleve'])) {
-  $id_eleve = $_GET['id_eleve'];
-
-  $sql = "SELECT * FROM eleves WHERE id_eleve = :id_eleve";
-  $stmt = $dbh->prepare($sql);
-
-  try {
-    $stmt->execute([':id_eleve' => $id_eleve]);
-    $eleve = $stmt->fetch(PDO::FETCH_OBJ);
-  } catch (PDOException $e) {
-    echo "Erreur lors de la récupération des données : " . $e->getMessage();
+  if (!$classeSelected) {
+    die("Classe non trouvée");
   }
 } else {
-  echo "ID de l'élève non fourni.";
+  die("ID de classe manquant");
 }
+
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_classe'])) {
+  $result = update_classe(
+    $dbh,
+    $_POST['id_classe'],
+    $_POST['nom_classe'],
+    $_POST['id_filiere'],
+    $_POST['id_niveau'],
+    $_POST['annee_scolaire'],
+    $_POST['capacite'],
+    $_POST['statut'],
+    $_POST['date_creation'],
+    $_POST['nom_responsable']
+  );
+
+  if ($result['success']) {
+    header("Location: classes.php?success=1");
+    exit();
+  } else {
+    $errorMessage = urlencode($result['message']);
+    header("Location: classes.php?error={$errorMessage}");
+    exit();
+  }
+}
+
+
+// Récupération des filières
+$filieresById = get_filieres_with_niveaux($dbh);
+$filieres = $filieresById['data'];
+
+// Récupération des niveaux
+$niveaux = get_all_niveau($dbh);
+
 ?>
 
 <!-- HEAD -->
@@ -157,226 +75,103 @@ if (isset($_GET['id_eleve'])) {
     </div>
     <div class="container-fluid py-4">
       <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
-                <p class="mb-0">Modifier Eleve</p>
+                <p class="mb-0">Modifier Classe</p>
               </div>
             </div>
             <hr class="horizontal dark">
             <form method="post">
               <div class="card-body">
-                <p class="text-uppercase text-sm">Eleve Information</p>
+                <p class="text-uppercase text-sm">Modification de Classe</p>
                 <div class="row">
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="id_eleve" class="form-control-label">ID Élève</label>
-                      <input class="form-control" type="text" readonly name="id_eleve" id="id_eleve" value="<?= $eleve->id_eleve ?>" required>
+                      <label for="id_classe" class="form-control-label">ID Classe</label>
+                      <input class="form-control" type="text" readonly name="id_classe" value="<?= $classeSelected->id_classe ?>" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="nom_eleve" class="form-control-label">Nom Élève</label>
-                      <input class="form-control" type="text" name="nom_eleve" id="nom_eleve" value="<?= $eleve->nom ?>" required>
+                      <label for="nom_classe" class="form-control-label">Nom de la Classe</label>
+                      <input class="form-control" type="text" name="nom_classe" value="<?= $classeSelected->nom_classe ?>" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="prenom_eleve" class="form-control-label">Prénom Élève</label>
-                      <input class="form-control" type="text" name="prenom_eleve" id="prenom_eleve" value="<?= $eleve->prenom ?>" required>
+                      <label for="id_filiere" class="form-control-label">Filière</label>
+                      <select class="form-select" name="id_filiere" required>
+                        <?php foreach ($filieres as $filiere) : ?>
+                          <option value="<?= $filiere->id_filiere ?>" <?= ($classeSelected->filiere_id == $filiere->id_filiere) ? 'selected' : '' ?>>
+                            <?= $filiere->nom_filiere ?>
+                          </option>
+                        <?php endforeach; ?>
+                      </select>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="date_naissance_eleve" class="form-control-label">Date de Naissance</label>
-                      <input class="form-control" type="date" name="date_naissance_eleve" id="date_naissance_eleve" value="<?= $eleve->date_naissance ?>" required>
+                      <label for="id_niveau" class="form-control-label">Niveau</label>
+                      <select class="form-select" name="id_niveau" required>
+                        <?php foreach ($niveaux as $niveau) : ?>
+                          <option value="<?= $niveau->id_niveau ?>" <?= ($classeSelected->niveau_id == $niveau->id_niveau) ? 'selected' : '' ?>>
+                            <?= $niveau->nom_niveau ?>
+                          </option>
+                        <?php endforeach; ?>
+                      </select>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="genre_eleve" class="form-control-label">Genre</label>
-                      <input class="form-control" type="text" name="genre_eleve" id="genre_eleve" value="<?= $eleve->genre ?>" required>
+                      <label for="annee_scolaire" class="form-control-label">Année Scolaire</label>
+                      <input class="form-control" type="text" name="annee_scolaire" value="<?= $classeSelected->annee_scolaire ?>" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="nationalite_eleve" class="form-control-label">Nationalité</label>
-                      <input class="form-control" type="text" name="nationalite_eleve" id="nationalite_eleve" value="<?= $eleve->nationalite ?>" required>
+                      <label for="capacite" class="form-control-label">Capacité</label>
+                      <input class="form-control" type="number" name="capacite" value="<?= $classeSelected->capacite ?>" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="adresse_eleve" class="form-control-label">Adresse</label>
-                      <input class="form-control" type="text" name="adresse_eleve" id="adresse_eleve" value="<?= $eleve->adresse ?>" required>
+                      <label for="statut" class="form-control-label">Statut</label>
+                      <select class="form-select" name="statut" required>
+                        <option value="active" <?= ($classeSelected->statut == 'active') ? 'selected' : '' ?>>Active</option>
+                        <option value="inactive" <?= ($classeSelected->statut == 'inactive') ? 'selected' : '' ?>>Inactive</option>
+                      </select>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="telephone_eleve" class="form-control-label">Téléphone</label>
-                      <input class="form-control" type="text" name="telephone_eleve" id="telephone_eleve" value="<?= $eleve->telephone ?>" required>
+                      <label for="date_creation" class="form-control-label">Date de création</label>
+                      <input class="form-control" type="date" name="date_creation" value="<?= $classeSelected->date_creation ?>" required>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="email_eleve" class="form-control-label">Email</label>
-                      <input class="form-control" type="email" name="email_eleve" id="email_eleve" value="<?= $eleve->email ?>" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="date_inscription_eleve" class="form-control-label">Date d'Inscription</label>
-                      <input class="form-control" type="date" name="date_inscription_eleve" id="date_inscription_eleve" value="<?= $eleve->date_inscription ?>" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="statut_eleve" class="form-control-label">Statut</label>
-                      <input class="form-control" type="text" name="statut_eleve" id="statut_eleve" value="<?= $eleve->statut ?>" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="historique_scolaire_eleve" class="form-control-label">Historique Scolaire</label>
-                      <input class="form-control" type="text" name="historique_scolaire_eleve" id="historique_scolaire_eleve" value="<?= $eleve->historique_scolaire ?>" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="langues_parlees_eleve" class="form-control-label">Langues Parlées</label>
-                      <input class="form-control" type="text" name="langues_parlees_eleve" id="langues_parlees_eleve" value="<?= $eleve->langues_parlees ?>" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="nom_tuteur_eleve" class="form-control-label">Nom Tuteur</label>
-                      <input class="form-control" type="text" name="nom_tuteur_eleve" id="nom_tuteur_eleve" value="<?= $eleve->nom_tuteur ?>" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="telephone_tuteur_eleve" class="form-control-label">Téléphone Tuteur</label>
-                      <input class="form-control" type="text" name="telephone_tuteur_eleve" id="telephone_tuteur_eleve" value="<?= $eleve->telephone_tuteur ?>" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="email_tuteur_eleve" class="form-control-label">Email Tuteur</label>
-                      <input class="form-control" type="email" name="email_tuteur_eleve" id="email_tuteur_eleve" value="<?= $eleve->email_tuteur ?>" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="profession_tuteur_eleve" class="form-control-label">Profession Tuteur</label>
-                      <input class="form-control" type="text" name="profession_tuteur_eleve" id="profession_tuteur_eleve" value="<?= $eleve->profession_tuteur ?>" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="niveau_scolaire_eleve" class="form-control-label">Niveau Scolaire</label>
-                      <input class="form-control" type="text" name="niveau_scolaire_eleve" id="niveau_scolaire_eleve" value="<?= $eleve->niveau_scolaire ?>" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="besoins_speciaux_eleve" class="form-control-label">Besoins Spéciaux</label>
-                      <input class="form-control" type="text" name="besoins_speciaux_eleve" id="besoins_speciaux_eleve" value="<?= $eleve->besoins_speciaux ?>" required>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="langue_etrangere_eleve" class="form-control-label">Langue Étrangère</label>
-                      <input class="form-control" type="text" name="langue_etrangere_eleve" id="langue_etrangere_eleve" value="<?= $eleve->langue_etrangere ?>" required>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="niveau_de_satisfaction_eleve" class="form-control-label">Niveau de Satisfaction</label>
-                      <input class="form-control" type="text" name="niveau_de_satisfaction_eleve" id="niveau_de_satisfaction_eleve" value="<?= $eleve->niveau_de_satisfaction ?>" required>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="image_eleve" class="form-control-label">Image</label>
-                      <input class="form-control" type="file" name="image_eleve" id="image_eleve" value="<?= $eleve->photo ?>" required>
+                      <label for="nom_responsable" class="form-control-label">Nom du Responsable</label>
+                      <input class="form-control" type="text" name="nom_responsable" value="<?= $classeSelected->nom_responsable ?>" required>
                     </div>
                   </div>
 
                 </div>
-                <!-- Ajoutez d'autres champs ici -->
+
                 <div class="row">
-                  <input class="btn btn-primary" type="submit" value="Modifier" name="edit">
+                  <input class="btn btn-primary" type="submit" value="Modifier" name="edit_classe">
                 </div>
               </div>
             </form>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card card-profile">
-            <img src="../../assets/img/bg-profile.jpg" alt="Image placeholder" class="card-img-top">
-            <div class="row justify-content-center">
-              <div class="col-4 col-lg-4 order-lg-2">
-                <div class="mt-n4 mt-lg-n6 mb-4 mb-lg-0">
-                  <a href="javascript:;">
-                    <img src="../../assets/img/team-2.jpg" class="rounded-circle img-fluid border border-2 border-white">
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div class="card-body pt-0 mb-5">
-              <div class="row">
-                <div class="col">
-                  <div class="d-flex justify-content-center">
-                    <div class="d-grid text-center">
-                      <span class="text-lg font-weight-bolder" id="chaise_value"></span>
-                      <span class="text-sm opacity-8">Chaise </span>
-                    </div>
-                    <div class="d-grid text-center mx-4">
-                      <span class="text-lg font-weight-bolder" id="bureau_value"></span>
-                      <span class="text-sm opacity-8">Bureau </span>
-                    </div>
-                    <div class="d-grid text-center">
-                      <span class="text-lg font-weight-bolder" id="tableau_value"></span>
-                      <span class="text-sm opacity-8">Tableau</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="text-center mt-4">
-                <h5>
-                  Nom Salle :<span class="font-weight-light" id="nom_salle_value"></span>
-                </h5>
-                <div class="h6 font-weight-300">
-                  <i class="ni location_pin mr-2"></i>Etage : <span class="font-weight-light" id="etage_value"></span>
-                </div>
-                <div class="h6 font-weight-300">
-                  <i class="ni location_pin mr-2"></i>
-                  Equipement : <span class="font-weight-light" id="equipement_value"></span>
-                </div>
-                <div class="h6 font-weight-300">
-                  <i class="ni location_pin mr-2"></i>
-                  Capacite Eleve : <span class="font-weight-light" id="capacite_value"></span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

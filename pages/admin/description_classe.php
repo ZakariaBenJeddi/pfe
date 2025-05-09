@@ -247,7 +247,7 @@ function escape($data)
           </div>
           <div class="row"> <!-- Delete this ligne if something wrong-->
             <div class="col-md-8 mb-lg-0 mb-4">
-              <div class="card mt-4">
+              <div class="card position-relative locked-card" style="opacity: 0.6; pointer-events: none;">
                 <div class="row">
                   <div class="col-6">
                     <div class="card-header pb-0 p-3">
@@ -269,8 +269,18 @@ function escape($data)
                           ?></h4>
                     </div>
                   </div>
+                    <!-- Overlay verrouillé -->
+  <div class="locked-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" 
+       style="background: rgba(255,255,255,0.6);">
+    <div class="text-center">
+      <i class="fas fa-lock fa-2x text-secondary mb-2"></i>
+      <p class="text-muted mb-0">Fiche verrouillée</p>
+      <small class="text-muted">Accès restreint</small>
+    </div>
+  </div>
                 </div>
               </div>
+              
             </div>
             <div class="col-md-3 mb-lg-0 mb-2">
               <!-- <div class="card mt-4"> -->
@@ -353,7 +363,7 @@ function escape($data)
         </div>
         <div class="col-md-4 mt-4">
           <div class="card h-100 mb-4">
-            <div class="card-header pb-0 px-3">
+            <div class="card h-100 mb-4 position-relative locked-card" style="opacity: 0.6; pointer-events: none;">
               <div class="row">
                 <div class="col-md-6">
                   <h6 class="mb-0">Nombre de sceance chaque annees</h6>
@@ -379,57 +389,16 @@ function escape($data)
                     - 4%
                   </div>
                 </li>
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                  <div class="d-flex align-items-center">
-                    <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
-                    <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">2023</h6>
-                      <span class="text-xs">271 Sceance</span>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
-                    + 17%
-                  </div>
-                </li>
               </ul>
-              <ul class="list-group">
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                  <div class="d-flex align-items-center">
-                    <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
-                    <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">2022</h6>
-                      <span class="text-xs">200 Sceance</span>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
-                    + 1%
-                  </div>
-                </li>
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                  <div class="d-flex align-items-center">
-                    <button class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-down"></i></button>
-                    <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">2021</h6>
-                      <span class="text-xs">191 Sceance</span>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
-                    + 7%
-                  </div>
-                </li>
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                  <div class="d-flex align-items-center">
-                    <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"><i class="fas fa-arrow-up"></i></button>
-                    <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">2020</h6>
-                      <span class="text-xs">151 Sceance</span>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
-                    + 100%
-                  </div>
-                </li>
-              </ul>
+            </div>
+            <!-- Overlay verrouillé -->
+            <div class="locked-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" 
+                style="background: rgba(255,255,255,0.6);">
+              <div class="text-center">
+                <i class="fas fa-lock fa-2x text-secondary mb-2"></i>
+                <p class="text-muted mb-0">Contenu verrouillé</p>
+                <small class="text-muted">Disponible bientôt</small>
+              </div>
             </div>
           </div>
         </div>

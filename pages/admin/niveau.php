@@ -47,11 +47,12 @@ try {
 if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
   $result = delete_niveau($dbh, $_GET['id']);
   if ($result['success']) {
-    echo "<script>alert('" . $result['message'] . "');</script>";
-    header("Location: niveau.php");
-    exit();
+      header("Location: niveau.php?success=1");
+      exit();
   } else {
-    echo "<script>alert('" . $result['message'] . "');</script>";
+      $errorMessage = urlencode($result['message']);
+      header("Location: niveau.php?error={$errorMessage}");
+      exit();
   }
 }
 ?>
@@ -137,7 +138,7 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
                               <a href="description_niveau.php?id=<?= $result->id_niveau ?>" class="dropdown-item">
                                 <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                               </a>
-                              <a href="niveau.php?id=<?= $result->id_niveau ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                              <a href="niveau.php?id=<?= $result->id_niveau ?>&del=1" class="dropdown-item" onClick="return confirmDelete(event, this)">
                                 <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
                               </a>
                             </div>
@@ -168,6 +169,9 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
   <script src="../../assets/js/datatable.js"></script>
   <!-- Export Functio -->
   <script src="../../assets/js/export.js"></script>
+
+  <!-- sweet alert -->
+  <script src="../../assets/js/alerts/sweet_alert.js"></script>
 
   <!-- //* Date Picker + AJAX niveau intervalle date  -->
   <script src="../../assets/dateP_dateP/dateP_dataP_niveau.js"></script>

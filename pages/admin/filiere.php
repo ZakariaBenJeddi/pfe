@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   exit;
 }
 
-//* Read 
+//* Read
 try {
   $result = get_filieres_with_niveaux($dbh);
   if ($result['success']) {
@@ -63,11 +63,12 @@ try {
     $result = delete_filiere($dbh, $_GET['id']);
 
     if ($result['success']) {
-      echo "<script>alert('Filière Bien Supprimée');</script>";
-      header("Location: filiere.php");
-      exit;
+      header("Location: filiere.php?success=1");
+      exit();
     } else {
-      echo "<script>alert('" . htmlspecialchars($result['message']) . "');</script>";
+      $errorMessage = urlencode($result['message']);
+      header("Location: filiere.php?error={$errorMessage}");
+      exit();
     }
   }
 } catch (Exception $e) {
@@ -155,7 +156,7 @@ try {
                               <a href="description_filiere.php?id=<?= $result->id_filiere ?>" class="dropdown-item">
                                 <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                               </a>
-                              <a href="filiere.php?id=<?= $result->id_filiere ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                              <a href="filiere.php?id=<?= $result->id_filiere ?>&del=1" class="dropdown-item" onClick="return confirmDelete(event, this)">
                                 <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
                               </a>
                             </div>
@@ -186,6 +187,9 @@ try {
   <script src="../../assets/js/datatable.js"></script>
   <!-- Export Functio -->
   <script src="../../assets/js/export.js"></script>
+
+  <!-- sweet alert -->
+  <script src="../../assets/js/alerts/sweet_alert.js"></script>
 
   <!-- //* Date Picker + AJAX filieres intervalle date  -->
   <script src="../../assets/dateP_dateP/dateP_dataP_filiere.js"></script>

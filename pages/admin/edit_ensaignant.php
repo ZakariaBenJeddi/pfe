@@ -54,7 +54,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit'])) {
   if ($result['success']) {
     header("Location: enseignant.php?success=1");
   } else {
-    header("Location: enseignant.php?error=1");
+    $errorMessage = urlencode($result['message']);
+    header("Location: enseignant.php?error={$errorMessage}");
+    exit();
   }
 }
 ?>
