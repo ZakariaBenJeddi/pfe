@@ -101,9 +101,13 @@ $classe_courante = get_classe_by_id($dbh, $eleve->id_classe)['data'];
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="genre_eleve" class="form-control-label">Genre</label>
-                      <input class="form-control" type="text" name="genre_eleve" id="genre_eleve" value="<?= $eleve->genre ?>" required>
+                      <select class="form-control" name="genre_eleve" id="genre_eleve" required>
+                        <option value="Masculin" <?= $eleve->genre === 'Masculin' ? 'selected' : '' ?>>Masculin</option>
+                        <option value="Féminin" <?= $eleve->genre === 'Féminin' ? 'selected' : '' ?>>Féminin</option>
+                      </select>
                     </div>
                   </div>
+
 
                   <div class="col-md-6">
                     <div class="form-group">
