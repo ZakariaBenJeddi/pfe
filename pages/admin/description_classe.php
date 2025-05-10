@@ -269,18 +269,17 @@ function escape($data)
                           ?></h4>
                     </div>
                   </div>
-                    <!-- Overlay verrouillé -->
-  <div class="locked-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" 
-       style="background: rgba(255,255,255,0.6);">
-    <div class="text-center">
-      <i class="fas fa-lock fa-2x text-secondary mb-2"></i>
-      <p class="text-muted mb-0">Fiche verrouillée</p>
-      <small class="text-muted">Accès restreint</small>
-    </div>
-  </div>
+                  <!-- Overlay verrouillé -->
+                  <div class="locked-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(255,255,255,0.6);">
+                    <div class="text-center">
+                      <i class="fas fa-lock fa-2x text-secondary mb-2"></i>
+                      <p class="text-muted mb-0">Fiche verrouillée</p>
+                      <small class="text-muted">Accès restreint</small>
+                    </div>
+                  </div>
                 </div>
               </div>
-              
+
             </div>
             <div class="col-md-3 mb-lg-0 mb-2">
               <!-- <div class="card mt-4"> -->
@@ -301,9 +300,6 @@ function escape($data)
       <div class="row">
         <div class="col-md-8 mt-4">
           <div class="card">
-            <div class="card-header pb-0 border-bottom">
-              <button class="btn btn-primary brn-rounded">Afficher l'emploi du temps de cette Filiere </button>
-            </div>
             <div class="card-body pt-4 p-3">
               <h4 class="text-center mt-3">Configuer Classe Enseignant</h4>
               <ul class="list-group">
@@ -392,8 +388,7 @@ function escape($data)
               </ul>
             </div>
             <!-- Overlay verrouillé -->
-            <div class="locked-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" 
-                style="background: rgba(255,255,255,0.6);">
+            <div class="locked-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(255,255,255,0.6);">
               <div class="text-center">
                 <i class="fas fa-lock fa-2x text-secondary mb-2"></i>
                 <p class="text-muted mb-0">Contenu verrouillé</p>
