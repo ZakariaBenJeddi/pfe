@@ -87,17 +87,12 @@ try {
     // Appeler la fonction du controller
     $result = supprimerEleve($dbh, $_GET['id']);
     if ($result['success']) {
-      echo "<script>
-              alert('Élève bien supprimé');
-              window.location.href = 'eleves.php';
-          </script>";
-      exit;
+      header("Location: absence.php?success=1");
+      exit();
     } else {
-      echo "<script>
-              alert('" . $result['message'] . "');
-              window.location.href = 'eleves.php';
-          </script>";
-      exit;
+      $errorMessage = urlencode($result['message']);
+      header("Location:absence.php?error={$errorMessage}");
+      exit();
     }
   }
 } catch (Exception $e) {
@@ -195,7 +190,7 @@ try {
                           </td>
                           <td class="align-middle text-center">
                             <?php if (!empty($result->justification)) : ?>
-                              <a href="<?= htmlspecialchars($result->justification) ?>" target="_blank" class="btn btn-xs btn-info px-4">
+                              <a href="http://localhost/gestionEcole/<?= htmlspecialchars($result->justification) ?>" target="_blank" class="btn btn-xs btn-info px-4">
                                 Voir
                               </a>
                             <?php else : ?>
@@ -228,7 +223,7 @@ try {
                               <a href="edit_absence.php?id_absence=<?= $result->id_absence ?>" class="dropdown-item">
                                 <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                               </a>
-                              <a href="absence.php?id=<?= $result->id_absence ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                              <a href="absence.php?id=<?= $result->id_absence ?>&del=1" class="dropdown-item" onClick="return confirmDelete(event, this)">
                                 <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_absence ?>"></i>
                               </a>
                             </div>
@@ -258,6 +253,9 @@ try {
   <script src="../../assets/js/datatable.js"></script>
   <!-- Export Functio -->
   <script src="../../assets/js/export.js"></script>
+
+  <!-- sweet alert -->
+  <script src="../../assets/js/alerts/sweet_alert.js"></script>
 
   <!-- //* Date Picker + AJAX eleves intervalle date  -->
   <script src="../../assets/dateP_dateP/dateP_dataP_absence.js"></script>

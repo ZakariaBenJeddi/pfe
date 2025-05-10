@@ -59,14 +59,18 @@ $(function() {
                 <span class="badge badge-sm bg-gradient-secondary">Annulee</span>
               </td>`;
             }
+            const imageSrc = absence.genre === 'Masculin'
+              ? '../../assets/img/team-4.jpg'
+              : (absence.genre === 'Féminin'
+                ? '../../assets/img/marie.jpg'
+                : '../../assets/img/marie.jpg');
             
             tableBody.append(`
               <tr>
                 <td>
                   <div class="d-flex px-2 py-1">
                     <div>
-                      <img src="<?= $result->genre === 'Masculin' ? '../../assets/img/team-4.jpg' : ($result->genre === 'Féminin' ? '../../assets/img/marie.jpg' : '../../assets/img/default.jpg') ?>"
-                                class="avatar avatar-sm me-3" alt="eleve">
+                      <img src="${imageSrc}" class="avatar avatar-sm me-3" alt="eleve">
                     </div>
                     <div class="d-flex flex-column justify-content-center">
                       <h6 class="mb-0 text-sm">${absence.nom_eleve || ''} ${absence.prenom_eleve || ''}</h6>
@@ -96,6 +100,12 @@ $(function() {
                   <p class="text-xs font-weight-bold mb-0">${absence.motif || ''}</p>
                 </td>
                 <td class="align-middle text-center">
+                  ${absence.justification
+                    ? `<a href="${absence.justification}" target="_blank" class="btn btn-xs btn-info px-4">Voir</a>`
+                    : `<span class="text-muted">-</span>`
+                  }
+                </td>
+                <td class="align-middle text-center">
                   <p class="text-xs font-weight-bold mb-0">${absence.type_absence || ''}</p>
                 </td>
                 ${statutHTML}
@@ -107,7 +117,7 @@ $(function() {
                     <a href="edit_absence.php?id_absence=${absence.id_absence}" class="dropdown-item">
                       <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                     </a>
-                    <a href="absence.php?id=${absence.id_absence}&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                    <a href="absence.php?id=${absence.id_absence}&del=1" onClick="return confirmDelete(event, this)" class="dropdown-item">
                       <i class="fas fa-trash fa-sm text-danger opacity-8" id="${absence.id_absence}"></i>
                     </a>
                   </div>

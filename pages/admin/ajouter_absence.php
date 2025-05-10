@@ -13,17 +13,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
   // Fusionner $_POST et $_FILES pour la fonction ajouterAbsence
   $donnees_absence = $_POST;
   
+  // Débogage - Vérifier les données reçues
+  error_log("Données d'absence reçues: " . print_r($donnees_absence, true));
+  
   $resultat = ajouterAbsence($dbh, $donnees_absence);
+  
+  // Débogage - Vérifier le résultat
+  error_log("Résultat de l'ajout: " . print_r($resultat, true));
 
   if ($resultat['success']) {
-    echo "<script>
-          alert('Absence ajoutée avec succès.');
-          window.location.href = 'absence.php';
-      </script>";
+    header("Location: absence.php?success=" . urlencode($resultat['message']));
+    exit();
   } else {
-    echo "<script>
-          alert('Erreur: " . addslashes($resultat['message']) . "');
-      </script>";
+    $errorMessage = urlencode($resultat['message']); // Correction: $resultat au lieu de $result
+    header("Location: absence.php?error={$errorMessage}");
+    exit();
   }
 }
 

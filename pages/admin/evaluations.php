@@ -139,15 +139,6 @@ function get_pagination_url($page)
 }
 
 
-//* create
-// if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['save'])) {
-//   $result = ajouter_evaluation($dbh, $_POST, $_FILES);
-//   if ($result['success']) {
-//     echo "<script>alert('{$result['message']}'); window.location.href='{$result['redirect_url']}';</script>";
-//   } else {
-//     echo "<script>alert('{$result['message']}');</script>";
-//   }
-// }
 
 //* delete
 try {
@@ -180,7 +171,7 @@ try {
 }
 
 
-//* update
+//* create & update
 // Gestion de la sauvegarde ou de la mise à jour
 if (isset($_POST['save'])) {
   $id_evaluation = isset($_POST['id_evaluation']) ? (int)$_POST['id_evaluation'] : null;
