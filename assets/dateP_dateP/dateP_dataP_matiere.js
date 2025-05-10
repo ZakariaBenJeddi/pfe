@@ -36,6 +36,8 @@ $(function() {
         if (response.status === 'success' && response.count > 0) {
           // Parcourir et ajouter chaque matiere
           response.data.forEach(function(matiere) {
+            console.log(matiere.volume_horaire);
+            console.log(matiere.description);
             tableBody.append(`
                     <tr>
                       <td>
@@ -58,10 +60,16 @@ $(function() {
                         <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">${matiere.statut}</p>
                       </td>
                       <td>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">${matiere.type_matiere}</p>
+                      </td>
+                      <td>
                         <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">${matiere.nombre_seance_semaine}</p>
                       </td>
                       <td>
                         <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">${matiere.nombre_heures_semaine}</p>
+                      </td>
+                      <td>
+                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">${matiere.volume_horaire}</p>
                       </td>
                       <td class="align-middle text-center">
                         <p class="text-xs font-weight-bold mb-0" title="${matiere.description}">
@@ -70,13 +78,10 @@ $(function() {
                       </td>
                       <td class="align-middle text-center">
                         <div class="d-flex">
-                          <a href="edit_matiere.php?id=${matiere.id_matiere}" class="dropdown-item">
+                          <a href="matiere.php?id=${matiere.id_matiere}"  class="dropdown-item edit-btn">
                             <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                           </a>
-                          <a href="description_matiere.php?id=${matiere.id_matiere}" class="dropdown-item">
-                            <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
-                          </a>
-                          <a href="matiere.php?id=${matiere.id_matiere}&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                          <a href="matiere.php?id=${matiere.id_matiere}&del=1" class="dropdown-item" onClick="return confirmDelete(event, this)" >
                             <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
                         </div>
                       </td>

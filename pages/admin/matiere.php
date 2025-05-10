@@ -73,9 +73,9 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
   if ($result['success'] && $result['redirect']) {
     header("Location: " . $result['redirect_url'] . "?success=1");
     exit;
-  }else{
+  } else {
     $errorMessage = urlencode($result['message']);
-    header("Location:" . $result['redirect_url'] ."?error={$errorMessage}");
+    header("Location:" . $result['redirect_url'] . "?error={$errorMessage}");
     exit();
   }
 }
@@ -351,61 +351,108 @@ if (isset($_POST['update'])) {
     </div>
   </main>
 
-
   <script>
-    // Script pour gérer l'ouverture directe du modal lors du clic sur l'icône d'édition
+    // Script pour gérer l'édition de matière via modal
     document.addEventListener('DOMContentLoaded', function() {
-      // Ajouter un écouteur d'événements pour les boutons d'édition dans le tableau
+      // Référence au modal
+      const matiereModal = new bootstrap.Modal(document.getElementById('MatiereModal'));
+      
+      // Fonction pour charger les données d'une matière
+      function loadMatiereData(id) {
+        return fetch('get_matiere_data.php?id=' + id)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Erreur réseau');
+            }
+            return response.json();
+          })
+          .then(data => {
+            if (data.success) {
+              return data.matiere;
+            } else {
+              throw new Error(data.message || 'Erreur lors du chargement des données');
+            }
+          });
+      }
+      
+      // Fonction pour remplir le formulaire avec les données
+      function fillFormWithData(data) {
+        document.getElementById('id_matiere').value = data.id_matiere;
+        document.getElementById('nom_filiere').value = data.nom_matiere;
+        document.getElementById('code_filiere').value = data.code_matiere;
+        document.getElementById('filiere').value = data.id_filiere;
+        document.getElementById('statut').value = data.statut;
+        document.getElementById('coeficient').value = data.coefficient;
+        document.getElementById('nombre_seance').value = data.nombre_seance_semaine;
+        document.getElementById('nombre_heures_max').value = data.nombre_heures_semaine;
+        document.getElementById('volume_horaire').value = data.volume_horaire;
+        document.getElementById('type_matiere').value = data.type_matiere;
+        document.getElementById('description').value = data.description;
+        
+        // Changer le bouton de soumission pour la mise à jour
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.name = 'update';
+        submitBtn.textContent = 'Mettre à jour';
+        
+        // Changer le titre du modal
+        document.getElementById('paiementModalLabel').textContent = 'Modifier la Matière';
+      }
+      
+      // Fonction pour réinitialiser le formulaire
+      function resetForm() {
+        document.getElementById('id_matiere').value = '';
+        document.getElementById('nom_filiere').value = '';
+        document.getElementById('code_filiere').value = '';
+        // Remettre les autres champs à leur valeur par défaut ou vides
+        
+        // Remettre le bouton de soumission pour l'ajout
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.name = 'save';
+        submitBtn.textContent = 'Enregistrer';
+        
+        // Remettre le titre du modal
+        document.getElementById('paiementModalLabel').textContent = 'Gérer la Matière';
+      }
+      
+      // Ajouter des écouteurs d'événements pour les boutons d'édition
       document.querySelectorAll('.edit-btn').forEach(function(button) {
         button.addEventListener('click', function(e) {
           e.preventDefault(); // Empêcher la navigation par défaut
-
-          // Récupérer l'ID de la matière depuis l'URL
-          var href = this.getAttribute('href');
-          var id = href.split('=')[1];
-
-          // Appel AJAX pour récupérer les données de la matière
-          fetch('get_matiere_data.php?id=' + id)
-            .then(response => response.json())
+          
+          // Extraire l'ID de la matière depuis l'URL du lien
+          const href = this.getAttribute('href');
+          const id = href.split('=')[1].split('&')[0]; // Gérer les paramètres supplémentaires éventuels
+          
+          // Charger les données et afficher le modal
+          loadMatiereData(id)
             .then(data => {
-              if (data.success) {
-                // Remplir le formulaire avec les données
-                document.getElementById('id_matiere').value = data.matiere.id_matiere;
-                document.getElementById('nom_filiere').value = data.matiere.nom_matiere;
-                document.getElementById('code_filiere').value = data.matiere.code_matiere;
-                document.getElementById('filiere').value = data.matiere.id_filiere;
-                document.getElementById('statut').value = data.matiere.statut;
-                document.getElementById('coeficient').value = data.matiere.coefficient;
-                document.getElementById('nombre_seance').value = data.matiere.nombre_seance_semaine;
-                document.getElementById('nombre_heures_max').value = data.matiere.nombre_heures_semaine;
-                document.getElementById('volume_horaire').value = data.matiere.volume_horaire;
-                document.getElementById('type_matiere').value = data.matiere.type_matiere;
-                document.getElementById('description').value = data.matiere.description;
-
-                // Changer le bouton de soumission pour la mise à jour
-                var submitBtn = document.getElementById('submitBtn');
-                submitBtn.name = 'update';
-                submitBtn.textContent = 'Mettre à jour';
-
-                // Changer le titre du modal
-                document.getElementById('paiementModalLabel').textContent = 'Modifier la Matière';
-
-                // Ouvrir le modal
-                var matiereModal = new bootstrap.Modal(document.getElementById('MatiereModal'));
-                matiereModal.show();
-              } else {
-                alert('Erreur: ' + data.message);
-              }
+              fillFormWithData(data);
+              matiereModal.show();
             })
             .catch(error => {
               console.error('Erreur:', error);
-              alert('Une erreur est survenue lors de la récupération des données.');
+              alert('Une erreur est survenue lors de la récupération des données: ' + error.message);
             });
+          
+          // Supprimer l'ID de l'URL sans recharger la page
+          if (window.history && window.history.pushState) {
+            const newurl = window.location.protocol + '//' + window.location.host + window.location.pathname;
+            window.history.pushState({ path: newurl }, '', newurl);
+          }
         });
+      });
+      
+      // Réinitialiser le formulaire quand le modal est fermé
+      document.getElementById('MatiereModal').addEventListener('hidden.bs.modal', function() {
+        resetForm();
+      });
+      
+      // Gérer l'ouverture du modal pour l'ajout
+      document.querySelector('a[data-bs-toggle="modal"][data-bs-target="#MatiereModal"]').addEventListener('click', function() {
+        resetForm();
       });
     });
   </script>
-
 
   <!-- Data table -->
   <script src="../../assets/js/datatable.js"></script>

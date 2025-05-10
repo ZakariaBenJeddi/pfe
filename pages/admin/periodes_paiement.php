@@ -147,7 +147,7 @@ if (isset($_POST['save'])) {
                               <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="<?= $result->id_periode ?>" data-nom="<?= $result->nom_periode ?>" data-mois="<?= $result->nombre_mois ?>" data-reduction="<?= $result->pourcentage_reduction ?>" data-description="<?= $result->description ?>" data-actif="<?= $result->est_actif ?>">
                                 <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                               </a>
-                              <a href="periodes_paiement.php?id=<?= $result->id_periode ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                              <a href="periodes_paiement.php?id=<?= $result->id_periode ?>&del=1" class="dropdown-item" onClick="return confirmDelete(event, this)">
                                 <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
                             </div>
                             </a>
@@ -180,6 +180,9 @@ if (isset($_POST['save'])) {
   <script src="../../assets/js/datatable.js"></script>
   <!-- Export Functio -->
   <script src="../../assets/js/export.js"></script>
+
+  <!-- sweet alert -->
+  <script src="../../assets/js/alerts/sweet_alert.js"></script>
 
   <!-- periode paiement passer les info a modal -->
   <script src="../../assets/js/periode_paiement.js"></script>
