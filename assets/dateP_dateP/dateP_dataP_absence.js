@@ -42,8 +42,6 @@ $(function() {
           console.log("Nombre d'absences trouvées:", response.data.length);
           
           response.data.forEach(function(absence) {
-            console.log("Traitement d'une absence:", absence);
-            
             let statutHTML = '';
             
             if (absence.statut === 'validee') {
@@ -101,7 +99,7 @@ $(function() {
                 </td>
                 <td class="align-middle text-center">
                   ${absence.justification
-                    ? `<a href="${absence.justification}" target="_blank" class="btn btn-xs btn-info px-4">Voir</a>`
+                    ? `<a href="http://localhost/gestionEcole/${absence.justification}" target="_blank" class="btn btn-xs btn-info px-4">Voir</a>`
                     : `<span class="text-muted">-</span>`
                   }
                 </td>
