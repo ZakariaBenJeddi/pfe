@@ -177,7 +177,7 @@ try {
                               <a href="description_enseignant.php?id=<?= $result->id_enseignant ?>" class="dropdown-item">
                                 <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                               </a>
-                              <a href="enseignant.php?id=<?= $result->id_enseignant ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                              <a href="enseignant.php?id=<?= $result->id_enseignant ?>&del=1" class="dropdown-item" onClick="return confirmDelete(event, this)">
                                 <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_enseignant ?>"></i>
                               </a>
                             </div>

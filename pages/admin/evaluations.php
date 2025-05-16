@@ -130,6 +130,12 @@ if ($evaluationsInfo['success']) {
   $total_pages = 0;
 }
 
+// Assurez-vous que $total_pages est bien défini comme un nombre
+if (!is_numeric($total_pages)) {
+  $total_pages = 0;
+  error_log("total_pages n'est pas numérique, valeur forcée à 0");
+}
+
 // Fonction pour conserver les paramètres de filtrage dans l'URL de pagination
 function get_pagination_url($page)
 {
@@ -137,8 +143,6 @@ function get_pagination_url($page)
   $params['page'] = $page;
   return '?' . http_build_query($params);
 }
-
-
 
 //* delete
 try {
@@ -150,29 +154,123 @@ try {
     $stmt_delete->execute();
     $result = $stmt_delete->fetch(PDO::FETCH_ASSOC);
     if ($stmt_delete->rowCount() > 0) {
-      echo "<script>
-              alert('Evaluation bien supprimé');
-              window.location.href = 'evaluations.php';
-          </script>";
+      header("Location: evaluations.php?success=1");
+      exit();
     } else {
-      echo "<script>
-            alert('Evaluation NON supprimé');
-            window.location.href = 'evaluations.php';
-            </script>";
+      header("Location:absence.php?error=Evaluation NON supprimé");
+      exit();
     }
   }
 } catch (Exception $e) {
   error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
-  echo "<script>
-      alert('Une erreur est survenue. Veuillez réessayer plus tard.');
-      window.location.href = 'eleves.php';
-  </script>";
+  header("Location:absence.php?error=Une erreur est survenue. Veuillez réessayer plus tard.");
   exit;
 }
 
 
 //* create & update
-// Gestion de la sauvegarde ou de la mise à jour
+// if (isset($_POST['save'])) {
+//   $id_evaluation = isset($_POST['id_evaluation']) ? (int)$_POST['id_evaluation'] : null;
+//   $titre = htmlspecialchars($_POST['titre']);
+//   $description = htmlspecialchars($_POST['description']);
+//   $id_enseignant = (int)$_POST['id_enseignant'];
+//   $id_classe = (int)$_POST['id_classe'];
+//   $id_matiere = (int)$_POST['id_matiere'];
+//   $type_evaluation = htmlspecialchars($_POST['type_evaluation']);
+//   $statut = htmlspecialchars($_POST['statut']);
+
+//   // Gestion du fichier
+//   $fichier_path = '';
+//   $new_file_uploaded = false;
+
+//   if ($_FILES['fichier_path']['size'] > 0) {
+//     $upload_dir = 'uploads/evaluations/';
+//     $file_name = time() . '_' . $_FILES['fichier_path']['name'];
+//     $target_file = $upload_dir . $file_name;
+
+//     // Vérifier si le dossier existe, sinon le créer
+//     if (!file_exists($upload_dir)) {
+//       mkdir($upload_dir, 0777, true);
+//     }
+
+//     if (move_uploaded_file($_FILES['fichier_path']['tmp_name'], $target_file)) {
+//       $fichier_path = $target_file;
+//       $new_file_uploaded = true;
+//     } else {
+//       $error_message = "Erreur lors du téléchargement du fichier.";
+//     }
+//   }
+
+//   try {
+//     if ($id_evaluation) {
+//       // Mise à jour d'une évaluation existante
+
+//       // Si un nouveau fichier a été téléchargé, on met à jour le chemin du fichier
+//       if ($new_file_uploaded) {
+//         // Obtenir l'ancien chemin de fichier pour le supprimer plus tard
+//         $stmt = $dbh->prepare("SELECT fichier_path FROM evaluation WHERE id = ?");
+//         $stmt->execute([$id_evaluation]);
+//         $old_file = $stmt->fetchColumn();
+
+//         $sql = "UPDATE evaluation SET 
+//                       titre = ?, 
+//                       description = ?, 
+//                       id_enseignant = ?, 
+//                       id_classe = ?, 
+//                       id_matiere = ?, 
+//                       type_evaluation = ?, 
+//                       statut = ?, 
+//                       fichier_path = ?, 
+//                       date_modification = NOW() 
+//                       WHERE id = ?";
+//         $stmt = $dbh->prepare($sql);
+//         $stmt->execute([$titre, $description, $id_enseignant, $id_classe, $id_matiere, $type_evaluation, $statut, $fichier_path, $id_evaluation]);
+
+//         // Supprimer l'ancien fichier s'il existe
+//         if (file_exists($old_file)) {
+//           unlink($old_file);
+//         }
+//       } else {
+//         // Pas de nouveau fichier, on ne met pas à jour le chemin du fichier
+//         $sql = "UPDATE evaluation SET 
+//                       titre = ?, 
+//                       description = ?, 
+//                       id_enseignant = ?, 
+//                       id_classe = ?, 
+//                       id_matiere = ?, 
+//                       type_evaluation = ?, 
+//                       statut = ?, 
+//                       date_modification = NOW() 
+//                       WHERE id = ?";
+//         $stmt = $dbh->prepare($sql);
+//         $stmt->execute([$titre, $description, $id_enseignant, $id_classe, $id_matiere, $type_evaluation, $statut, $id_evaluation]);
+//       }
+
+//       $success_message = "Évaluation mise à jour avec succès.";
+//     } else {
+//       // Ajout d'une nouvelle évaluation
+//       if ($new_file_uploaded) {
+//         $result = ajouter_evaluation($dbh, $_POST, $_FILES);
+//         var_dump($result);
+//         die();
+//         if ($result['success']) {
+//           echo "<script>alert('{$result['message']}'); window.location.href='{$result['redirect_url']}';</script>";
+//         } else {
+//           echo "<script>alert('{$result['message']}');</script>";
+//         }
+//       } else {
+//         $error_message = "Veuillez sélectionner un fichier.";
+//       }
+//     }
+//   } catch (PDOException $e) {
+//     $error_message = "Erreur lors de l'enregistrement: " . $e->getMessage();
+//   }
+
+//   // Redirection pour éviter la soumission du formulaire en cas de rafraîchissement
+//   header("Location: evaluations.php" . (isset($error_message) ? "?error=" . urlencode($error_message) : "?success=" . urlencode($success_message)));
+//   exit;
+// }
+
 if (isset($_POST['save'])) {
   $id_evaluation = isset($_POST['id_evaluation']) ? (int)$_POST['id_evaluation'] : null;
   $titre = htmlspecialchars($_POST['titre']);
@@ -188,20 +286,38 @@ if (isset($_POST['save'])) {
   $new_file_uploaded = false;
 
   if ($_FILES['fichier_path']['size'] > 0) {
-    $upload_dir = 'uploads/evaluations/';
-    $file_name = time() . '_' . $_FILES['fichier_path']['name'];
-    $target_file = $upload_dir . $file_name;
+    // Utiliser le chemin absolu correct
+    $dossier_destination = dirname(dirname(__FILE__)) . '/assets/evaluation/';
 
     // Vérifier si le dossier existe, sinon le créer
-    if (!file_exists($upload_dir)) {
-      mkdir($upload_dir, 0777, true);
+    if (!file_exists($dossier_destination)) {
+      if (!mkdir($dossier_destination, 0777, true)) {
+        $error_message = "Erreur lors de la création du dossier d'upload.";
+        error_log("Échec de création du dossier: $dossier_destination");
+      }
     }
 
-    if (move_uploaded_file($_FILES['fichier_path']['tmp_name'], $target_file)) {
-      $fichier_path = $target_file;
+    // Générer un nom de fichier unique
+    $extension = pathinfo($_FILES['fichier_path']['name'], PATHINFO_EXTENSION);
+    $nom_fichier = 'eval_' . time() . '_' . $id_enseignant . '.' . $extension;
+
+    // Le chemin enregistré en BDD (URL relative)
+    $fichier_path = 'assets/evaluation/' . $nom_fichier;
+
+    // Le chemin physique réel pour enregistrer le fichier
+    $destination_physique = $dossier_destination . $nom_fichier;
+
+    // Débogage
+    error_log("Tentative d'upload - Chemin physique: $destination_physique");
+    error_log("Dossier existe: " . (file_exists($dossier_destination) ? 'Oui' : 'Non'));
+    error_log("Dossier accessible en écriture: " . (is_writable($dossier_destination) ? 'Oui' : 'Non'));
+
+    if (move_uploaded_file($_FILES['fichier_path']['tmp_name'], $destination_physique)) {
       $new_file_uploaded = true;
     } else {
       $error_message = "Erreur lors du téléchargement du fichier.";
+      error_log("Erreur d'upload - Code: " . $_FILES['fichier_path']['error']);
+      error_log("Détails de l'erreur: " . (error_get_last() ? error_get_last()['message'] : 'Erreur inconnue'));
     }
   }
 
@@ -231,8 +347,12 @@ if (isset($_POST['save'])) {
         $stmt->execute([$titre, $description, $id_enseignant, $id_classe, $id_matiere, $type_evaluation, $statut, $fichier_path, $id_evaluation]);
 
         // Supprimer l'ancien fichier s'il existe
-        if (file_exists($old_file)) {
-          unlink($old_file);
+        // Attention: il faut utiliser le chemin physique complet pour la suppression
+        if (!empty($old_file)) {
+          $old_file_physical = dirname(dirname(__FILE__)) . '/' . $old_file;
+          if (file_exists($old_file_physical)) {
+            unlink($old_file_physical);
+          }
         }
       } else {
         // Pas de nouveau fichier, on ne met pas à jour le chemin du fichier
@@ -255,10 +375,16 @@ if (isset($_POST['save'])) {
       // Ajout d'une nouvelle évaluation
       if ($new_file_uploaded) {
         $result = ajouter_evaluation($dbh, $_POST, $_FILES);
+
         if ($result['success']) {
-          echo "<script>alert('{$result['message']}'); window.location.href='{$result['redirect_url']}';</script>";
+          $success_message = $result['message'];
+          // Utiliser la redirection fournie par le résultat
+          if ($result['redirect']) {
+            header("Location: " . $result['redirect_url']);
+            exit;
+          }
         } else {
-          echo "<script>alert('{$result['message']}');</script>";
+          $error_message = $result['message'];
         }
       } else {
         $error_message = "Veuillez sélectionner un fichier.";
@@ -266,11 +392,14 @@ if (isset($_POST['save'])) {
     }
   } catch (PDOException $e) {
     $error_message = "Erreur lors de l'enregistrement: " . $e->getMessage();
+    error_log($e->getMessage());
   }
 
   // Redirection pour éviter la soumission du formulaire en cas de rafraîchissement
-  header("Location: evaluations.php" . (isset($error_message) ? "?error=" . urlencode($error_message) : "?success=" . urlencode($success_message)));
-  exit;
+  if (!isset($result['redirect']) || !$result['redirect']) {
+    header("Location: evaluations.php" . (isset($error_message) ? "?error=" . urlencode($error_message) : "?success=" . urlencode($success_message)));
+    exit;
+  }
 }
 
 ?>
@@ -300,9 +429,9 @@ if (isset($_POST['save'])) {
                   <h6 class="text-primary">Evaluation</h6>
                 </div>
                 <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-2 w-100">
-                  <input type="text" class="form-control w-100 w-md-auto mb-3" id="daterange" name="daterange" value="" />
+                  <!-- <input type="text" class="form-control w-100 w-md-auto mb-3" id="daterange" name="daterange" value="" /> -->
                   <a class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#evaluationModal">Ajouter Evaluation</a>
-                  <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button>
+                  <!-- <button type="button" class="btn btn-primary btn-sm" onclick="expo()" id="btnexp">Exporter</button> -->
                 </div>
               </div>
               <div class="row my-4">
@@ -448,10 +577,10 @@ if (isset($_POST['save'])) {
                           <a href="edit_evaluation.php?id=<?= $result->id ?>" class="btn btn-xs btn-info px-2 ms-1">
                             <i class="fas fa-pencil-alt"></i>
                           </a>
-                          <a href="evaluations.php?id=<?= $result->id ?>&del=1" class="btn btn-xs btn-danger px-2 ms-1" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                          <a href="evaluations.php?id=<?= $result->id ?>&del=1" class="btn btn-xs btn-danger px-2 ms-1" onClick="return confirmDelete(event, this)">
                             <i class="fas fa-trash"></i>
                           </a>
-                        </div>
+                        </div>fichier_path
                       </div>
                     </div>
                   </div>
@@ -512,7 +641,6 @@ if (isset($_POST['save'])) {
 
   <script>
     // Script pour basculer entre vue en grille et vue en tableau
-
     document.addEventListener('DOMContentLoaded', function() {
       // Gérer le clic sur le bouton de filtrage
       document.getElementById('filter-button').addEventListener('click', function() {
@@ -539,10 +667,13 @@ if (isset($_POST['save'])) {
   <!-- Data table -->
   <script src="../../assets/js/datatable.js"></script>
   <!-- Export Functio -->
-  <script src="../../assets/js/export.js"></script>
+  <!-- <script src="../../assets/js/export.js"></script> -->
 
-  <!-- //* Date Picker + AJAX eleves intervalle date  -->
-  <script src="../../assets/dateP_dateP/dateP_dataP_absence.js"></script>
+  <!-- sweet alert -->
+  <script src="../../assets/js/alerts/sweet_alert.js"></script>
+
+  <!-- //* Date Picker + AJAX eleves intervalle date 
+  <script src="../../assets/dateP_dateP/dateP_dataP_absence.js"></script> -->
 
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
