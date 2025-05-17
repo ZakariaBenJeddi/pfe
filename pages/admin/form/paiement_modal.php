@@ -22,7 +22,7 @@ $classes = get_all_classes($dbh)['data'];
                   <option value="">-- Sélectionner un niveau --</option>
                   <?php foreach ($all_niveaux as $niveau) : ?>
                     <option value="<?= $niveau->id_niveau ?>">
-                      <?= htmlspecialchars($niveau->nom_niveau) ?>
+                      <?=  htmlspecialchars($niveau->nom_niveau) ?>
                     </option>
                   <?php endforeach; ?>
                 </select>
@@ -37,7 +37,7 @@ $classes = get_all_classes($dbh)['data'];
                   <option value="">Sélectionner une filière</option>
                   <?php foreach ($filieres as $filiere) : ?>
                       <option value="<?= $filiere->id_filiere ?>" >
-                        <?= htmlspecialchars($filiere->nom_filiere) ?>
+                        <?=  htmlspecialchars($filiere->nom_filiere) ?>
                       </option>
                   <?php endforeach; ?>
                 </select>
@@ -52,7 +52,7 @@ $classes = get_all_classes($dbh)['data'];
                   <option value="">Sélectionner une classe</option>
                   <?php foreach ($classes as $classe) : ?>
                       <option value="<?= $classe->id_classe ?>">
-                        <?= htmlspecialchars($classe->nom_classe) ?>
+                        <?=  htmlspecialchars($classe->nom_classe) ?>
                       </option>
                   <?php endforeach; ?>
                 </select>
@@ -170,5 +170,3 @@ $classes = get_all_classes($dbh)['data'];
     </div>
   </div>
 </div>
-<!-- FILIRE ET CLASSE SELON LE NIVEAU -->
-<script src="../../../assets/js/niveau_filiere_classe.js"></script>

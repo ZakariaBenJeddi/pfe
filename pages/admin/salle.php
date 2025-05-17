@@ -38,13 +38,13 @@ $results = get_all_salles($dbh);
 if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
   $result = delete_class($dbh, $_GET['id']);
 
-  // Affichage du message
-  echo "<script>alert('" . htmlspecialchars($result['message']) . "');</script>";
-
-  // Redirection si nécessaire
-  if ($result['success'] && $result['redirect']) {
-    header("Location: " . $result['redirect_url']);
-    exit;
+  if ($result['success']) {
+    header("Location: salle.php?success=1");
+    exit();
+  } else {
+    $errorMessage = urlencode($result['message']);
+    header("Location:salle.php?error={$errorMessage}");
+    exit();
   }
 }
 ?>
@@ -138,7 +138,7 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
                                 <a href="description_salle.php?id=<?= $result->id_salle ?>" class="dropdown-item">
                                   <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
                                 </a>
-                                <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirm('Etes-vous sûr que vous voulez supprimer?')">
+                                <a href="salle.php?id=<?= $result->id_salle ?>&del=1" class="dropdown-item" onClick="return confirmDelete(event, this)">
                                   <i class="fas fa-trash fa-sm text-danger opacity-8" id="<?= $result->id_salle ?>"></i>
                                 </a>
                               </div>
@@ -169,6 +169,9 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
   <script src="../../assets/js/datatable.js"></script>
   <!-- Export Functio -->
   <script src="../../assets/js/export.js"></script>
+
+  <!-- sweet alert -->
+  <script src="../../assets/js/alerts/sweet_alert.js"></script>
 
   <!-- date picker + salle intervalle date -->
   <script src="../../assets/dateP_dateP/dateP_dataP_salle.js"></script>

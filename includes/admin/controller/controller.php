@@ -208,6 +208,197 @@ if (file_exists($filePath)) {
     }
 // =============== Enseignant ================
 
+
+// =============== Administrateur ================
+    function get_all_administrateur($dbh)
+    {
+        try {
+            $sql = "CALL get_all_administrateur()";
+            $stmt = $dbh->query($sql);
+            $result = $stmt->fetchAll(PDO::FETCH_OBJ);
+            return $result;
+        } catch (PDOException $e) {
+            // En cas d'erreur, retournez le message d'erreur ou gérez-le selon vos besoins.
+            echo "Erreur : " . $e->getMessage();
+            return [];
+        }
+    }
+
+    function getAdministrateurById($dbh, $id_admin) {
+        try {
+            // Validation de l'ID
+            if (!$id_admin || !filter_var($id_admin, FILTER_VALIDATE_INT)) {
+                return [
+                    'success' => false,
+                    'message' => "ID d'administrateur invalide",
+                    'redirect' => true
+                ];
+            }
+
+            // Appel de la procédure stockée
+            $sql = "CALL get_administrateur_by_id(:id_admin)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->bindParam(':id_admin', $id_admin, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+            if (empty($results)) {
+                return [
+                    'success' => false,
+                    'message' => "Administrateur non trouvé",
+                    'redirect' => true
+                ];
+            }
+
+            return [
+                'success' => true,
+                'data' => $results
+            ];
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return [
+                'success' => false,
+                'message' => "Erreur lors de la récupération de l'administrateur",
+                'redirect' => true
+            ];
+        }
+    }
+
+    function ajouterAdministrateur($dbh, $data)
+    {
+        try {
+            // Préparer l'appel de la procédure stockée
+            $sql = "CALL ajouter_administrateur(
+                :nom_admin, :prenom_admin, :user_name_admin,
+                :email_admin, :mot_de_passe, :gender,
+                :service, :telephone, :status,
+                :admin_image
+            )";
+
+            $stmt = $dbh->prepare($sql);
+
+            // Exécuter la procédure avec les paramètres
+            $result = $stmt->execute([
+                ':nom_admin' => $data['nom_admin'],
+                ':prenom_admin' => $data['prenom_admin'],
+                ':user_name_admin' => $data['user_name_admin'],
+                ':email_admin' => $data['email_admin'],
+                ':mot_de_passe' => $data['mot_de_passe'],
+                ':gender' => $data['gender'],
+                ':service' => $data['service'],
+                ':telephone' => $data['telephone'],
+                ':status' => $data['status'],
+                ':admin_image' => $data['admin_image']
+            ]);
+
+            return ['success' => true, 'message' => 'Administrateur ajouté avec succès'];
+        } catch (PDOException $e) {
+            return ['success' => false, 'message' => 'Erreur lors de l\'ajout : ' . $e->getMessage()];
+        }
+    }
+
+    function modifierAdministrateur($dbh, $data)
+    {
+        try {
+            $sql = "CALL modifier_administrateur(
+                :id_admin, :nom_admin, :prenom_admin,
+                :user_name_admin, :email_admin, :gender,
+                :service, :telephone, :status,
+                :admin_image
+            )";
+
+            $stmt = $dbh->prepare($sql);
+            $result = $stmt->execute([
+                ':id_admin' => $data['id_admin'],
+                ':nom_admin' => $data['nom_admin'],
+                ':prenom_admin' => $data['prenom_admin'],
+                ':user_name_admin' => $data['user_name_admin'],
+                ':email_admin' => $data['email_admin'],
+                ':gender' => $data['gender'],
+                ':service' => $data['service'],
+                ':telephone' => $data['telephone'],
+                ':status' => $data['status'],
+                ':admin_image' => $data['admin_image']
+            ]);
+
+            return ['success' => true, 'message' => 'Administrateur modifié avec succès'];
+        } catch (PDOException $e) {
+            return ['success' => false, 'message' => 'Erreur lors de la modification : ' . $e->getMessage()];
+        }
+    }
+
+    function supprimerAdministrateur($dbh, $id)
+    {
+        try {
+            // Valider l'ID
+            $id = filter_var($id, FILTER_VALIDATE_INT);
+            if ($id === false) {
+                return ['success' => false, 'message' => 'ID invalide. Opération annulée.'];
+            }
+
+            // Appeler la procédure stockée
+            $sql = "CALL supprimer_administrateur(:id)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+            if ($stmt->execute()) {
+                return ['success' => true, 'message' => 'Administrateur supprimé avec succès'];
+            } else {
+                return ['success' => false, 'message' => 'Erreur lors de la suppression'];
+            }
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+            return ['success' => false, 'message' => 'Une erreur est survenue. Veuillez réessayer plus tard.'];
+        }
+    }
+
+    function filtrerAdministrateursParDate($dbh, $start_date, $end_date)
+    {
+        try {
+            // Validation des dates
+            if (empty($start_date) || empty($end_date)) {
+                throw new Exception("Les dates sont requises");
+            }
+
+            // Nettoyage et validation des dates
+            $start_date = filter_var($start_date, FILTER_SANITIZE_STRING);
+            $end_date = filter_var($end_date, FILTER_SANITIZE_STRING);
+
+            if (!$start_date || !$end_date) {
+                throw new Exception("Format de date invalide");
+            }
+
+            // Conversion des dates au format MySQL
+            $start_date = date("Y-m-d", strtotime($start_date));
+            $end_date = date("Y-m-d", strtotime($end_date));
+
+            // Appel de la procédure stockée
+            $sql = "CALL filtrer_administrateurs_par_date(:start_date, :end_date)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute([
+                ':start_date' => $start_date,
+                ':end_date' => $end_date
+            ]);
+
+            $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+            return [
+                'success' => true,
+                'data' => $results,
+                'count' => count($results)
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+// =============== Administrateur ================
+
+
 // =============== Eleve ================
     function getElevesInfo($dbh)
     {
@@ -345,8 +536,8 @@ if (file_exists($filePath)) {
             $stmt = $dbh->prepare($sql);
             $stmt->execute([
                 ':id_niveau' => $donnees_eleve['niveau_scolaire_eleve'],
-                ':id_classe' => $donnees_eleve['classe_eleve'],
-                ':id_filiere' => $donnees_eleve['filiere_eleve'],
+                ':id_classe' => $donnees_eleve['classe_eleve'] ?: null,  // Gérer les valeurs vides
+                ':id_filiere' => $donnees_eleve['filiere_eleve'] ?: null, // Gérer les valeurs vides
                 ':code_massare' => $donnees_eleve['code_massare'],
                 ':nom' => $donnees_eleve['nom_eleve'],
                 ':prenom' => $donnees_eleve['prenom_eleve'],
@@ -358,20 +549,27 @@ if (file_exists($filePath)) {
                 ':email' => $donnees_eleve['email_eleve'],
                 ':date_inscription' => $donnees_eleve['date_inscription_eleve'],
                 ':statut' => $donnees_eleve['statut_eleve'],
-                ':historique_scolaire' => $donnees_eleve['historique_scolaire_eleve'],
+                ':historique_scolaire' => $donnees_eleve['historique_scolaire_eleve'] ?: null,
                 ':langues_parlees' => $donnees_eleve['langues_parlees_eleve'],
                 ':nom_tuteur' => $donnees_eleve['nom_tuteur_eleve'],
                 ':telephone_tuteur' => $donnees_eleve['telephone_tuteur_eleve'],
                 ':email_tuteur' => $donnees_eleve['email_tuteur_eleve'],
                 ':profession_tuteur' => $donnees_eleve['profession_tuteur_eleve'],
-                ':besoins_speciaux' => $donnees_eleve['besoins_speciaux_eleve'],
+                ':besoins_speciaux' => $donnees_eleve['besoins_speciaux_eleve'] ?: null,
                 ':langue_etrangere' => $donnees_eleve['langue_etrangere_eleve'],
                 ':niveau_de_satisfaction' => $donnees_eleve['niveau_de_satisfaction_eleve']
             ]);
-    
-            // Récupérer l'ID du nouvel élève
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            $id_eleve = $result['id_eleve'];
+            
+            // Correction: Récupérer correctement le jeu de résultats
+            $result = null;
+            do {
+                if ($stmt->columnCount() > 0) {
+                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                    break;
+                }
+            } while ($stmt->nextRowset());
+            
+            $id_eleve = $result ? $result['id_eleve'] : null;
     
             return [
                 'success' => true,
@@ -383,7 +581,7 @@ if (file_exists($filePath)) {
             error_log($e->getMessage());
             return [
                 'success' => false,
-                'message' => 'Une erreur est survenue lors de l\'ajout de l\'élève.'
+                'message' => 'Une erreur est survenue lors de l\'ajout de l\'élève: ' . $e->getMessage()
             ];
         }
     }
@@ -425,7 +623,7 @@ if (file_exists($filePath)) {
                     ];
                 }
             }
-
+    
             // Gestion de l'upload d'image
             $photo = null;
             if ($fichier_image && !empty($fichier_image['name'])) {
@@ -435,20 +633,23 @@ if (file_exists($filePath)) {
                 }
                 $photo = $resultat_upload['filename'];
             }
-
+    
             // Appel de la procédure stockée
             $sql = "CALL modifier_eleve(
-                :id_eleve, :nom, :prenom, :date_naissance, :genre, 
+                :id_eleve, :id_niveau, :id_classe, :id_filiere, :nom, :prenom, :date_naissance, :genre, 
                 :nationalite, :adresse, :telephone, :email, :date_inscription,
                 :statut, :historique_scolaire, :langues_parlees, :nom_tuteur,
                 :telephone_tuteur, :email_tuteur, :profession_tuteur,
-                :niveau_scolaire, :besoins_speciaux, :langue_etrangere,
+                :besoins_speciaux, :langue_etrangere,
                 :niveau_de_satisfaction, :photo
             )";
-
+    
             $stmt = $dbh->prepare($sql);
             $stmt->execute([
                 ':id_eleve' => $donnees_eleve['id_eleve'],
+                ':id_niveau' => $donnees_eleve['niveau_scolaire_eleve'],
+                ':id_classe' => $donnees_eleve['classe_eleve'],
+                ':id_filiere' => $donnees_eleve['filiere_eleve'],
                 ':nom' => $donnees_eleve['nom_eleve'],
                 ':prenom' => $donnees_eleve['prenom_eleve'],
                 ':date_naissance' => $donnees_eleve['date_naissance_eleve'],
@@ -465,23 +666,22 @@ if (file_exists($filePath)) {
                 ':telephone_tuteur' => $donnees_eleve['telephone_tuteur_eleve'],
                 ':email_tuteur' => $donnees_eleve['email_tuteur_eleve'],
                 ':profession_tuteur' => $donnees_eleve['profession_tuteur_eleve'],
-                ':niveau_scolaire' => $donnees_eleve['niveau_scolaire_eleve'],
                 ':besoins_speciaux' => $donnees_eleve['besoins_speciaux_eleve'],
                 ':langue_etrangere' => $donnees_eleve['langue_etrangere_eleve'],
                 ':niveau_de_satisfaction' => $donnees_eleve['niveau_de_satisfaction_eleve'],
                 ':photo' => $photo
             ]);
-
+    
             return [
                 'success' => true,
                 'message' => 'Élève modifié avec succès'
             ];
-
+    
         } catch (PDOException $e) {
             error_log($e->getMessage());
             return [
                 'success' => false,
-                'message' => "Erreur lors de la modification de l'élève"
+                'message' => "Erreur lors de la modification de l'élève: " . $e->getMessage()
             ];
         }
     }
@@ -539,6 +739,43 @@ if (file_exists($filePath)) {
             return [
                 'success' => false,
                 'message' => 'Erreur lors du calcul des heures d\'absence'
+            ];
+        }
+    }
+
+    function getPaiementsByEleveId($dbh, $id_eleve)
+    {
+        try {
+            if (!filter_var($id_eleve, FILTER_VALIDATE_INT)) {
+                return [
+                    'success' => false,
+                    'message' => "ID d'élève invalide"
+                ];
+            }
+
+            $sql = "CALL get_paiements_by_eleve(:id_eleve)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute([':id_eleve' => $id_eleve]);
+
+            $paiements = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+            if (!$paiements) {
+                return [
+                    'success' => false,
+                    'message' => "Aucun paiement trouvé pour cet élève"
+                ];
+            }
+
+            return [
+                'success' => true,
+                'data' => $paiements
+            ];
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return [
+                'success' => false,
+                'message' => "Erreur lors de la récupération des paiements"
             ];
         }
     }
@@ -692,7 +929,6 @@ if (file_exists($filePath)) {
             // Nettoyage des données
             $nom_niveau = trim(strip_tags($nom_niveau));
             $description = trim(strip_tags($description));
-            $statut = filter_var($statut, FILTER_VALIDATE_INT);
             $date_creation = date('Y-m-d');
     
             // Appel de la procédure stockée
@@ -701,7 +937,7 @@ if (file_exists($filePath)) {
             
             $stmt->bindParam(':nom_niveau', $nom_niveau, PDO::PARAM_STR);
             $stmt->bindParam(':description', $description, PDO::PARAM_STR);
-            $stmt->bindParam(':statut', $statut, PDO::PARAM_INT);
+            $stmt->bindParam(':statut', $statut, PDO::PARAM_STR);
             $stmt->bindParam(':date_creation', $date_creation, PDO::PARAM_STR);
     
             if ($stmt->execute()) {
@@ -740,8 +976,7 @@ if (file_exists($filePath)) {
             // Nettoyage des données
             $nom_niveau = trim(strip_tags($nom_niveau));
             $description_niveau = trim(strip_tags($description_niveau));
-            $statut = filter_var($statut, FILTER_VALIDATE_INT);
-    
+
             // Appel de la procédure stockée
             $sql = "CALL update_niveau(:id_niveau, :nom_niveau, :description_niveau, :statut)";
             $stmt = $dbh->prepare($sql);
@@ -749,7 +984,7 @@ if (file_exists($filePath)) {
             $stmt->bindParam(':id_niveau', $id_niveau, PDO::PARAM_INT);
             $stmt->bindParam(':nom_niveau', $nom_niveau, PDO::PARAM_STR);
             $stmt->bindParam(':description_niveau', $description_niveau, PDO::PARAM_STR);
-            $stmt->bindParam(':statut', $statut, PDO::PARAM_INT);
+            $stmt->bindParam(':statut', $statut, PDO::PARAM_STR);
     
             if ($stmt->execute()) {
                 return [
@@ -774,7 +1009,7 @@ if (file_exists($filePath)) {
     }
 // =============== Niveau ================
 
-// =============== Classe (Ajouter/Modifier ❌)================
+// =============== Classe ================
     function get_all_classes($dbh) {
         try {
             // Appel de la procédure stockée
@@ -795,6 +1030,83 @@ if (file_exists($filePath)) {
                 'success' => false,
                 'message' => 'Une erreur est survenue lors de la récupération des classes'
             ];
+        }
+    }
+
+    function add_classe($dbh, $nom_classe, $niveau_id, $filiere_id, $annee_scolaire, $capacite, $statut, $nom_responsable) {
+        try {
+            // Validation des données
+            if (empty($nom_classe) || empty($niveau_id) || empty($annee_scolaire) || empty($capacite) || empty($statut)) {
+                throw new Exception("Tous les champs obligatoires doivent être remplis.");
+            }
+
+            // Nettoyage des données
+            $nom_classe = trim(strip_tags($nom_classe));
+            $annee_scolaire = trim(strip_tags($annee_scolaire));
+            $nom_responsable = trim(strip_tags($nom_responsable));
+            $date_creation = date('Y-m-d');
+
+            // Appel de la procédure stockée
+            $sql = "CALL add_classe(:nom_classe, :niveau_id, :filiere_id, :annee_scolaire, :capacite, :statut, :date_creation, :nom_responsable)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->bindParam(':nom_classe', $nom_classe);
+            $stmt->bindParam(':niveau_id', $niveau_id, PDO::PARAM_INT);
+            $stmt->bindParam(':filiere_id', $filiere_id, PDO::PARAM_INT);
+            $stmt->bindParam(':annee_scolaire', $annee_scolaire);
+            $stmt->bindParam(':capacite', $capacite, PDO::PARAM_INT);
+            $stmt->bindParam(':statut', $statut);
+            $stmt->bindParam(':date_creation', $date_creation);
+            $stmt->bindParam(':nom_responsable', $nom_responsable);
+
+            if ($stmt->execute()) {
+                return ['success' => true, 'message' => 'Classe ajoutée avec succès'];
+            } else {
+                throw new Exception("Échec de l'ajout de la classe.");
+            }
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+            return ['success' => false, 'message' => "Erreur lors de l'ajout de la classe"];
+        } catch (Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    function update_classe($dbh, $id_classe, $nom_classe, $id_filiere, $id_niveau, $annee_scolaire, $capacite, $statut, $date_creation, $nom_responsable) {
+        try {
+            if (empty($nom_classe)) {
+                throw new Exception('Le nom de la classe est requis');
+            }
+
+            $id_classe = filter_var($id_classe, FILTER_VALIDATE_INT);
+            $id_filiere = filter_var($id_filiere, FILTER_VALIDATE_INT);
+            $id_niveau = filter_var($id_niveau, FILTER_VALIDATE_INT);
+            $capacite = filter_var($capacite, FILTER_VALIDATE_INT);
+
+            if (!$id_classe || !$id_filiere || !$id_niveau || !$capacite) {
+                throw new Exception("Données invalides");
+            }
+
+            $sql = "CALL update_classe(:id_classe, :nom_classe, :id_filiere, :id_niveau, :annee_scolaire, :capacite, :statut, :date_creation, :nom_responsable)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->bindParam(':id_classe', $id_classe, PDO::PARAM_INT);
+            $stmt->bindParam(':nom_classe', $nom_classe, PDO::PARAM_STR);
+            $stmt->bindParam(':id_filiere', $id_filiere, PDO::PARAM_INT);
+            $stmt->bindParam(':id_niveau', $id_niveau, PDO::PARAM_INT);
+            $stmt->bindParam(':annee_scolaire', $annee_scolaire, PDO::PARAM_STR);
+            $stmt->bindParam(':capacite', $capacite, PDO::PARAM_INT);
+            $stmt->bindParam(':statut', $statut, PDO::PARAM_STR);
+            $stmt->bindParam(':date_creation', $date_creation, PDO::PARAM_STR);
+            $stmt->bindParam(':nom_responsable', $nom_responsable, PDO::PARAM_STR);
+
+            if ($stmt->execute()) {
+                return ['success' => true, 'message' => 'Classe modifiée avec succès'];
+            } else {
+                throw new Exception("Échec de la modification de la classe");
+            }
+        } catch (PDOException $e) {
+            return ['success' => false, 'message' => 'Erreur base de données'];
+        } catch (Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
         }
     }
 
@@ -873,7 +1185,6 @@ if (file_exists($filePath)) {
             ];
         }
     }
-    
 
     function get_classes_by_date_range($dbh, $start_date, $end_date) {
         try {
@@ -1525,6 +1836,32 @@ if (file_exists($filePath)) {
             throw new Exception('Erreur lors de la récupération des matières');
         }
     }
+    function updateMatiere($dbh, $id_matiere, $id_filiere, $nom_matiere, $code_matiere, $coefficient, 
+        $description, $statut, $volume_horaire, $nombre_heures_semaine, $nombre_seance_semaine, $type_matiere) {
+        try {
+            $sql = "CALL update_matiere(:id_matiere, :id_filiere, :nom_matiere, :code_matiere, :coefficient, 
+                    :description, :statut, :volume_horaire, :nombre_heures_semaine, :nombre_seance_semaine, :type_matiere)";
+            
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute([
+                ':id_matiere' => $id_matiere,
+                ':id_filiere' => $id_filiere,
+                ':nom_matiere' => $nom_matiere,
+                ':code_matiere' => $code_matiere,
+                ':coefficient' => $coefficient,
+                ':description' => $description,
+                ':statut' => $statut,
+                ':volume_horaire' => $volume_horaire,
+                ':nombre_heures_semaine' => $nombre_heures_semaine,
+                ':nombre_seance_semaine' => $nombre_seance_semaine,
+                ':type_matiere' => $type_matiere
+            ]);
+            
+            return ['success' => true, 'message' => 'Matière mise à jour avec succès !'];
+        } catch (PDOException $e) {
+            return ['success' => false, 'message' => 'Erreur lors de la mise à jour de la matière: ' . $e->getMessage()];
+        }
+    }
     function delete_matiere($dbh, $id) {
         try {
             // Validation de l'ID
@@ -1601,6 +1938,197 @@ if (file_exists($filePath)) {
             return [
                 'status' => 'error',
                 'message' => 'Une erreur est survenue lors de la suppression'
+            ];
+        }
+    }
+    function export_timetable($dbh) {
+        try {
+            // Appel de la procédure stockée
+            $stmt = $dbh->prepare("CALL export_timetable()");
+            $stmt->execute();
+            
+            // Récupérer toutes les données
+            $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Vérifier si des données ont été récupérées
+            if (count($events) > 0) {
+                return [
+                    'status' => 'success',
+                    'data' => $events,
+                    'message' => 'Données récupérées avec succès'
+                ];
+            } else {
+                return [
+                    'status' => 'warning',
+                    'message' => 'Aucun événement trouvé dans le calendrier'
+                ];
+            }
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return [
+                'status' => 'error',
+                'message' => 'Une erreur est survenue lors de la récupération des données'
+            ];
+        }
+    }
+
+    function import_timetable_event($dbh, $event) {
+        try {
+            // Vérifier que tous les champs nécessaires sont présents
+            $required_fields = ['description', 'professeur', 'matiere', 'classe', 'salle', 'start_datetime', 'end_datetime'];
+            foreach ($required_fields as $field) {
+                if (!isset($event[$field]) || empty($event[$field])) {
+                    return [
+                        'status' => 'error',
+                        'message' => "Le champ '$field' est manquant ou vide"
+                    ];
+                }
+            }
+            
+            // Appel de la procédure stockée
+            $stmt = $dbh->prepare("CALL import_timetable(:description, :professeur, :matiere, :classe, :salle, :start_datetime, :end_datetime)");
+            $stmt->bindParam(':description', $event['description'], PDO::PARAM_STR);
+            $stmt->bindParam(':professeur', $event['professeur'], PDO::PARAM_STR);
+            $stmt->bindParam(':matiere', $event['matiere'], PDO::PARAM_STR);
+            $stmt->bindParam(':classe', $event['classe'], PDO::PARAM_STR);
+            $stmt->bindParam(':salle', $event['salle'], PDO::PARAM_STR);
+            $stmt->bindParam(':start_datetime', $event['start_datetime'], PDO::PARAM_STR);
+            $stmt->bindParam(':end_datetime', $event['end_datetime'], PDO::PARAM_STR);
+            $stmt->execute();
+            
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($result['success']) {
+                return [
+                    'status' => 'success',
+                    'message' => $result['message'],
+                    'id' => $result['id']
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => $result['message']
+                ];
+            }
+            
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return [
+                'status' => 'error',
+                'message' => 'Une erreur est survenue lors de l\'importation'
+            ];
+        }
+    }
+
+    function import_timetable_bulk($dbh, $data) {
+        try {
+            // Vérifier si les données sont valides
+            if (!is_array($data) || count($data) <= 1) {
+                return [
+                    'status' => 'error',
+                    'message' => 'Aucune donnée reçue ou données invalides.'
+                ];
+            }
+            
+            // Commencer une transaction
+            $dbh->beginTransaction();
+            
+            $success_count = 0;
+            $error_count = 0;
+            $errors = [];
+            
+            // En supposant que la première ligne contient les en-têtes
+            $headers = $data[0];
+            
+            // Vérifier si les en-têtes attendus sont présents
+            $expected_headers = ['Description', 'Professeur', 'Matière', 'Classe', 'Salle', 'Début', 'Fin'];
+            $missing_headers = array_diff($expected_headers, $headers);
+            
+            if (!empty($missing_headers)) {
+                return [
+                    'status' => 'error',
+                    'message' => 'Le fichier Excel ne contient pas tous les en-têtes nécessaires: ' . implode(', ', $missing_headers)
+                ];
+            }
+            
+            // Trouver les indices des colonnes
+            $header_indices = [
+                'description' => array_search('Description', $headers),
+                'professeur' => array_search('Professeur', $headers),
+                'matiere' => array_search('Matière', $headers),
+                'classe' => array_search('Classe', $headers),
+                'salle' => array_search('Salle', $headers),
+                'start_datetime' => array_search('Début', $headers),
+                'end_datetime' => array_search('Fin', $headers)
+            ];
+            
+            // Insérer chaque ligne de données (en sautant la première ligne des en-têtes)
+            for ($i = 1; $i < count($data); $i++) {
+                $row = $data[$i];
+                
+                // Vérifier que la ligne a assez de colonnes
+                if (count($row) >= count($header_indices)) {
+                    // Construire le tableau d'événement
+                    $event = [
+                        'description' => $row[$header_indices['description']],
+                        'professeur' => $row[$header_indices['professeur']],
+                        'matiere' => $row[$header_indices['matiere']],
+                        'classe' => $row[$header_indices['classe']],
+                        'salle' => $row[$header_indices['salle']],
+                        'start_datetime' => $row[$header_indices['start_datetime']],
+                        'end_datetime' => $row[$header_indices['end_datetime']]
+                    ];
+                    
+                    // Importer l'événement
+                    $result = import_timetable_event($dbh, $event);
+                    
+                    if ($result['status'] === 'success') {
+                        $success_count++;
+                    } else {
+                        $error_count++;
+                        $errors[] = "Ligne " . ($i + 1) . ": " . $result['message'];
+                    }
+                } else {
+                    $error_count++;
+                    $errors[] = "Ligne " . ($i + 1) . ": Nombre de colonnes insuffisant";
+                }
+            }
+            
+            // Valider ou annuler la transaction en fonction du résultat
+            if ($success_count > 0) {
+                $dbh->commit();
+                if ($error_count === 0) {
+                    return [
+                        'status' => 'success',
+                        'message' => "$success_count événements ont été importés avec succès!"
+                    ];
+                } else {
+                    return [
+                        'status' => 'warning',
+                        'message' => "$success_count événements importés avec succès, mais $error_count lignes présentaient des erreurs.",
+                        'errors' => $errors
+                    ];
+                }
+            } else {
+                $dbh->rollBack();
+                return [
+                    'status' => 'error',
+                    'message' => "Import échoué. $error_count erreurs sur " . (count($data) - 1) . " lignes.",
+                    'errors' => $errors
+                ];
+            }
+            
+        } catch (Exception $e) {
+            // En cas d'erreur, annuler la transaction
+            if ($dbh->inTransaction()) {
+                $dbh->rollBack();
+            }
+            
+            error_log($e->getMessage());
+            return [
+                'status' => 'error',
+                'message' => 'Une erreur est survenue lors de l\'importation des données: ' . $e->getMessage()
             ];
         }
     }
@@ -2148,11 +2676,10 @@ if (file_exists($filePath)) {
                     'message' => "L'heure de fin doit être postérieure à l'heure de début."
                 ];
             }
-            
             // Gestion du fichier de justification
             $chemin_fichier = null;
             if ($donnees_absence['type_absence'] === 'excusee' && isset($_FILES['justification']) && $_FILES['justification']['error'] === UPLOAD_ERR_OK) {
-                $dossier_destination = '../assets/justification_eleves/';
+                $dossier_destination = __DIR__ . '/../../../assets/justification_eleves/';
                 
                 // Créer le dossier s'il n'existe pas
                 if (!file_exists($dossier_destination)) {
@@ -2162,11 +2689,14 @@ if (file_exists($filePath)) {
                 // Générer un nom de fichier unique
                 $extension = pathinfo($_FILES['justification']['name'], PATHINFO_EXTENSION);
                 $nom_fichier = 'justif_' . $donnees_absence['id_elevesX'] . '_' . date('Ymd_His') . '.' . $extension;
-                // $chemin_fichier = $dossier_destination . $nom_fichier;
-                $chemin_fichier = realpath(__DIR__ . '/../../..') . '/assets/justification_eleves/' . $nom_fichier;
 
-                // Déplacer le fichier
-                if (!move_uploaded_file($_FILES['justification']['tmp_name'], $chemin_fichier)) {
+                // Le chemin enregistré en BDD (URL relative)
+                $chemin_fichier = 'assets/justification_eleves/' . $nom_fichier;
+
+                // Le chemin physique réel pour enregistrer le fichier
+                $destination_physique = $dossier_destination . $nom_fichier;
+
+                if (!move_uploaded_file($_FILES['justification']['tmp_name'], $destination_physique)) {
                     return [
                         'success' => false,
                         'message' => "Erreur lors du téléchargement du fichier de justification."
@@ -2218,3 +2748,323 @@ if (file_exists($filePath)) {
         }
     }
 // =============== Abcsnce ================
+
+// =============== Evaluation ================
+    function getEvaluationsinfo($dbh)
+    {
+        try {
+            // Appel de la procédure stockée
+            $sql = "CALL get_evaluations_info()";
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute();
+
+            $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+            return [
+                'success' => true,
+                'data' => $results,
+                'count' => count($results)
+            ];
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des données élèves'
+            ];
+        }
+    }
+
+    function getEvaluationsinfoPaginated($dbh, $page, $per_page)
+    {
+        try {
+            // Appel de la procédure stockée paginée
+            $sql = "CALL get_evaluations_info_paginated(?, ?)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->bindParam(1, $page, PDO::PARAM_INT);
+            $stmt->bindParam(2, $per_page, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+            // Récupérer le nombre total
+            $stmt->closeCursor(); // Important pour MySQL
+            $sql2 = "CALL get_evaluations_total_count()";
+            $stmt2 = $dbh->prepare($sql2);
+            $stmt2->execute();
+            $count = $stmt2->fetch(PDO::FETCH_OBJ)->total;
+
+            return [
+                'success' => true,
+                'data' => $results,
+                'count' => $count
+            ];
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des données'
+            ];
+        }
+    }
+
+    // function ajouter_evaluation($dbh, $data, $file) {
+    //     try {
+    //         // Nettoyage des données
+    //         $titre = htmlspecialchars(trim($data['titre'] ?? ''));
+    //         $description = htmlspecialchars(trim($data['description'] ?? ''));
+    //         $type_evaluation = htmlspecialchars(trim($data['type_evaluation'] ?? ''));
+    //         $statut = htmlspecialchars(trim($data['statut'] ?? ''));
+    //         $id_enseignant = isset($data['id_enseignant']) ? intval($data['id_enseignant']) : null;
+    //         $id_classe = isset($data['id_classe']) ? intval($data['id_classe']) : null;
+    //         $id_matiere = isset($data['id_matiere']) ? intval($data['id_matiere']) : null;
+
+    //         // Gestion de l'upload fichier
+    //         if (isset($file['fichier_path']) && $file['fichier_path']['error'] == 0) {
+    //             // Chemin absolu vers le dossier d'évaluations
+    //             $dossier_destination = dirname(dirname(dirname(__FILE__))) . '/assets/evaluation/';
+                
+    //             // Vérifier si le dossier existe, sinon le créer
+    //             if (!file_exists($dossier_destination)) {
+    //                 if (!mkdir($dossier_destination, 0777, true)) {
+    //                     error_log("Échec de création du dossier: $dossier_destination");
+    //                     return [
+    //                         'success' => false,
+    //                         'message' => 'Erreur lors de la création du dossier d\'upload',
+    //                         'redirect' => false
+    //                     ];
+    //                 }
+    //             }
+                
+    //             // Générer un nom de fichier unique
+    //             $extension = pathinfo($file['fichier_path']['name'], PATHINFO_EXTENSION);
+    //             $nom_fichier = 'eval_' . time() . '_' . $id_enseignant . '.' . $extension;
+                
+    //             // Chemin physique complet pour l'upload
+    //             $destination_physique = $dossier_destination . $nom_fichier;
+                
+    //             // Chemin relatif pour enregistrer en BDD
+    //             $target_file = 'assets/evaluation/' . $nom_fichier;
+                
+    //             // Débogage
+    //             error_log("Tentative d'upload - Chemin physique: $destination_physique");
+    //             error_log("Dossier existe: " . (file_exists($dossier_destination) ? 'Oui' : 'Non'));
+    //             error_log("Dossier accessible en écriture: " . (is_writable($dossier_destination) ? 'Oui' : 'Non'));
+
+    //             if (!move_uploaded_file($file['fichier_path']['tmp_name'], $destination_physique)) {
+    //                 error_log("Erreur d'upload - Code: " . $file['fichier_path']['error']);
+    //                 error_log("Détails de l'erreur: " . (error_get_last() ? error_get_last()['message'] : 'Erreur inconnue'));
+    //                 return [
+    //                     'success' => false,
+    //                     'message' => 'Erreur lors du téléchargement du fichier',
+    //                     'redirect' => false
+    //                 ];
+    //             }
+    //         } else {
+    //             return [
+    //                 'success' => false,
+    //                 'message' => 'Veuillez sélectionner un fichier',
+    //                 'redirect' => false
+    //             ];
+    //         }
+
+    //         // Appel de la procédure stockée
+    //         $sql = "CALL add_evaluation(:titre, :description, :fichier_path, :id_matiere, :id_enseignant, :id_classe, :type_evaluation, :statut)";
+    //         $stmt = $dbh->prepare($sql);
+
+    //         // Lier les paramètres
+    //         $stmt->bindParam(':titre', $titre);
+    //         $stmt->bindParam(':description', $description);
+    //         $stmt->bindParam(':fichier_path', $target_file); // Utiliser le chemin relatif
+    //         $stmt->bindParam(':id_matiere', $id_matiere, PDO::PARAM_INT);
+    //         $stmt->bindParam(':id_enseignant', $id_enseignant, PDO::PARAM_INT);
+    //         $stmt->bindParam(':id_classe', $id_classe, PDO::PARAM_INT);
+    //         $stmt->bindParam(':type_evaluation', $type_evaluation);
+    //         $stmt->bindParam(':statut', $statut);
+
+    //         if ($stmt->execute()) {
+    //             return [
+    //                 'success' => true,
+    //                 'message' => 'Évaluation ajoutée avec succès !',
+    //                 'redirect' => true,
+    //                 'redirect_url' => 'evaluations.php'
+    //             ];
+    //         } else {
+    //             return [
+    //                 'success' => false,
+    //                 'message' => 'Erreur lors de l\'ajout de l\'évaluation',
+    //                 'redirect' => false
+    //             ];
+    //         }
+
+    //     } catch (PDOException $e) {
+    //         error_log($e->getMessage());
+    //         return [
+    //             'success' => false,
+    //             'message' => 'Une erreur est survenue',
+    //             'redirect' => false
+    //         ];
+    //     }
+    // }
+
+    function ajouter_evaluation($dbh, $data, $file) {
+        try {
+            // Nettoyage des données
+            $titre = htmlspecialchars(trim($data['titre'] ?? ''));
+            $description = htmlspecialchars(trim($data['description'] ?? ''));
+            $type_evaluation = htmlspecialchars(trim($data['type_evaluation'] ?? ''));
+            $statut = htmlspecialchars(trim($data['statut'] ?? ''));
+            $id_enseignant = isset($data['id_enseignant']) ? intval($data['id_enseignant']) : null;
+            $id_classe = isset($data['id_classe']) ? intval($data['id_classe']) : null;
+            $id_matiere = isset($data['id_matiere']) ? intval($data['id_matiere']) : null;
+
+            // Gestion de l'upload fichier
+            if (isset($file['fichier_path']) && $file['fichier_path']['error'] == 0) {
+                // Définir le chemin du dossier de destination comme dans ajouterAbsence
+                $dossier_destination = __DIR__ . '/../../../assets/evaluation/';
+                
+                // Créer le dossier s'il n'existe pas
+                if (!file_exists($dossier_destination)) {
+                    mkdir($dossier_destination, 0777, true);
+                }
+                
+                // Générer un nom de fichier unique
+                $extension = pathinfo($file['fichier_path']['name'], PATHINFO_EXTENSION);
+                $nom_fichier = 'eval_' . time() . '_' . $id_enseignant . '.' . $extension;
+                
+                // Le chemin relatif pour enregistrer en BDD
+                $target_file = 'assets/evaluation/' . $nom_fichier;
+                
+                // Le chemin physique réel pour enregistrer le fichier
+                $destination_physique = $dossier_destination . $nom_fichier;
+                
+                // Débogage
+                error_log("Tentative d'upload - Chemin physique: $destination_physique");
+                error_log("Dossier existe: " . (file_exists($dossier_destination) ? 'Oui' : 'Non'));
+                error_log("Dossier accessible en écriture: " . (is_writable($dossier_destination) ? 'Oui' : 'Non'));
+
+                if (!move_uploaded_file($file['fichier_path']['tmp_name'], $destination_physique)) {
+                    error_log("Erreur d'upload - Code: " . $file['fichier_path']['error']);
+                    error_log("Détails de l'erreur: " . (error_get_last() ? error_get_last()['message'] : 'Erreur inconnue'));
+                    return [
+                        'success' => false,
+                        'message' => 'Erreur lors du téléchargement du fichier',
+                        'redirect' => false
+                    ];
+                }
+            } else {
+                return [
+                    'success' => false,
+                    'message' => 'Veuillez sélectionner un fichier',
+                    'redirect' => false
+                ];
+            }
+
+            // Appel de la procédure stockée
+            $sql = "CALL add_evaluation(:titre, :description, :fichier_path, :id_matiere, :id_enseignant, :id_classe, :type_evaluation, :statut)";
+            $stmt = $dbh->prepare($sql);
+
+            // Lier les paramètres
+            $stmt->bindParam(':titre', $titre);
+            $stmt->bindParam(':description', $description);
+            $stmt->bindParam(':fichier_path', $target_file); // Utiliser le chemin relatif
+            $stmt->bindParam(':id_matiere', $id_matiere, PDO::PARAM_INT);
+            $stmt->bindParam(':id_enseignant', $id_enseignant, PDO::PARAM_INT);
+            $stmt->bindParam(':id_classe', $id_classe, PDO::PARAM_INT);
+            $stmt->bindParam(':type_evaluation', $type_evaluation);
+            $stmt->bindParam(':statut', $statut);
+
+            if ($stmt->execute()) {
+                return [
+                    'success' => true,
+                    'message' => 'Évaluation ajoutée avec succès !',
+                    'redirect' => true,
+                    'redirect_url' => 'evaluations.php'
+                ];
+            } else {
+                return [
+                    'success' => false,
+                    'message' => 'Erreur lors de l\'ajout de l\'évaluation',
+                    'redirect' => false
+                ];
+            }
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Une erreur est survenue',
+                'redirect' => false
+            ];
+        }
+    }
+
+    function getEvaluationsFiltered($dbh, $page, $per_page, $enseignant, $matiere, $classe, $statut, $type_evaluation) {
+        try {
+            // Préparer la requête pour appeler la procédure stockée
+            $stmt = $dbh->prepare("CALL get_evaluations_info_filtered(?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bindParam(1, $page, PDO::PARAM_INT);
+            $stmt->bindParam(2, $per_page, PDO::PARAM_INT);
+            $stmt->bindParam(3, $enseignant, PDO::PARAM_INT);
+            $stmt->bindParam(4, $matiere, PDO::PARAM_INT);
+            $stmt->bindParam(5, $classe, PDO::PARAM_INT);
+            $stmt->bindParam(6, $statut, PDO::PARAM_STR);
+            $stmt->bindParam(7, $type_evaluation, PDO::PARAM_STR);
+            
+            // Exécuter la requête
+            $stmt->execute();
+            
+            // Récupérer les données des évaluations
+            $data = $stmt->fetchAll(PDO::FETCH_OBJ);
+            
+            // Fermer le curseur pour pouvoir exécuter la deuxième requête
+            $stmt->closeCursor();
+            
+            // Approche alternative pour récupérer le compte total
+            // Depuis la procédure stockée, on reçoit un second jeu de résultats
+            if ($stmt->nextRowset()) {
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                $total_count = $row['total_count'];
+            } else {
+                // Plan B : Compter manuellement si la procédure ne renvoie pas de deuxième jeu
+                $countSql = "SELECT COUNT(*) as total FROM evaluation 
+                            WHERE (? IS NULL OR id_enseignant = ?)
+                            AND (? IS NULL OR id_matiere = ?)
+                            AND (? IS NULL OR id_classe = ?)
+                            AND (? IS NULL OR statut = ?)
+                            AND (? IS NULL OR type_evaluation = ?)";
+                
+                $countStmt = $dbh->prepare($countSql);
+                $countStmt->bindParam(1, $enseignant, PDO::PARAM_INT);
+                $countStmt->bindParam(2, $enseignant, PDO::PARAM_INT);
+                $countStmt->bindParam(3, $matiere, PDO::PARAM_INT);
+                $countStmt->bindParam(4, $matiere, PDO::PARAM_INT);
+                $countStmt->bindParam(5, $classe, PDO::PARAM_INT);
+                $countStmt->bindParam(6, $classe, PDO::PARAM_INT);
+                $countStmt->bindParam(7, $statut, PDO::PARAM_STR);
+                $countStmt->bindParam(8, $statut, PDO::PARAM_STR);
+                $countStmt->bindParam(9, $type_evaluation, PDO::PARAM_STR);
+                $countStmt->bindParam(10, $type_evaluation, PDO::PARAM_STR);
+                $countStmt->execute();
+                $row = $countStmt->fetch(PDO::FETCH_ASSOC);
+                $total_count = $row['total'];
+            }
+            
+            // Afficher des infos de débogage
+            error_log("Nombre total d'évaluations: " . $total_count);
+            error_log("Nombre d'évaluations récupérées: " . count($data));
+            
+            return [
+                'success' => true,
+                'data' => $data,
+                'count' => $total_count
+            ];
+        } catch (PDOException $e) {
+            error_log("Erreur PDO: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des évaluations: ' . $e->getMessage()
+            ];
+        }
+    }
+    
+// =============== Evaluation ================

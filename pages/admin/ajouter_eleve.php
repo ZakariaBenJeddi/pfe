@@ -259,8 +259,8 @@ try {
   </div>
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
-  <!-- FILIRE ET CLASSE SELON LE NIVEAU -->
-  <script src="../../assets/js/niveau_filiere_classe.js"></script>
+  <!-- FILIRE ET CLASSE SELON LE NIVEAU ET FILIERE -->
+  <script src="../../assets/js/ajouter_eleve.js"></script>
 
   <!-- sweet alert -->
   <script src="../../assets/js/alerts/sweet_alert.js"></script>

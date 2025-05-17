@@ -3,28 +3,16 @@ session_start();
 if (empty($_SESSION['user'])) {
   header('location:../sign-in.php');
 }
-
 include('../../includes/admin/controller/controller.php');
 
 //* deconnexion
 require('../../includes/deconnexion_5s.php');
 
-//* Add
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
-  $result = ajouter_salle($dbh, $_POST);
-  if ($result['success']) {
-    header("Location: salle.php?success=1");
-    exit();
-  } else {
-    $errorMessage = urlencode($result['message']);
-    header("Location:salle.php?error={$errorMessage}");
-    exit();
-  }
-}
-?>
 
+?>
 <!DOCTYPE html>
 <html lang="en">
+
 <!-- HEAD -->
 <?php include '../../includes/admin/head_admin.php' ?>
 
@@ -37,84 +25,91 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
     <!-- Navbar -->
     <?php require('../../includes/admin/navbar_admin.php') ?>
     <!-- End Navbar -->
-    <div class="card shadow-lg mx-4 card-profile-bottom">
-
-    </div>
-    <div class="container-fluid py-4">
-      <div class="row">
-        <div class="col-md-12">
-          <div class="card">
-            <div class="card-header pb-0">
-              <div class="d-flex align-items-center">
-                <p class="mb-0">Ajouter Salle</p>
+    <div class="card ">
+      <div class="card-body p-3">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-header pb-0">
+                <div class="d-flex align-items-center">
+                  <p class="mb-0">Edit Profile</p>
+                  <!-- <button class="btn btn-primary btn-sm ms-auto">Settings</button> -->
+                </div>
+              </div>
+              <div class="card-body">
+                <p class="text-uppercase text-sm">User Information</p>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">Username</label>
+                      <input class="form-control" type="text" value="lucky.jesse">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">Email address</label>
+                      <input class="form-control" type="email" value="jesse@example.com">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">First name</label>
+                      <input class="form-control" type="text" value="Jesse">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">Last name</label>
+                      <input class="form-control" type="text" value="Lucky">
+                    </div>
+                  </div>
+                </div>
+                <hr class="horizontal dark">
+                <p class="text-uppercase text-sm">Contact Information</p>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">Address</label>
+                      <input class="form-control" type="text" value="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09">
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">City</label>
+                      <input class="form-control" type="text" value="New York">
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">Country</label>
+                      <input class="form-control" type="text" value="United States">
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">Postal code</label>
+                      <input class="form-control" type="text" value="437300">
+                    </div>
+                  </div>
+                </div>
+                <hr class="horizontal dark">
+                <p class="text-uppercase text-sm">About me</p>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="example-text-input" class="form-control-label">About me</label>
+                      <input class="form-control" type="text" value="A beautiful Dashboard for Bootstrap 5. It is Free and Open Source.">
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <hr class="horizontal dark">
-            <form method="post">
-              <div class="card-body">
-                <p class="text-uppercase text-sm">Salle Information</p>
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="example-text-input" class="form-control-label">Nom Salle</label>
-                      <input class="form-control" type="text" value="" name="nom_salle" id="nom_salle" onchange="nom_salleChange()">
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="example-text-input" class="form-control-label">Equipement</label>
-                      <input class="form-control" type="text" value="" name="equipement" id="equipement" onchange="equipementChange()">
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="example-text-input" class="form-control-label" id="etage">Etage</label>
-                      <select class="form-select" name="etage" id="etage" onchange="etageChange()">
-                        <option value="0">Rez de chaussée</option>
-                        <option value="1">Etage 1</option>
-                        <option value="2">Etage 2</option>
-                        <option value="3">Etage 3</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="example-text-input" class="form-control-label">Capacite Eleve</label>
-                      <input class="form-control" type="number" value="" name="capacite" min="10" max="30" id="capacite" onchange="capaciteChange()">
-                    </div>
-                  </div>
-                </div>
-                <hr class="horizontal dark">
-                <p class="text-uppercase text-sm">Nombre Equipement </p>
-                <div class="row">
-                  <div class="col-md-4">
-                    <div class="form-group">
-                      <label for="example-text-input" class="form-control-label">Nombre Chaise</label>
-                      <input class="form-control" type="number" min="10" max="15" name="nombre_chaise" id="chaise" onchange="chaiseChange()">
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="form-group">
-                      <label for="example-text-input" class="form-control-label">Nombre Bureau</label>
-                      <input class="form-control" type="number" min="1" max="2" name="nombre_bureau" id="bureau" onchange="bureauChange()">
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="form-group">
-                      <label for="example-text-input" class="form-control-label">Nombre Tableau</label>
-                      <input class="form-control" type="number" min="1" max="2" name="nombre_tableau" id="tableau" onchange="tableauChange()">
-                    </div>
-                  </div>
-                </div>
-                <hr class="horizontal dark">
-                <div class="row">
-                  <input class="btn btn-primary" type="submit" value="Ajouter" name="ajouter">
-                </div>
-              </div>
-            </form>
           </div>
         </div>
       </div>
+    </div>
+    <div class="container-fluid py-4">
+
       <!-- FOOTER -->
       <?php include '../../includes/footer.php' ?>
 
@@ -122,6 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
   </div>
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
+
   <!--   Core JS Files   -->
   <script src="../../assets/js/core/popper.min.js"></script>
   <script src="../../assets/js/core/bootstrap.min.js"></script>
@@ -137,7 +133,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
     }
   </script>
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
-  <script src="../../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
+  <script src="../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
 </body>
 
 </html>

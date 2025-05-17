@@ -286,15 +286,12 @@ if (isset($_POST['save'])) {
   $new_file_uploaded = false;
 
   if ($_FILES['fichier_path']['size'] > 0) {
-    // Utiliser le chemin absolu correct
-    $dossier_destination = dirname(dirname(__FILE__)) . '/assets/evaluation/';
+    // Utiliser le même chemin absolu que dans ajouterAbsence
+    $dossier_destination = __DIR__ . '/../../assets/evaluation/';
 
-    // Vérifier si le dossier existe, sinon le créer
+    // Créer le dossier s'il n'existe pas
     if (!file_exists($dossier_destination)) {
-      if (!mkdir($dossier_destination, 0777, true)) {
-        $error_message = "Erreur lors de la création du dossier d'upload.";
-        error_log("Échec de création du dossier: $dossier_destination");
-      }
+      mkdir($dossier_destination, 0777, true);
     }
 
     // Générer un nom de fichier unique
@@ -347,9 +344,8 @@ if (isset($_POST['save'])) {
         $stmt->execute([$titre, $description, $id_enseignant, $id_classe, $id_matiere, $type_evaluation, $statut, $fichier_path, $id_evaluation]);
 
         // Supprimer l'ancien fichier s'il existe
-        // Attention: il faut utiliser le chemin physique complet pour la suppression
         if (!empty($old_file)) {
-          $old_file_physical = dirname(dirname(__FILE__)) . '/' . $old_file;
+          $old_file_physical = __DIR__ . '/../../' . $old_file;
           if (file_exists($old_file_physical)) {
             unlink($old_file_physical);
           }

@@ -292,7 +292,7 @@ $classe_courante = get_classe_by_id($dbh, $eleve->id_classe)['data'];
   <?php include '../../includes/fixedplugin.php' ?>
 
   <!-- FILIRE ET CLASSE SELON LE NIVEAU -->
-  <script src="../../assets/js/niveau_filiere_classe.js"></script>
+  <script src="../../assets/js/ajouter_eleve.js"></script>
 
   <!--   Core JS Files   -->
   <script src="../../assets/js/core/popper.min.js"></script>

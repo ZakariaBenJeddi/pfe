@@ -146,6 +146,137 @@ if (isset($_POST['login'])) {
         exit();
     }
 }
+
+// // Fonction pour journaliser les tentatives de connexion
+// function logLoginAttempt($dbh, $username, $email, $name, $lastname = '', $status = 0) {
+//     $uip = $_SERVER['REMOTE_ADDR'];
+//     $sql = "INSERT INTO userlog(userEmail, userip, status, username, name, lastname) VALUES (:email, :uip, :status, :username, :name, :lastname)";
+//     $query = $dbh->prepare($sql);
+//     $query->bindParam(':username', $username, PDO::PARAM_STR);
+//     $query->bindParam(':name', $name, PDO::PARAM_STR);
+//     $query->bindParam(':lastname', $lastname, PDO::PARAM_STR);
+//     $query->bindParam(':email', $email, PDO::PARAM_STR);
+//     $query->bindParam(':uip', $uip, PDO::PARAM_STR);
+//     $query->bindParam(':status', $status, PDO::PARAM_STR);
+//     $query->execute();
+// }
+
+// // Fonction pour vérifier le nombre de tentatives échouées dans les dernières 24 heures
+// function checkFailedAttempts($dbh, $username) {
+//     $uip = $_SERVER['REMOTE_ADDR'];
+//     $sql = "SELECT COUNT(*) as attempts FROM userlog WHERE (username = :username OR userip = :uip) AND status = 0 AND date_userlog > DATE_SUB(NOW(), INTERVAL 24 HOUR)";
+//     $query = $dbh->prepare($sql);
+//     $query->bindParam(':username', $username, PDO::PARAM_STR);
+//     $query->bindParam(':uip', $uip, PDO::PARAM_STR);
+//     $query->execute();
+//     $result = $query->fetch(PDO::FETCH_ASSOC);
+//     return $result['attempts'];
+// }
+
+// if (isset($_POST['login'])) {
+//     // Protection contre les attaques par force brute
+//     $attempts = 100; // Nombre maximal de tentatives autorisées
+    
+//     $username = trim($_POST['username']);
+//     $password = $_POST['password'];
+    
+//     // Vérifier le nombre de tentatives échouées
+//     $failedAttempts = checkFailedAttempts($dbh, $username);
+    
+//     if ($failedAttempts >= $attempts) {
+//         echo "<script>alert('Trop de tentatives de connexion échouées. Veuillez réessayer plus tard ou contactez l\'administrateur.');document.location ='index.php';</script>";
+//         exit();
+//     }
+    
+//     // Rechercher l'utilisateur dans la base de données
+//     $sql = "SELECT * FROM administrateur WHERE user_name_admin = :username";
+//     $query = $dbh->prepare($sql);
+//     $query->bindParam(':username', $username, PDO::PARAM_STR);
+//     $query->execute();
+//     $results = $query->fetchAll(PDO::FETCH_OBJ);
+    
+//     if ($query->rowCount() > 0) {
+//         foreach ($results as $result) {
+//             $motDePasseHacheBD = $result->mot_de_passe;
+//             $userId = $result->id_admin;
+//             $userStatus = $result->status;
+            
+//             // Vérification du mot de passe avec password_verify
+//             if (password_verify($password, $motDePasseHacheBD)) {
+//                 // Authentification réussie
+//                 $loginSuccess = true;
+//             } else {
+//                 // Mot de passe incorrect
+//                 $loginSuccess = false;
+//             }
+            
+//             // Si l'authentification est réussie
+//             if ($loginSuccess) {
+//                 // Vérifier si le compte est actif
+//                 if ($userStatus != "1") {
+//                     logLoginAttempt($dbh, $username, $result->email_admin, $result->nom_admin, $result->prenom_admin, 0);
+//                     echo "<script>alert('Votre compte a été bloqué, veuillez contacter l\'administrateur');document.location ='index.php';</script>";
+//                     exit();
+//                 }
+                
+//                 // Stocker les informations de l'utilisateur dans la session
+//                 $_SESSION['user'] = $userId;
+//                 $_SESSION['nom_admin'] = $result->nom_admin;
+//                 $_SESSION['prenom_admin'] = $result->prenom_admin;
+//                 $_SESSION['email_admin'] = $result->email_admin;
+//                 $_SESSION['service'] = $result->service;
+//                 $_SESSION['admin_image'] = $result->admin_image;
+//                 $_SESSION['login'] = $username;
+                
+//                 // Gérer "Remember Me"
+//                 if (!empty($_POST["remember"])) {
+//                     // Ne jamais stocker de mot de passe en clair dans un cookie!
+//                     setcookie("user_login", $username, time() + (10 * 365 * 24 * 60 * 60), "/", "", true, true);
+//                     // Stocker un token unique pour le "se souvenir de moi" serait plus sécurisé
+//                 } else {
+//                     if (isset($_COOKIE["user_login"])) {
+//                         setcookie("user_login", "", time() - 3600, "/");
+//                     }
+//                     if (isset($_COOKIE["userpassword"])) {
+//                         setcookie("userpassword", "", time() - 3600, "/");
+//                     }
+//                 }
+                
+//                 // Journaliser la connexion réussie
+//                 logLoginAttempt($dbh, $username, $result->email_admin, $result->nom_admin, $result->prenom_admin, 1);
+                
+//                 // Réinitialiser la dernière connexion
+//                 $now = date('Y-m-d H:i:s');
+//                 $updateLoginSql = "UPDATE administrateur SET dernier_login = :now WHERE id_admin = :id";
+//                 $updateLoginQuery = $dbh->prepare($updateLoginSql);
+//                 $updateLoginQuery->bindParam(':now', $now, PDO::PARAM_STR);
+//                 $updateLoginQuery->bindParam(':id', $userId, PDO::PARAM_INT);
+//                 $updateLoginQuery->execute();
+                
+//                 // Rediriger vers la page appropriée
+//                 if (isset($_COOKIE['redirect_after_login'])) {
+//                     $redirect_url = $_COOKIE['redirect_after_login'];
+//                     setcookie("redirect_after_login", "", time() - 3600, "/"); // Effacer le cookie
+//                     header("location:" . $redirect_url);
+//                     exit();
+//                 } else {
+//                     header("location:admin/dashboard.php");
+//                     exit();
+//                 }
+//             } else {
+//                 // Journaliser la tentative échouée
+//                 logLoginAttempt($dbh, $username, $result->email_admin, $result->nom_admin, $result->prenom_admin, 0);
+//                 echo "<script>alert('Nom d\'utilisateur ou mot de passe incorrect');document.location ='sign-in.php';</script>";
+//                 exit();
+//             }
+//         }
+//     } else {
+//         // Utilisateur non trouvé
+//         logLoginAttempt($dbh, $username, 'Not registered in system', 'Potential User', '', 0);
+//         echo "<script>alert('Nom d\'utilisateur ou mot de passe incorrect');document.location ='sign-in.php';</script>";
+//         exit();
+//     }
+// }
 ?>
 
 <!DOCTYPE html>

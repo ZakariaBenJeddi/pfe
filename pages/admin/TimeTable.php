@@ -28,6 +28,11 @@ class MultiClassScheduleGenerator
   private $dailyWorkload = [];
   private $weeklyMatiereCount = [];
 
+  // Nouveau tracker pour les heures par matière
+  private $matiereHoursTracking = [];
+  // Stockage des durées personnalisées pour chaque session
+  private $customSessionDurations = [];
+
   public function __construct()
   {
     try {
@@ -65,8 +70,6 @@ class MultiClassScheduleGenerator
     $this->max_class_hours_per_week = $config['max_class_hours'];
     $this->session_duration = $config['session_duration'];
   }
-
-
 
   private function initializeWeeklyHours()
   {
@@ -166,6 +169,24 @@ class MultiClassScheduleGenerator
   }
 
 
+  // private function initializeTrackingArrays()
+  // {
+  //   $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
+
+  //   foreach ($this->classes as $class) {
+  //     $this->matiereDailyCount[$class['id_classe']] = array_fill_keys($days, []);
+  //     $this->dailyWorkload[$class['id_classe']] = array_fill_keys($days, 0);
+  //     $this->weeklyMatiereCount[$class['id_classe']] = [];
+
+  //     foreach ($this->matieres as $matiere) {
+  //       foreach ($days as $day) {
+  //         $this->matiereDailyCount[$class['id_classe']][$day][$matiere['id_matiere']] = 0;
+  //       }
+  //       $this->weeklyMatiereCount[$class['id_classe']][$matiere['id_matiere']] = 0;
+  //     }
+  //   }
+  // }
+
   private function initializeTrackingArrays()
   {
     $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
@@ -174,39 +195,39 @@ class MultiClassScheduleGenerator
       $this->matiereDailyCount[$class['id_classe']] = array_fill_keys($days, []);
       $this->dailyWorkload[$class['id_classe']] = array_fill_keys($days, 0);
       $this->weeklyMatiereCount[$class['id_classe']] = [];
+      $this->matiereHoursTracking[$class['id_classe']] = []; // Initialisation du tracking d'heures
 
       foreach ($this->matieres as $matiere) {
         foreach ($days as $day) {
           $this->matiereDailyCount[$class['id_classe']][$day][$matiere['id_matiere']] = 0;
         }
         $this->weeklyMatiereCount[$class['id_classe']][$matiere['id_matiere']] = 0;
+        $this->matiereHoursTracking[$class['id_classe']][$matiere['id_matiere']] = 0; // Heures à 0
       }
     }
   }
 
-
-  //! function1  => 13-04-2025
   // private function canAddSession($classId, $matiereId, $day)
   // {
-  //   // Relax constraints significantly for debugging
-  //   if ($this->matiereDailyCount[$classId][$day][$matiereId] >= 4) {
+  //   // Limit sessions per day for each matiere (allow up to 2 per day if needed)
+  //   if ($this->matiereDailyCount[$classId][$day][$matiereId] >= 2) {
   //     return false;
   //   }
 
-  //   // Remove or significantly increase weekly session limit
+  //   // Enforce weekly session limit from configuration
   //   $filiereId = $this->getFiliereForClass($classId);
   //   $constraintKey = $filiereId . '-' . $matiereId;
 
   //   if (isset($this->matiereConstraints[$constraintKey])) {
-  //     $maxWeeklySession = $this->matiereConstraints[$constraintKey]['nombre_seance_semaine'] + 2;
+  //     $maxWeeklySession = $this->matiereConstraints[$constraintKey]['nombre_seance_semaine'];
   //     if ($this->weeklyMatiereCount[$classId][$matiereId] >= $maxWeeklySession) {
   //       return false;
   //     }
   //   }
 
-  //   // Significantly increase daily workload
+  //   // Check daily workload with a reasonable limit
   //   $dailyLoad = $this->dailyWorkload[$classId][$day];
-  //   $maxDailyLoad = 12; // Increased substantially
+  //   $maxDailyLoad = 8; // Reasonable limit but more flexible
 
   //   if ($dailyLoad >= $maxDailyLoad) {
   //     return false;
@@ -215,28 +236,39 @@ class MultiClassScheduleGenerator
   //   return true;
   // }
 
-
-  private function canAddSession($classId, $matiereId, $day)
+  private function canAddSession($classId, $matiereId, $day, $duration = null)
   {
-    // Limit sessions per day for each matiere (allow up to 2 per day if needed)
-    if ($this->matiereDailyCount[$classId][$day][$matiereId] >= 2) {
+    // Vérification du nombre de séances par jour
+    if ($this->matiereDailyCount[$classId][$day][$matiereId] >= 1) {
       return false;
     }
 
-    // Enforce weekly session limit from configuration
+    // Vérification du nombre de séances hebdomadaires
     $filiereId = $this->getFiliereForClass($classId);
     $constraintKey = $filiereId . '-' . $matiereId;
 
     if (isset($this->matiereConstraints[$constraintKey])) {
-      $maxWeeklySession = $this->matiereConstraints[$constraintKey]['nombre_seance_semaine'];
-      if ($this->weeklyMatiereCount[$classId][$matiereId] >= $maxWeeklySession) {
+      $maxWeeklySessions = $this->matiereConstraints[$constraintKey]['nombre_seance_semaine'];
+      
+      // Vérifier si on a déjà atteint le nombre max de séances
+      if ($this->weeklyMatiereCount[$classId][$matiereId] >= $maxWeeklySessions) {
+        return false;
+      }
+      
+      // Vérifier le nombre d'heures hebdomadaires
+      $maxWeeklyHours = $this->matiereConstraints[$constraintKey]['nombre_heures_semaine'];
+      $currentHours = $this->matiereHoursTracking[$classId][$matiereId];
+      $sessionDuration = $duration ? $duration / 60 : $this->session_duration / 60;
+      
+      // Si cette séance ferait dépasser le total d'heures
+      if (($currentHours + $sessionDuration) > $maxWeeklyHours) {
         return false;
       }
     }
 
-    // Check daily workload with a reasonable limit
+    // Autres vérifications existantes...
     $dailyLoad = $this->dailyWorkload[$classId][$day];
-    $maxDailyLoad = 8; // Reasonable limit but more flexible
+    $maxDailyLoad = 8;
 
     if ($dailyLoad >= $maxDailyLoad) {
       return false;
@@ -245,19 +277,102 @@ class MultiClassScheduleGenerator
     return true;
   }
 
+  // private function updateSessionTracking($classId, $matiereId, $day)
+  // {
+  //   $this->matiereDailyCount[$classId][$day][$matiereId]++;
+  //   $this->weeklyMatiereCount[$classId][$matiereId]++;
 
+  //   // Update daily workload
+  //   $matiereCoeff = $this->getMatiereCoefficient($matiereId);
+  //   $this->dailyWorkload[$classId][$day] += ($this->session_duration / 60) * $matiereCoeff;
+  // }
 
-  private function updateSessionTracking($classId, $matiereId, $day)
+  private function updateSessionTracking($classId, $matiereId, $day, $duration)
   {
     $this->matiereDailyCount[$classId][$day][$matiereId]++;
     $this->weeklyMatiereCount[$classId][$matiereId]++;
+    
+    // Mettre à jour le compteur d'heures
+    $hoursDuration = $duration / 60; // Convertir minutes en heures
+    $this->matiereHoursTracking[$classId][$matiereId] += $hoursDuration;
 
-    // Update daily workload
+    // Mettre à jour la charge de travail quotidienne
     $matiereCoeff = $this->getMatiereCoefficient($matiereId);
-    $this->dailyWorkload[$classId][$day] += ($this->session_duration / 60) * $matiereCoeff;
+    $this->dailyWorkload[$classId][$day] += $hoursDuration * $matiereCoeff;
   }
 
+  private function calculateSessionDurations($classId, $matiereId)
+  {
+    $filiereId = $this->getFiliereForClass($classId);
+    $constraintKey = $filiereId . '-' . $matiereId;
+    
+    if (!isset($this->matiereConstraints[$constraintKey])) {
+      // Si pas de contrainte, utiliser la durée par défaut
+      return array_fill(0, 3, $this->session_duration);
+    }
+    
+    $totalHours = $this->matiereConstraints[$constraintKey]['nombre_heures_semaine'];
+    $totalSessions = $this->matiereConstraints[$constraintKey]['nombre_seance_semaine'];
+    
+    if ($totalSessions <= 0) {
+      return [];
+    }
+    
+    // Calculer les durées optimales pour chaque séance
+    $durations = [];
+    $totalMinutes = $totalHours * 60;
+    $remainingMinutes = $totalMinutes;
+    
+    // Distribuer les minutes de façon équilibrée
+    for ($i = 0; $i < $totalSessions; $i++) {
+      if ($i == $totalSessions - 1) {
+        // Dernière séance prend le reste des minutes
+        $durations[] = $remainingMinutes;
+      } else {
+        // Essayer de répartir équitablement les minutes
+        $sessionMinutes = floor($remainingMinutes / ($totalSessions - $i));
+        
+        // Ajuster à un intervalle de 30 minutes (valeur typique)
+        $sessionMinutes = round($sessionMinutes / 30) * 30;
+        
+        // Garantir un minimum de 60 minutes
+        $sessionMinutes = max(60, $sessionMinutes);
+        
+        // Mais ne pas dépasser le temps restant moins un minimum pour chaque séance restante
+        $sessionMinutes = min($sessionMinutes, $remainingMinutes - ($totalSessions - $i - 1) * 60);
+        
+        $durations[] = $sessionMinutes;
+        $remainingMinutes -= $sessionMinutes;
+      }
+    }
+    
+    // Stocker ces durées pour référence future
+    $key = "$classId-$matiereId";
+    $this->customSessionDurations[$key] = $durations;
+    
+    return $durations;
+  }
 
+  private function getNextSessionDuration($classId, $matiereId)
+  {
+    $key = "$classId-$matiereId";
+    
+    // Si les durées n'ont pas encore été calculées
+    if (!isset($this->customSessionDurations[$key])) {
+      $this->customSessionDurations[$key] = $this->calculateSessionDurations($classId, $matiereId);
+    }
+    
+    // Trouver le nombre de séances déjà planifiées
+    $sessionsPlanned = $this->weeklyMatiereCount[$classId][$matiereId];
+    
+    // S'il reste des durées dans le tableau
+    if (isset($this->customSessionDurations[$key][$sessionsPlanned])) {
+      return $this->customSessionDurations[$key][$sessionsPlanned];
+    }
+    
+    // Fallback au cas où
+    return $this->session_duration;
+  }
 
   private function fetchData($query)
   {
@@ -287,24 +402,6 @@ class MultiClassScheduleGenerator
       ];
     }
   }
-
-  //! first loadTeachersTimetable
-  // private function loadTeachersTimetable()
-  // {
-  //   $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-  //   $timeSlots = $this->getDailyTimeSlots();
-  //   foreach ($this->professeurs as $prof) {
-  //     $this->professeursTimetable[$prof['id']] = [];
-  //     foreach ($days as $day) {
-  //       $this->professeursTimetable[$prof['id']][$day] = array_fill_keys(
-  //         array_map(function ($slot) {
-  //           return $slot['start'] . '-' . $slot['end'];
-  //         }, $timeSlots),
-  //         null
-  //       );
-  //     }
-  //   }
-  // }
 
   //! second loadTeachersTimetable
   private function loadTeachersTimetable()
@@ -388,21 +485,7 @@ class MultiClassScheduleGenerator
     return isset($this->professeursAssignments[$key]) ?
       $this->professeursAssignments[$key] : null;
   }
-
-  //! function5 updated
-  // private function getMatieresForClass($classeId)
-  // {
-  //   $matieres = [];
-  //   foreach ($this->professeursAssignments as $key => $assignment) {
-  //     list($classId, $matiereId) = explode('-', $key);
-  //     if ($classId == $classeId) {
-  //       $matieres[] = $matiereId;
-  //     }
-  //   }
-  //   return array_unique($matieres);
-  // }
-
-    private function getMatieresForClass($classeId)
+  private function getMatieresForClass($classeId)
   {
       $matieres = [];
       foreach ($this->professeursAssignments as $key => $assignment) {
@@ -435,17 +518,6 @@ class MultiClassScheduleGenerator
     return !isset($usedRooms[$day][$timeSlot]) ||
       !in_array($roomId, $usedRooms[$day][$timeSlot]);
   }
-
-  // private function findAvailableRoom($usedRooms, $day, $timeSlot)
-  // {
-  //   foreach ($this->salles as $room) {
-  //     if ($this->isRoomAvailable($room['id_salle'], $usedRooms, $day, $timeSlot)) {
-  //       return $room;
-  //     }
-  //   }
-  //   return null;
-  // }
-
   private function findAvailableRoom($usedRooms, $day, $timeSlot, $currentUsedRooms = [])
   {
     // Mélanger les salles pour introduire de l'aléatoire
@@ -485,7 +557,6 @@ class MultiClassScheduleGenerator
     return $usedRooms;
   }
 
-  //! function3 updated
   // public function generateAllSchedules()
   // {
   //   $allSchedules = [];
@@ -493,32 +564,47 @@ class MultiClassScheduleGenerator
   //   $timeSlots = $this->getDailyTimeSlots();
   //   $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
 
+  //   // Pre-allocate sessions for strict requirement subjects
+  //   $preAllocatedSessions = $this->preAllocateRequiredSessions($days, $timeSlots);
+
   //   foreach ($this->classes as $class) {
-  //     $schedule = [];
-  //     $classMatieres = $this->getMatieresForClass($class['id_classe']);
-  //     $targetHours = $this->getTargetHoursForClass($class['id_classe']);
-  //     $currentHours = 0;
-  //     $currentUsedRooms = []; // Tracker des salles utilisées par cette classe
+  //     $schedule = isset($preAllocatedSessions[$class['id_classe']]) ?
+  //       $preAllocatedSessions[$class['id_classe']] : [];
 
-
-  //     error_log("Generating schedule for class: {$class['nom_classe']}");
-  //     error_log("Target Hours: {$targetHours}");
-  //     error_log("Available Matieres: " . implode(', ', $classMatieres));
-
-
+  //     // Initialize any missing days/slots
   //     foreach ($days as $day) {
-  //       $schedule[$day] = [];
+  //       if (!isset($schedule[$day])) {
+  //         $schedule[$day] = [];
+  //       }
 
   //       foreach ($timeSlots as $timeSlot) {
   //         $timeSlotKey = $timeSlot['start'] . '-' . $timeSlot['end'];
-  //         error_log("Day: {$day}, TimeSlot: {$timeSlot['start']}-{$timeSlot['end']}");
-
-  //         if ($currentHours >= $targetHours) {
+  //         if (!isset($schedule[$day][$timeSlotKey])) {
   //           $schedule[$day][$timeSlotKey] = null;
+  //         }
+  //       }
+  //     }
+
+  //     $classMatieres = $this->getMatieresForClass($class['id_classe']);
+  //     $targetHours = $this->getTargetHoursForClass($class['id_classe']);
+  //     $currentHours = $this->calculateCurrentHours($schedule);
+  //     $currentUsedRooms = [];
+
+  //     // Fill remaining slots with other subjects
+  //     foreach ($days as $day) {
+  //       foreach ($timeSlots as $timeSlot) {
+  //         $timeSlotKey = $timeSlot['start'] . '-' . $timeSlot['end'];
+
+  //         // Skip if slot is already allocated
+  //         if ($schedule[$day][$timeSlotKey] !== null) {
   //           continue;
   //         }
 
-  //         // Sort matieres by priority (based on remaining required sessions)
+  //         if ($currentHours >= $targetHours) {
+  //           continue;
+  //         }
+
+  //         // Try to add a session here
   //         $prioritizedMatieres = $this->prioritizeMatieres($class['id_classe'], $classMatieres);
 
   //         foreach ($prioritizedMatieres as $matiereId) {
@@ -526,7 +612,6 @@ class MultiClassScheduleGenerator
   //             $assignedProf = $this->getAssignedProfesseur($class['id_classe'], $matiereId);
 
   //             if ($this->isValidSession($assignedProf, $day, $timeSlotKey, $class['id_classe'])) {
-  //               // Passer currentUsedRooms comme paramètre supplémentaire
   //               $availableRoom = $this->findAvailableRoom($usedRooms, $day, $timeSlotKey, $currentUsedRooms);
 
   //               if ($availableRoom) {
@@ -537,27 +622,19 @@ class MultiClassScheduleGenerator
   //                 );
 
   //                 $this->updateSessionTracking($class['id_classe'], $matiereId, $day);
-
-  //                 // Mettre à jour les salles utilisées
   //                 $usedRooms = $this->bookRoom($availableRoom['id_salle'], $usedRooms, $day, $timeSlotKey);
 
-  //                 // Tracker les salles utilisées par cette classe
   //                 if (!isset($currentUsedRooms[$day][$timeSlotKey])) {
   //                   $currentUsedRooms[$day][$timeSlotKey] = [];
   //                 }
   //                 $currentUsedRooms[$day][$timeSlotKey][] = $availableRoom['id_salle'];
 
   //                 $this->bookResources($assignedProf['enseignant_id'], $availableRoom['id_salle'], $day, $timeSlotKey);
-
   //                 $currentHours += $timeSlot['duration'] / 60;
   //                 break;
   //               }
   //             }
   //           }
-  //         }
-
-  //         if (!isset($schedule[$day][$timeSlotKey])) {
-  //           $schedule[$day][$timeSlotKey] = null;
   //         }
   //       }
   //     }
@@ -580,14 +657,14 @@ class MultiClassScheduleGenerator
     $timeSlots = $this->getDailyTimeSlots();
     $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
 
-    // Pre-allocate sessions for strict requirement subjects
+    // Pré-allouer les séances pour les matières avec des exigences strictes
     $preAllocatedSessions = $this->preAllocateRequiredSessions($days, $timeSlots);
 
     foreach ($this->classes as $class) {
       $schedule = isset($preAllocatedSessions[$class['id_classe']]) ?
         $preAllocatedSessions[$class['id_classe']] : [];
 
-      // Initialize any missing days/slots
+      // Initialiser les jours/créneaux manquants
       foreach ($days as $day) {
         if (!isset($schedule[$day])) {
           $schedule[$day] = [];
@@ -606,12 +683,12 @@ class MultiClassScheduleGenerator
       $currentHours = $this->calculateCurrentHours($schedule);
       $currentUsedRooms = [];
 
-      // Fill remaining slots with other subjects
+      // Remplir les créneaux restants avec d'autres matières si nécessaire
       foreach ($days as $day) {
         foreach ($timeSlots as $timeSlot) {
           $timeSlotKey = $timeSlot['start'] . '-' . $timeSlot['end'];
 
-          // Skip if slot is already allocated
+          // Ignorer si le créneau est déjà alloué
           if ($schedule[$day][$timeSlotKey] !== null) {
             continue;
           }
@@ -620,11 +697,19 @@ class MultiClassScheduleGenerator
             continue;
           }
 
-          // Try to add a session here
+          // Essayer d'ajouter une séance ici
           $prioritizedMatieres = $this->prioritizeMatieres($class['id_classe'], $classMatieres);
 
           foreach ($prioritizedMatieres as $matiereId) {
-            if ($this->canAddSession($class['id_classe'], $matiereId, $day)) {
+            // Obtenir la durée personnalisée pour cette séance
+            $sessionDuration = $this->getNextSessionDuration($class['id_classe'], $matiereId);
+            
+            // Vérifier si la durée peut tenir dans ce créneau horaire
+            if ($sessionDuration > $timeSlot['duration']) {
+              continue;
+            }
+            
+            if ($this->canAddSession($class['id_classe'], $matiereId, $day, $sessionDuration)) {
               $assignedProf = $this->getAssignedProfesseur($class['id_classe'], $matiereId);
 
               if ($this->isValidSession($assignedProf, $day, $timeSlotKey, $class['id_classe'])) {
@@ -634,10 +719,10 @@ class MultiClassScheduleGenerator
                   $schedule[$day][$timeSlotKey] = $this->createSessionEntry(
                     $assignedProf,
                     $availableRoom,
-                    $timeSlot['duration']
+                    $sessionDuration
                   );
 
-                  $this->updateSessionTracking($class['id_classe'], $matiereId, $day);
+                  $this->updateSessionTracking($class['id_classe'], $matiereId, $day, $sessionDuration);
                   $usedRooms = $this->bookRoom($availableRoom['id_salle'], $usedRooms, $day, $timeSlotKey);
 
                   if (!isset($currentUsedRooms[$day][$timeSlotKey])) {
@@ -646,7 +731,7 @@ class MultiClassScheduleGenerator
                   $currentUsedRooms[$day][$timeSlotKey][] = $availableRoom['id_salle'];
 
                   $this->bookResources($assignedProf['enseignant_id'], $availableRoom['id_salle'], $day, $timeSlotKey);
-                  $currentHours += $timeSlot['duration'] / 60;
+                  $currentHours += $sessionDuration / 60;
                   break;
                 }
               }
@@ -666,234 +751,346 @@ class MultiClassScheduleGenerator
     return $allSchedules;
   }
 
-  //! function4 updated
-  // private function preAllocateRequiredSessions($days, $timeSlots)
-  // {
-  //   $preAllocatedSessions = [];
-  //   $usedRooms = [];
-  //   $usedTimeSlots = [];
-
-  //   foreach ($this->classes as $class) {
-  //     $classId = $class['id_classe'];
-  //     $filiereId = $this->getFiliereForClass($classId);
-  //     $preAllocatedSessions[$classId] = [];
-
-  //     // Initialize days
-  //     foreach ($days as $day) {
-  //       $preAllocatedSessions[$classId][$day] = [];
-  //     }
-
-  //     // Get all matieres for this class with their constraints
-  //     $classMatiereIds = $this->getMatieresForClass($classId);
-
-  //     foreach ($classMatiereIds as $matiereId) {
-  //       $constraintKey = $filiereId . '-' . $matiereId;
-
-  //       // Check if this matiere has specific session requirements
-  //       if (isset($this->matiereConstraints[$constraintKey])) {
-  //         $requiredSessions = $this->matiereConstraints[$constraintKey]['nombre_seance_semaine'];
-
-  //         // Only pre-allocate for subjects with strict requirements (like Mathematics)
-  //         if ($requiredSessions >= 3) {
-  //           $assignedProf = $this->getAssignedProfesseur($classId, $matiereId);
-  //           if (!$assignedProf) continue;
-
-  //           // Try to spread these sessions throughout the week
-  //           $sessionsAllocated = 0;
-  //           $dayIndex = 0;
-
-  //           while ($sessionsAllocated < $requiredSessions && $dayIndex < count($days)) {
-  //             $day = $days[$dayIndex];
-
-  //             // Try each time slot on this day
-  //             foreach ($timeSlots as $timeSlot) {
-  //               $timeSlotKey = $timeSlot['start'] . '-' . $timeSlot['end'];
-
-  //               // Check if this slot is available
-  //               if (
-  //                 !isset($usedTimeSlots[$classId][$day][$timeSlotKey]) &&
-  //                 $this->isTeacherAvailable($assignedProf['enseignant_id'], $day, $timeSlotKey)
-  //               ) {
-
-  //                 // Find an available room
-  //                 $availableRoom = $this->findAvailableRoom($usedRooms, $day, $timeSlotKey);
-
-  //                 if ($availableRoom) {
-  //                   // Allocate this session
-  //                   $preAllocatedSessions[$classId][$day][$timeSlotKey] = $this->createSessionEntry(
-  //                     $assignedProf,
-  //                     $availableRoom,
-  //                     $timeSlot['duration']
-  //                   );
-
-  //                   // Mark resources as used
-  //                   if (!isset($usedTimeSlots[$classId][$day])) {
-  //                     $usedTimeSlots[$classId][$day] = [];
-  //                   }
-  //                   $usedTimeSlots[$classId][$day][$timeSlotKey] = true;
-
-  //                   $usedRooms = $this->bookRoom($availableRoom['id_salle'], $usedRooms, $day, $timeSlotKey);
-  //                   $this->bookResources($assignedProf['enseignant_id'], $availableRoom['id_salle'], $day, $timeSlotKey);
-
-  //                   // Update tracking for constraints
-  //                   $this->updateSessionTracking($classId, $matiereId, $day);
-
-  //                   $sessionsAllocated++;
-  //                   if ($sessionsAllocated >= $requiredSessions) {
-  //                     break;
-  //                   }
-  //                 }
-  //               }
-  //             }
-
-  //             $dayIndex++;
-  //           }
-
-  //           // If we couldn't allocate all required sessions in the first pass,
-  //           // try again with less restrictions
-  //           if ($sessionsAllocated < $requiredSessions) {
-  //             // Implementation for fallback allocation - would be similar to above but with looser constraints
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   return $preAllocatedSessions;
-  // }
-
-    private function preAllocateRequiredSessions($days, $timeSlots) 
-  {
-      $preAllocatedSessions = [];
-      $usedRooms = [];
-      $usedTimeSlots = [];
+    // Nouvelle méthode de débogage pour vérifier le respect du volume horaire
+    public function debugMatiereHours()
+    {
+      echo "<h2>Matière Hours Debug</h2>";
       
       foreach ($this->classes as $class) {
-          $classId = $class['id_classe'];
-          $filiereId = $this->getFiliereForClass($classId);
-          $preAllocatedSessions[$classId] = [];
-          
-          // Initialize days
-          foreach ($days as $day) {
-              $preAllocatedSessions[$classId][$day] = [];
+        $classId = $class['id_classe'];
+        $className = $class['nom_classe'];
+        
+        echo "<h3>Class: $className (ID: $classId)</h3>";
+        
+        $classMatiereIds = $this->getMatieresForClass($classId);
+        $filiereId = $this->getFiliereForClass($classId);
+        
+        foreach ($classMatiereIds as $matiereId) {
+          // Trouver le nom de la matière
+          $matiereName = "Unknown";
+          foreach ($this->matieres as $matiere) {
+            if ($matiere['id_matiere'] == $matiereId) {
+              $matiereName = $matiere['nom_matiere'];
+              break;
+            }
           }
           
-          // Get ALL assigned subjects for this class
-          $classMatiereIds = $this->getMatieresForClass($classId);
+          $constraintKey = $filiereId . '-' . $matiereId;
           
-          // Sort matieres by required sessions (descending) to schedule high-priority subjects first
-          $matieresPriority = [];
-          foreach ($classMatiereIds as $matiereId) {
-              $constraintKey = $filiereId . '-' . $matiereId;
-              $requiredSessions = isset($this->matiereConstraints[$constraintKey]) ? 
-                                $this->matiereConstraints[$constraintKey]['nombre_seance_semaine'] : 1;
-              $matieresPriority[$matiereId] = $requiredSessions;
+          if (isset($this->matiereConstraints[$constraintKey])) {
+            $requiredHours = $this->matiereConstraints[$constraintKey]['nombre_heures_semaine'];
+            $requiredSessions = $this->matiereConstraints[$constraintKey]['nombre_seance_semaine'];
+            $currentHours = isset($this->matiereHoursTracking[$classId][$matiereId]) ? 
+                          $this->matiereHoursTracking[$classId][$matiereId] : 0;
+            $currentSessions = isset($this->weeklyMatiereCount[$classId][$matiereId]) ?
+                              $this->weeklyMatiereCount[$classId][$matiereId] : 0;
+            
+            $hoursStatus = ($currentHours == $requiredHours) ? "✅" : "❌";
+            $sessionsStatus = ($currentSessions == $requiredSessions) ? "✅" : "❌";
+            
+            echo "<strong>$matiereName</strong>:<br>";
+            echo "- Heures: $currentHours / $requiredHours $hoursStatus<br>";
+            echo "- Séances: $currentSessions / $requiredSessions $sessionsStatus<br>";
+            
+            // Afficher les durées planifiées
+            $key = "$classId-$matiereId";
+            if (isset($this->customSessionDurations[$key])) {
+              echo "- Durées planifiées: ";
+              foreach ($this->customSessionDurations[$key] as $idx => $duration) {
+                echo ($duration/60) . "h";
+                if ($idx < count($this->customSessionDurations[$key]) - 1) {
+                  echo ", ";
+                }
+              }
+              echo "<br>";
+            }
           }
+        }
+        
+        echo "<hr>";
+      }
+    }
+
+  // private function preAllocateRequiredSessions($days, $timeSlots) 
+  // {
+  //     $preAllocatedSessions = [];
+  //     $usedRooms = [];
+  //     $usedTimeSlots = [];
+      
+  //     foreach ($this->classes as $class) {
+  //         $classId = $class['id_classe'];
+  //         $filiereId = $this->getFiliereForClass($classId);
+  //         $preAllocatedSessions[$classId] = [];
           
-          // Sort by descending priority
-          arsort($matieresPriority);
+  //         // Initialize days
+  //         foreach ($days as $day) {
+  //             $preAllocatedSessions[$classId][$day] = [];
+  //         }
           
-          // Now process each matiere
-          foreach ($matieresPriority as $matiereId => $requiredSessions) {
-              $assignedProf = $this->getAssignedProfesseur($classId, $matiereId);
-              if (!$assignedProf) continue;
+  //         // Get ALL assigned subjects for this class
+  //         $classMatiereIds = $this->getMatieresForClass($classId);
+          
+  //         // Sort matieres by required sessions (descending) to schedule high-priority subjects first
+  //         $matieresPriority = [];
+  //         foreach ($classMatiereIds as $matiereId) {
+  //             $constraintKey = $filiereId . '-' . $matiereId;
+  //             $requiredSessions = isset($this->matiereConstraints[$constraintKey]) ? 
+  //                               $this->matiereConstraints[$constraintKey]['nombre_seance_semaine'] : 1;
+  //             $matieresPriority[$matiereId] = $requiredSessions;
+  //         }
+          
+  //         // Sort by descending priority
+  //         arsort($matieresPriority);
+          
+  //         // Now process each matiere
+  //         foreach ($matieresPriority as $matiereId => $requiredSessions) {
+  //             $assignedProf = $this->getAssignedProfesseur($classId, $matiereId);
+  //             if (!$assignedProf) continue;
               
-              // Try to allocate all required sessions for this subject
-              $sessionsAllocated = 0;
+  //             // Try to allocate all required sessions for this subject
+  //             $sessionsAllocated = 0;
               
-              // First pass: Try to distribute evenly across days
-              foreach ($days as $day) {
-                  if ($sessionsAllocated >= $requiredSessions) break;
+  //             // First pass: Try to distribute evenly across days
+  //             foreach ($days as $day) {
+  //                 if ($sessionsAllocated >= $requiredSessions) break;
                   
-                  // Try at most one session per day in first pass
-                  foreach ($timeSlots as $timeSlot) {
-                      if ($sessionsAllocated >= $requiredSessions) break;
+  //                 // Try at most one session per day in first pass
+  //                 foreach ($timeSlots as $timeSlot) {
+  //                     if ($sessionsAllocated >= $requiredSessions) break;
                       
-                      $timeSlotKey = $timeSlot['start'] . '-' . $timeSlot['end'];
+  //                     $timeSlotKey = $timeSlot['start'] . '-' . $timeSlot['end'];
                       
-                      // Check if this slot is available
-                      if (!isset($usedTimeSlots[$classId][$day][$timeSlotKey]) && 
-                          $this->isTeacherAvailable($assignedProf['enseignant_id'], $day, $timeSlotKey)) {
+  //                     // Check if this slot is available
+  //                     if (!isset($usedTimeSlots[$classId][$day][$timeSlotKey]) && 
+  //                         $this->isTeacherAvailable($assignedProf['enseignant_id'], $day, $timeSlotKey)) {
                           
-                          // Find an available room
-                          $availableRoom = $this->findAvailableRoom($usedRooms, $day, $timeSlotKey);
+  //                         // Find an available room
+  //                         $availableRoom = $this->findAvailableRoom($usedRooms, $day, $timeSlotKey);
                           
-                          if ($availableRoom) {
-                              // Allocate this session
-                              $preAllocatedSessions[$classId][$day][$timeSlotKey] = $this->createSessionEntry(
-                                  $assignedProf,
-                                  $availableRoom,
-                                  $timeSlot['duration']
-                              );
+  //                         if ($availableRoom) {
+  //                             // Allocate this session
+  //                             $preAllocatedSessions[$classId][$day][$timeSlotKey] = $this->createSessionEntry(
+  //                                 $assignedProf,
+  //                                 $availableRoom,
+  //                                 $timeSlot['duration']
+  //                             );
                               
-                              // Mark resources as used
-                              if (!isset($usedTimeSlots[$classId][$day])) {
-                                  $usedTimeSlots[$classId][$day] = [];
-                              }
-                              $usedTimeSlots[$classId][$day][$timeSlotKey] = true;
+  //                             // Mark resources as used
+  //                             if (!isset($usedTimeSlots[$classId][$day])) {
+  //                                 $usedTimeSlots[$classId][$day] = [];
+  //                             }
+  //                             $usedTimeSlots[$classId][$day][$timeSlotKey] = true;
                               
-                              $usedRooms = $this->bookRoom($availableRoom['id_salle'], $usedRooms, $day, $timeSlotKey);
-                              $this->bookResources($assignedProf['enseignant_id'], $availableRoom['id_salle'], $day, $timeSlotKey);
+  //                             $usedRooms = $this->bookRoom($availableRoom['id_salle'], $usedRooms, $day, $timeSlotKey);
+  //                             $this->bookResources($assignedProf['enseignant_id'], $availableRoom['id_salle'], $day, $timeSlotKey);
                               
-                              // Update tracking for constraints
-                              $this->updateSessionTracking($classId, $matiereId, $day);
+  //                             // Update tracking for constraints
+  //                             $this->updateSessionTracking($classId, $matiereId, $day);
                               
-                              $sessionsAllocated++;
-                              // Only allocate one session per day in first pass
-                              break;
-                          }
-                      }
-                  }
-              }
+  //                             $sessionsAllocated++;
+  //                             // Only allocate one session per day in first pass
+  //                             break;
+  //                         }
+  //                     }
+  //                 }
+  //             }
               
-              // Second pass: Fill in remaining sessions wherever possible
-              if ($sessionsAllocated < $requiredSessions) {
-                  foreach ($days as $day) {
-                      if ($sessionsAllocated >= $requiredSessions) break;
+  //             // Second pass: Fill in remaining sessions wherever possible
+  //             if ($sessionsAllocated < $requiredSessions) {
+  //                 foreach ($days as $day) {
+  //                     if ($sessionsAllocated >= $requiredSessions) break;
                       
-                      // Try each time slot on this day
-                      foreach ($timeSlots as $timeSlot) {
-                          if ($sessionsAllocated >= $requiredSessions) break;
+  //                     // Try each time slot on this day
+  //                     foreach ($timeSlots as $timeSlot) {
+  //                         if ($sessionsAllocated >= $requiredSessions) break;
                           
-                          $timeSlotKey = $timeSlot['start'] . '-' . $timeSlot['end'];
+  //                         $timeSlotKey = $timeSlot['start'] . '-' . $timeSlot['end'];
                           
-                          // Check if this slot is available
-                          if (!isset($usedTimeSlots[$classId][$day][$timeSlotKey]) && 
-                              $this->isTeacherAvailable($assignedProf['enseignant_id'], $day, $timeSlotKey)) {
+  //                         // Check if this slot is available
+  //                         if (!isset($usedTimeSlots[$classId][$day][$timeSlotKey]) && 
+  //                             $this->isTeacherAvailable($assignedProf['enseignant_id'], $day, $timeSlotKey)) {
                               
-                              // Find an available room
-                              $availableRoom = $this->findAvailableRoom($usedRooms, $day, $timeSlotKey);
+  //                             // Find an available room
+  //                             $availableRoom = $this->findAvailableRoom($usedRooms, $day, $timeSlotKey);
                               
-                              if ($availableRoom) {
-                                  // Allocate this session
-                                  $preAllocatedSessions[$classId][$day][$timeSlotKey] = $this->createSessionEntry(
-                                      $assignedProf,
-                                      $availableRoom,
-                                      $timeSlot['duration']
-                                  );
+  //                             if ($availableRoom) {
+  //                                 // Allocate this session
+  //                                 $preAllocatedSessions[$classId][$day][$timeSlotKey] = $this->createSessionEntry(
+  //                                     $assignedProf,
+  //                                     $availableRoom,
+  //                                     $timeSlot['duration']
+  //                                 );
                                   
-                                  // Mark resources as used
-                                  if (!isset($usedTimeSlots[$classId][$day])) {
-                                      $usedTimeSlots[$classId][$day] = [];
-                                  }
-                                  $usedTimeSlots[$classId][$day][$timeSlotKey] = true;
+  //                                 // Mark resources as used
+  //                                 if (!isset($usedTimeSlots[$classId][$day])) {
+  //                                     $usedTimeSlots[$classId][$day] = [];
+  //                                 }
+  //                                 $usedTimeSlots[$classId][$day][$timeSlotKey] = true;
                                   
-                                  $usedRooms = $this->bookRoom($availableRoom['id_salle'], $usedRooms, $day, $timeSlotKey);
-                                  $this->bookResources($assignedProf['enseignant_id'], $availableRoom['id_salle'], $day, $timeSlotKey);
+  //                                 $usedRooms = $this->bookRoom($availableRoom['id_salle'], $usedRooms, $day, $timeSlotKey);
+  //                                 $this->bookResources($assignedProf['enseignant_id'], $availableRoom['id_salle'], $day, $timeSlotKey);
                                   
-                                  // Update tracking for constraints
-                                  $this->updateSessionTracking($classId, $matiereId, $day);
+  //                                 // Update tracking for constraints
+  //                                 $this->updateSessionTracking($classId, $matiereId, $day);
                                   
-                                  $sessionsAllocated++;
-                              }
-                          }
-                      }
-                  }
-              }
-          }
+  //                                 $sessionsAllocated++;
+  //                             }
+  //                         }
+  //                     }
+  //                 }
+  //             }
+  //         }
+  //     }
+      
+  //     return $preAllocatedSessions;
+  // }
+
+  private function preAllocateRequiredSessions($days, $timeSlots) 
+  {
+    $preAllocatedSessions = [];
+    $usedRooms = [];
+    $usedTimeSlots = [];
+    
+    foreach ($this->classes as $class) {
+      $classId = $class['id_classe'];
+      $filiereId = $this->getFiliereForClass($classId);
+      $preAllocatedSessions[$classId] = [];
+      
+      // Initialiser les jours
+      foreach ($days as $day) {
+        $preAllocatedSessions[$classId][$day] = [];
       }
       
-      return $preAllocatedSessions;
+      // Obtenir toutes les matières assignées à cette classe
+      $classMatiereIds = $this->getMatieresForClass($classId);
+      
+      // Trier les matières par priorité
+      $matieresPriority = [];
+      foreach ($classMatiereIds as $matiereId) {
+        $constraintKey = $filiereId . '-' . $matiereId;
+        $requiredSessions = isset($this->matiereConstraints[$constraintKey]) ? 
+                          $this->matiereConstraints[$constraintKey]['nombre_seance_semaine'] : 1;
+        $matieresPriority[$matiereId] = $requiredSessions;
+      }
+      
+      // Trier par priorité décroissante
+      arsort($matieresPriority);
+      
+      // Traiter chaque matière
+      foreach ($matieresPriority as $matiereId => $requiredSessions) {
+        // Calculer les durées personnalisées pour les séances
+        $this->calculateSessionDurations($classId, $matiereId);
+        
+        $assignedProf = $this->getAssignedProfesseur($classId, $matiereId);
+        if (!$assignedProf) continue;
+        
+        // Essayer d'allouer toutes les séances requises
+        $sessionsAllocated = 0;
+        
+        // Premier passage: distribution régulière sur les jours
+        foreach ($days as $day) {
+          if ($sessionsAllocated >= $requiredSessions) break;
+          
+          foreach ($timeSlots as $timeSlot) {
+            if ($sessionsAllocated >= $requiredSessions) break;
+            
+            $timeSlotKey = $timeSlot['start'] . '-' . $timeSlot['end'];
+            
+            // Vérifier si ce créneau est disponible
+            if (!isset($usedTimeSlots[$classId][$day][$timeSlotKey]) && 
+                $this->isTeacherAvailable($assignedProf['enseignant_id'], $day, $timeSlotKey)) {
+                
+                // Obtenir la durée personnalisée pour cette séance
+                $sessionDuration = $this->getNextSessionDuration($classId, $matiereId);
+                
+                // Vérifier si la durée peut tenir dans ce créneau horaire
+                if ($sessionDuration <= $timeSlot['duration']) {
+                    // Trouver une salle disponible
+                    $availableRoom = $this->findAvailableRoom($usedRooms, $day, $timeSlotKey);
+                    
+                    if ($availableRoom) {
+                        // Allouer cette séance
+                        $preAllocatedSessions[$classId][$day][$timeSlotKey] = $this->createSessionEntry(
+                            $assignedProf,
+                            $availableRoom,
+                            $sessionDuration
+                        );
+                        
+                        // Marquer les ressources comme utilisées
+                        if (!isset($usedTimeSlots[$classId][$day])) {
+                            $usedTimeSlots[$classId][$day] = [];
+                        }
+                        $usedTimeSlots[$classId][$day][$timeSlotKey] = true;
+                        
+                        $usedRooms = $this->bookRoom($availableRoom['id_salle'], $usedRooms, $day, $timeSlotKey);
+                        $this->bookResources($assignedProf['enseignant_id'], $availableRoom['id_salle'], $day, $timeSlotKey);
+                        
+                        // Mettre à jour le suivi des contraintes
+                        $this->updateSessionTracking($classId, $matiereId, $day, $sessionDuration);
+                        
+                        $sessionsAllocated++;
+                        // Une seule séance par jour dans le premier passage
+                        break;
+                    }
+                }
+            }
+          }
+        }
+        
+        // Deuxième passage: remplir les séances restantes
+        if ($sessionsAllocated < $requiredSessions) {
+          foreach ($days as $day) {
+            if ($sessionsAllocated >= $requiredSessions) break;
+            
+            // Essayer chaque créneau de ce jour
+            foreach ($timeSlots as $timeSlot) {
+              if ($sessionsAllocated >= $requiredSessions) break;
+              
+              $timeSlotKey = $timeSlot['start'] . '-' . $timeSlot['end'];
+              
+              // Vérifier si ce créneau est disponible
+              if (!isset($usedTimeSlots[$classId][$day][$timeSlotKey]) && 
+                  $this->isTeacherAvailable($assignedProf['enseignant_id'], $day, $timeSlotKey)) {
+                  
+                  // Obtenir la durée personnalisée pour cette séance
+                  $sessionDuration = $this->getNextSessionDuration($classId, $matiereId);
+                  
+                  // Vérifier si la durée peut tenir dans ce créneau horaire
+                  if ($sessionDuration <= $timeSlot['duration']) {
+                      // Trouver une salle disponible
+                      $availableRoom = $this->findAvailableRoom($usedRooms, $day, $timeSlotKey);
+                      
+                      if ($availableRoom) {
+                          // Allouer cette séance
+                          $preAllocatedSessions[$classId][$day][$timeSlotKey] = $this->createSessionEntry(
+                              $assignedProf,
+                              $availableRoom,
+                              $sessionDuration
+                          );
+                          
+                          // Marquer les ressources comme utilisées
+                          if (!isset($usedTimeSlots[$classId][$day])) {
+                              $usedTimeSlots[$classId][$day] = [];
+                          }
+                          $usedTimeSlots[$classId][$day][$timeSlotKey] = true;
+                          
+                          $usedRooms = $this->bookRoom($availableRoom['id_salle'], $usedRooms, $day, $timeSlotKey);
+                          $this->bookResources($assignedProf['enseignant_id'], $availableRoom['id_salle'], $day, $timeSlotKey);
+                          
+                          // Mettre à jour le suivi des contraintes
+                          $this->updateSessionTracking($classId, $matiereId, $day, $sessionDuration);
+                          
+                          $sessionsAllocated++;
+                      }
+                  }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return $preAllocatedSessions;
   }
 
     public function debugClassAssignments()
@@ -1003,83 +1200,6 @@ class MultiClassScheduleGenerator
       }
   }
 
-
-  //! function3 hadi kant deja m comentia
-  // public function generateAllSchedules()
-  // {
-  //   $allSchedules = [];
-  //   $usedRooms = [];
-  //   $timeSlots = $this->getDailyTimeSlots();
-  //   $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
-
-  //   foreach ($this->classes as $class) {
-  //     $schedule = [];
-  //     $classMatieres = $this->getMatieresForClass($class['id_classe']);
-  //     $targetHours = $this->getTargetHoursForClass($class['id_classe']);
-  //     $currentHours = 0;
-
-  //     error_log("Generating schedule for class: {$class['nom_classe']}");
-  //     error_log("Target Hours: {$targetHours}");
-  //     error_log("Available Matieres: " . implode(', ', $classMatieres));
-
-
-  //     foreach ($days as $day) {
-  //       $schedule[$day] = [];
-
-  //       foreach ($timeSlots as $timeSlot) {
-  //         $timeSlotKey = $timeSlot['start'] . '-' . $timeSlot['end'];
-  //         error_log("Day: {$day}, TimeSlot: {$timeSlot['start']}-{$timeSlot['end']}");
-
-  //         if ($currentHours >= $targetHours) {
-  //           $schedule[$day][$timeSlotKey] = null;
-  //           continue;
-  //         }
-
-  //         // Sort matieres by priority (based on remaining required sessions)
-  //         $prioritizedMatieres = $this->prioritizeMatieres($class['id_classe'], $classMatieres);
-
-  //         foreach ($prioritizedMatieres as $matiereId) {
-  //           if ($this->canAddSession($class['id_classe'], $matiereId, $day)) {
-  //             $assignedProf = $this->getAssignedProfesseur($class['id_classe'], $matiereId);
-
-  //             if ($this->isValidSession($assignedProf, $day, $timeSlotKey, $class['id_classe'])) {
-  //               $availableRoom = $this->findAvailableRoom($usedRooms, $day, $timeSlotKey);
-
-  //               if ($availableRoom) {
-  //                 $schedule[$day][$timeSlotKey] = $this->createSessionEntry(
-  //                   $assignedProf,
-  //                   $availableRoom,
-  //                   $timeSlot['duration']
-  //                 );
-
-  //                 $this->updateSessionTracking($class['id_classe'], $matiereId, $day);
-  //                 $this->bookResources($assignedProf['enseignant_id'], $availableRoom['id_salle'], $day, $timeSlotKey);
-
-  //                 $currentHours += $timeSlot['duration'] / 60;
-  //                 break;
-  //               }
-  //             }
-  //           }
-  //         }
-
-  //         if (!isset($schedule[$day][$timeSlotKey])) {
-  //           $schedule[$day][$timeSlotKey] = null;
-  //         }
-  //       }
-  //     }
-
-  //     $allSchedules[$class['id_classe']] = [
-  //       'class_name' => $class['nom_classe'],
-  //       'target_hours' => $targetHours,
-  //       'actual_hours' => $currentHours,
-  //       'schedule' => $schedule
-  //     ];
-  //   }
-
-  //   return $allSchedules;
-  // }
-
-
   private function isValidSession($assignedProf, $day, $timeSlotKey, $classId)
   {
     if (!$assignedProf) {
@@ -1134,27 +1254,6 @@ class MultiClassScheduleGenerator
     arsort($priorityList);
     return array_keys($priorityList);
   }
-
-  //! function2 updated
-  // private function calculateMatierePriority($classId, $matiereId)
-  // {
-  //   $filiereId = $this->getFiliereForClass($classId);
-  //   $constraintKey = $filiereId . '-' . $matiereId;
-
-  //   if (!isset($this->matiereConstraints[$constraintKey])) {
-  //     return 0;
-  //   }
-
-  //   $requiredSessions = $this->matiereConstraints[$constraintKey]['nombre_seance_semaine'];
-  //   $currentSessions = $this->weeklyMatiereCount[$classId][$matiereId];
-  //   $coefficient = $this->matiereConstraints[$constraintKey]['coefficient'];
-
-  //   // Priority formula: (remaining_sessions * coefficient) + urgency_factor
-  //   $remainingSessions = $requiredSessions - $currentSessions;
-  //   $urgencyFactor = ($remainingSessions > 0) ? ($coefficient * 2) : 0;
-
-  //   return ($remainingSessions * $coefficient) + $urgencyFactor;
-  // }
 
   private function calculateMatierePriority($classId, $matiereId)
   {
@@ -1246,10 +1345,16 @@ class MultiClassScheduleGenerator
 }
 
 // Initialize and generate schedules
+// $generator = new MultiClassScheduleGenerator();
+// // $generator->testScheduleGeneration(); // Test the fix first
+// $generator->debugClassAssignments(); // Debug class assignments
+// $generator->debugMatiereAllocation(); // Debug specific subject allocations
+// $allSchedules = $generator->generateAllSchedules();
+// $teachersSchedule = $generator->getTeachersSchedule();
+// $roomsSchedule = $generator->getRoomsSchedule();
+
 $generator = new MultiClassScheduleGenerator();
-// $generator->testScheduleGeneration(); // Test the fix first
-$generator->debugClassAssignments(); // Debug class assignments
-$generator->debugMatiereAllocation(); // Debug specific subject allocations
 $allSchedules = $generator->generateAllSchedules();
+$generator->debugMatiereHours(); // Afficher les statistiques d'heures par matière
 $teachersSchedule = $generator->getTeachersSchedule();
 $roomsSchedule = $generator->getRoomsSchedule();

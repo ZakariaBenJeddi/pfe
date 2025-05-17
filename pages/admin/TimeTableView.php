@@ -11,24 +11,6 @@ require('../../includes/deconnexion_5s.php');
 require_once __DIR__ . '/../../includes/DatabaseConnexion.php';
 require_once __DIR__ . '/../../includes/admin/controller/controller_timeTable.php';
 
-// if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-//   $timeTableData = new TimeTableData();
-//   // Get week dates if provided
-//   $weekStart = null;
-//   $weekEnd = null;
-//   if (isset($_GET['week'])) {
-//       list($weekStart, $weekEnd) = explode(',', $_GET['week']);
-//   }
-//   if (isset($_GET['teacher'])) {
-//       echo $timeTableData->getSpecificTeacherSchedule($_GET['teacher'], $weekStart, $weekEnd);
-//   } elseif (isset($_GET['group'])) {
-//       echo $timeTableData->getSpecificGroupSchedule($_GET['group'], $weekStart, $weekEnd);
-//   } elseif (isset($_GET['room'])) {
-//       echo $timeTableData->getSpecificRoomSchedule($_GET['room'], $weekStart, $weekEnd);
-//   }
-//   exit;
-// }
-
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
   try {
     $timeTableData = new TimeTableData();

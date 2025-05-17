@@ -1,3 +1,4 @@
+// Ce script gère le chargement dynamique des élèves en fonction de la classe sélectionnée
 document.addEventListener('DOMContentLoaded', function() {
   const classeSelect = document.getElementById('classe_box');
   const eleveSelect = document.getElementById('eleve_box');

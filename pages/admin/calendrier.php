@@ -1,9 +1,9 @@
 <?php
+include('../../includes/admin/controller/controller.php');
 session_start();
-require('../../includes/DatabaseConnexion.php');
 
 if (empty($_SESSION['user'])) {
-    header('location:sign-in.php');
+    header('location:../sign-in.php');
 }
 
 //* deconnexion 5s
@@ -111,13 +111,13 @@ if (isset($_GET['action'])) {
                 <div class="container my-4">
                     <div class="row mb-3 text-center text-md-start">
                         <div class="col-12 col-md-4 mb-2">
+                            <a class="btn btn-primary w-100 btn-sm" data-bs-toggle="modal" data-bs-target="#CalendarModal">Ajouter Seance</a>
+                        </div>
+                        <div class="col-12 col-md-4 mb-2">
                             <button type="button" class="btn btn-primary w-100 btn-sm" id="import-btn">Importer</button>
                         </div>
                         <div class="col-12 col-md-4 mb-2">
                             <a href="export_excel.php" class="btn btn-primary w-100 btn-sm">Exporter</a>
-                        </div>
-                        <div class="col-12 col-md-4 mb-2">
-                            <a class="btn btn-primary w-100 btn-sm" data-bs-toggle="modal" data-bs-target="#CalendarModal">Ajouter Seance</a>
                         </div>
                     </div>
                 </div>

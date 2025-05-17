@@ -286,6 +286,8 @@ if (isset($_POST['save'])) {
 
   <!-- Tarif passer les info a modal -->
   <script src="../../assets/js/paiement_eleves.js"></script>
+  <!-- FILIRE ET CLASSE SELON LE NIVEAU -->
+  <script src="../../assets/js/niveau_filiere_classe.js"></script>
 
   <!-- //* Date Picker + AJAX eleves intervalle date  -->
   <script src="../../assets/dateP_dateP/dateP_dataP_paiement.js"></script>
@@ -296,6 +298,144 @@ if (isset($_POST['save'])) {
 
   <!-- sweet alert -->
   <script src="../../assets/js/alerts/sweet_alert.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+  // Gestionnaire d'événement pour l'ouverture du modal de paiement
+  $('#paiementModal').on('show.bs.modal', function(event) {
+    const button = $(event.relatedTarget); // Bouton qui a déclenché le modal
+    
+    // Récupérer les données de l'attribut data-*
+    const id_paiement = button.data('id');
+    const id_eleve = button.data('id-eleve');
+    const id_tarif = button.data('id-tarif');
+    const id_periode = button.data('id-periode');
+    const montant_base = button.data('montant-base');
+    const reduction_appliquee = button.data('reduction-appliquee');
+    const montant_final = button.data('montant-final');
+    const date_paiement = button.data('date-paiement');
+    const date_debut_periode = button.data('date-debut-periode');
+    const mode_paiement = button.data('mode-paiement');
+    const reference_paiement = button.data('reference-paiement');
+    const statut_paiement = button.data('statut-paiement');
+    const commentaire = button.data('commentaire');
+
+    // Si id_paiement existe, c'est une modification
+    if (id_paiement) {
+      // Mettre à jour le titre du modal
+      $(this).find('.modal-title').text('Modifier le Paiement');
+      
+      // Remplir les champs avec les valeurs existantes
+      $('#id_paiement').val(id_paiement);
+      $('#id_eleve').val(id_eleve).trigger('change');
+      $('#id_tarif').val(id_tarif).trigger('change');
+      $('#id_periode').val(id_periode).trigger('change');
+      $('#montant_base').val(montant_base);
+      $('#reduction_appliquee').val(reduction_appliquee);
+      $('#montant_final').val(montant_final);
+      $('#date_paiement').val(date_paiement);
+      $('#date_debut_periode').val(date_debut_periode);
+      $('#mode_paiement').val(mode_paiement);
+      $('#reference_paiement').val(reference_paiement);
+      $('#statut_paiement').val(statut_paiement);
+      $('#commentaire').val(commentaire);
+      
+      // Récupérer les informations de l'élève pour mettre à jour les champs niveau, filière et classe
+      const eleve_option = $('#id_eleve option[value="' + id_eleve + '"]');
+      if (eleve_option.length) {
+        const niveau_id = eleve_option.data('niveau');
+        const filiere_id = eleve_option.data('filiere');
+        
+        // Mettre à jour les sélecteurs de niveau et filière
+        $('#niveau_scolaire_eleve').val(niveau_id).change();
+        setTimeout(() => {
+          $('#filiere_eleve').val(filiere_id).change();
+          // Permettre un délai pour que la liste des classes se mette à jour
+          setTimeout(() => {
+            // La classe sera mise à jour automatiquement si vous avez une logique pour cela
+          }, 100);
+        }, 100);
+      }
+    } else {
+      // C'est un nouveau paiement
+      $(this).find('.modal-title').text('Nouveau Paiement');
+      $(this).find('form')[0].reset();
+      $('#id_paiement').val('');
+    }
+  });
+
+  // Calcul automatique du montant final lors du changement de tarif ou de période
+  $('#id_tarif, #id_periode').change(function() {
+    calculateMontantFinal();
+  });
+
+  function calculateMontantFinal() {
+    const tarif = $('#id_tarif option:selected');
+    const periode = $('#id_periode option:selected');
+    
+    if (tarif.length && periode.length) {
+      const montant_base = parseFloat(tarif.data('montant')) || 0;
+      const reduction_pourcentage = parseFloat(periode.data('reduction')) || 0;
+      
+      $('#montant_base').val(montant_base);
+      
+      const reduction_montant = (montant_base * reduction_pourcentage) / 100;
+      $('#reduction_appliquee').val(reduction_montant.toFixed(2));
+      
+      const montant_final = montant_base - reduction_montant;
+      $('#montant_final').val(montant_final.toFixed(2));
+    }
+  }
+
+  // Gestion des dépendances entre niveau, filière et classe
+  $('#niveau_scolaire_eleve').change(function() {
+    const niveau_id = $(this).val();
+    
+    // Filtrer les filières disponibles pour ce niveau
+    $('#filiere_eleve').prop('disabled', !niveau_id);
+    $('#filiere_eleve option').hide();
+    $('#filiere_eleve option[value=""]').show();
+    $('#filiere_eleve option[data-niveau="' + niveau_id + '"]').show();
+    $('#filiere_eleve').val('');
+    
+    // Réinitialiser la classe
+    $('#classe_eleve').prop('disabled', true);
+    $('#classe_eleve').val('');
+  });
+
+  $('#filiere_eleve').change(function() {
+    const filiere_id = $(this).val();
+    
+    // Filtrer les classes disponibles pour cette filière
+    $('#classe_eleve').prop('disabled', !filiere_id);
+    $('#classe_eleve option').hide();
+    $('#classe_eleve option[value=""]').show();
+    $('#classe_eleve option[data-filiere="' + filiere_id + '"]').show();
+    $('#classe_eleve').val('');
+    
+    // Filtrer les élèves selon le niveau et la filière sélectionnés
+    const niveau_id = $('#niveau_scolaire_eleve').val();
+    $('#id_eleve option').hide();
+    $('#id_eleve option[value=""]').show();
+    $('#id_eleve option[data-niveau="' + niveau_id + '"][data-filiere="' + filiere_id + '"]').show();
+    $('#id_eleve').val('');
+  });
+
+  // Filtrer les tarifs selon le niveau et la filière sélectionnés
+  $('#id_eleve').change(function() {
+    const eleve_option = $('#id_eleve option:selected');
+    if (eleve_option.length) {
+      const niveau_id = eleve_option.data('niveau');
+      const filiere_id = eleve_option.data('filiere');
+      
+      $('#id_tarif option').hide();
+      $('#id_tarif option[value=""]').show();
+      $('#id_tarif option[data-niveau="' + niveau_id + '"][data-filiere="' + filiere_id + '"]').show();
+      $('#id_tarif').val('');
+    }
+  });
+});
+  </script>
 
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
