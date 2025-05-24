@@ -346,39 +346,46 @@ try {
                   </tr>
                 </thead>
                 <tbody id="tableBody">
-                  <?php foreach ($paiements_eleves['data'] as $result) : ?>
-                    <tr>
-                      <td style="cursor:pointer" <?php if ($result->statut_paiement === "Validé") { ?>
-                        onclick="genererPDFPaiement(<?= $result->id_paiement ?>)" <?php } else { ?> onclick="window.location.href='paiements_eleves.php?error=<?= urlencode('Paiement non validé') ?>'" <?php } ?>>
-                        <div class="d-flex px-2 py-1">
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm"><?= $result->id_paiement ?></h6>
+                  <?php 
+                    if (!empty($paiements_eleves) && isset($paiements_eleves['data']) && is_array($paiements_eleves['data'])) {
+                      foreach ($paiements_eleves['data'] as $result) { ?>
+                      <tr>
+                        <td style="cursor:pointer" <?php if ($result->statut_paiement === "Validé") { ?>
+                          onclick="genererPDFPaiement(<?= $result->id_paiement ?>)" <?php } else { ?> onclick="window.location.href='paiements_eleves.php?error=<?= urlencode('Paiement non validé') ?>'" <?php } ?>>
+                          <div class="d-flex px-2 py-1">
+                            <div class="d-flex flex-column justify-content-center">
+                              <h6 class="mb-0 text-sm"><?= $result->id_paiement ?></h6>
+                            </div>
+                            <?php if ($result->statut_paiement === "Validé") { ?>
+                              <i class="fas fa-file-pdf text-primary ms-2"></i> <!-- Icône PDF -->
+                            <?php } ?>
                           </div>
-                          <?php if ($result->statut_paiement === "Validé") { ?>
-                            <i class="fas fa-file-pdf text-primary ms-2"></i> <!-- Icône PDF -->
-                          <?php } ?>
-                        </div>
-                      </td>
-                      <td><?= htmlspecialchars($result->nom_periode) ?></td>
-                      <td><?= htmlspecialchars($result->nom_frais) ?></td>
-                      <td><?= number_format($result->montant_final, 2) ?> MAD</td>
-                      <td><?= htmlspecialchars($result->mode_paiement) ?></td>
-                      <td><?= htmlspecialchars($result->date_paiement) ?></td>
-                      <td>
-                        <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
-                          <?php if ($result->statut_paiement === "En attente") { ?>
-                            <span class="badge badge-md bg-gradient-secondary"><?= $result->statut_paiement ?></span>
-                          <?php } ?>
-                          <?php if ($result->statut_paiement === "Validé") { ?>
-                            <span class="badge badge-md bg-gradient-success"><?= $result->statut_paiement ?></span>
-                          <?php } ?>
-                          <?php if ($result->statut_paiement === "Annulé") { ?>
-                            <span class="badge badge-md bg-gradient-danger"><?= $result->statut_paiement ?></span>
-                          <?php } ?>
-                        </p>
-                      </td>
-                    </tr>
-                  <?php endforeach; ?>
+                        </td>
+                        <td><?= htmlspecialchars($result->nom_periode) ?></td>
+                        <td><?= htmlspecialchars($result->nom_frais) ?></td>
+                        <td><?= number_format($result->montant_final, 2) ?> MAD</td>
+                        <td><?= htmlspecialchars($result->mode_paiement) ?></td>
+                        <td><?= htmlspecialchars($result->date_paiement) ?></td>
+                        <td>
+                          <p class="text-xs font-weight-bold mb-0 ms-lg-5 ms-5">
+                            <?php if ($result->statut_paiement === "En attente") { ?>
+                              <span class="badge badge-md bg-gradient-secondary"><?= $result->statut_paiement ?></span>
+                            <?php } ?>
+                            <?php if ($result->statut_paiement === "Validé") { ?>
+                              <span class="badge badge-md bg-gradient-success"><?= $result->statut_paiement ?></span>
+                            <?php } ?>
+                            <?php if ($result->statut_paiement === "Annulé") { ?>
+                              <span class="badge badge-md bg-gradient-danger"><?= $result->statut_paiement ?></span>
+                            <?php } ?>
+                          </p>
+                        </td>
+                      </tr>
+                    <?php }
+                    }else{ ?>
+                      <tr>
+                        <td colspan="7" class="text-center">Aucun paiement trouvé pour cet élève.</td>
+                      </tr>
+                    <?php } ?>
                 </tbody>
               </table>
             </div>
