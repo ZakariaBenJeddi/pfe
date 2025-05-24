@@ -3068,3 +3068,217 @@ if (file_exists($filePath)) {
     }
     
 // =============== Evaluation ================
+
+// =============== Routes ================
+    function get_all_routes($dbh)
+    {
+        try {
+            $sql = "CALL get_all_routes()";
+            $stmt = $dbh->query($sql);
+            $result = $stmt->fetchAll(PDO::FETCH_OBJ);
+            return $result;
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+            die("Erreur lors de la récupération des routes.");
+            return [];
+        }
+    }
+
+    function get_route_by_id($dbh, $id) {
+        try {
+            // Validation de l'ID
+            $id = filter_var($id, FILTER_VALIDATE_INT);
+            if ($id === false || $id === null) {
+                throw new Exception('ID invalide');
+            }
+
+            // Appel de la procédure stockée
+            $sql = "CALL get_route_by_id(:id)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            $result = $stmt->fetch(PDO::FETCH_OBJ);
+            if ($result) {
+                return [
+                    'success' => true,
+                    'data' => $result
+                ];
+            } else {
+                throw new Exception('Route non trouvée');
+            }
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+            return [
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de la récupération de la route'
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    function delete_route($dbh, $id) {
+        try {
+            // Validation de l'ID
+            $id = filter_var($id, FILTER_VALIDATE_INT);
+            if ($id === false || $id === null) {
+                throw new Exception('ID invalide');
+            }
+
+            // Appel de la procédure stockée
+            $sql = "CALL delete_route(:id)";
+            $stmt = $dbh->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            
+            if ($stmt->execute()) {
+                return [
+                    'success' => true,
+                    'message' => 'Route supprimée avec succès'
+                ];
+            } else {
+                throw new Exception('Échec de la suppression');
+            }
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+            return [
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de la suppression'
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    function add_route($dbh, $route_name, $start_latitude, $start_longitude, $end_latitude, $end_longitude) {
+        try {
+            // Validation des données
+            if (empty($route_name)) {
+                throw new Exception('Le nom de la route est requis');
+            }
+            
+            if (!is_numeric($start_latitude) || !is_numeric($start_longitude) || 
+                !is_numeric($end_latitude) || !is_numeric($end_longitude)) {
+                throw new Exception('Les coordonnées doivent être des valeurs numériques');
+            }
+
+            // Validation des plages de latitude et longitude
+            if ($start_latitude < -90 || $start_latitude > 90 || $end_latitude < -90 || $end_latitude > 90) {
+                throw new Exception('La latitude doit être comprise entre -90 et 90');
+            }
+            
+            if ($start_longitude < -180 || $start_longitude > 180 || $end_longitude < -180 || $end_longitude > 180) {
+                throw new Exception('La longitude doit être comprise entre -180 et 180');
+            }
+
+            // Nettoyage des données
+            $route_name = trim(strip_tags($route_name));
+            $start_latitude = floatval($start_latitude);
+            $start_longitude = floatval($start_longitude);
+            $end_latitude = floatval($end_latitude);
+            $end_longitude = floatval($end_longitude);
+
+            // Appel de la procédure stockée
+            $sql = "CALL add_route(:route_name, :start_latitude, :start_longitude, :end_latitude, :end_longitude)";
+            $stmt = $dbh->prepare($sql);
+            
+            $stmt->bindParam(':route_name', $route_name, PDO::PARAM_STR);
+            $stmt->bindParam(':start_latitude', $start_latitude, PDO::PARAM_STR);
+            $stmt->bindParam(':start_longitude', $start_longitude, PDO::PARAM_STR);
+            $stmt->bindParam(':end_latitude', $end_latitude, PDO::PARAM_STR);
+            $stmt->bindParam(':end_longitude', $end_longitude, PDO::PARAM_STR);
+
+            if ($stmt->execute()) {
+                return [
+                    'success' => true,
+                    'message' => 'Route ajoutée avec succès'
+                ];
+            } else {
+                throw new Exception('Échec de l\'ajout de la route');
+            }
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+            return [
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de l\'ajout de la route'
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    function update_route($dbh, $route_id, $route_name, $start_latitude, $start_longitude, $end_latitude, $end_longitude) {
+        try {
+            // Validation des données
+            if (empty($route_name)) {
+                throw new Exception('Le nom de la route est requis');
+            }
+
+            $route_id = filter_var($route_id, FILTER_VALIDATE_INT);
+            if ($route_id === false || $route_id === null) {
+                throw new Exception('ID invalide');
+            }
+            
+            if (!is_numeric($start_latitude) || !is_numeric($start_longitude) || 
+                !is_numeric($end_latitude) || !is_numeric($end_longitude)) {
+                throw new Exception('Les coordonnées doivent être des valeurs numériques');
+            }
+
+            // Validation des plages de latitude et longitude
+            if ($start_latitude < -90 || $start_latitude > 90 || $end_latitude < -90 || $end_latitude > 90) {
+                throw new Exception('La latitude doit être comprise entre -90 et 90');
+            }
+            
+            if ($start_longitude < -180 || $start_longitude > 180 || $end_longitude < -180 || $end_longitude > 180) {
+                throw new Exception('La longitude doit être comprise entre -180 et 180');
+            }
+
+            // Nettoyage des données
+            $route_name = trim(strip_tags($route_name));
+            $start_latitude = floatval($start_latitude);
+            $start_longitude = floatval($start_longitude);
+            $end_latitude = floatval($end_latitude);
+            $end_longitude = floatval($end_longitude);
+
+            // Appel de la procédure stockée
+            $sql = "CALL update_route(:route_id, :route_name, :start_latitude, :start_longitude, :end_latitude, :end_longitude)";
+            $stmt = $dbh->prepare($sql);
+            
+            $stmt->bindParam(':route_id', $route_id, PDO::PARAM_INT);
+            $stmt->bindParam(':route_name', $route_name, PDO::PARAM_STR);
+            $stmt->bindParam(':start_latitude', $start_latitude, PDO::PARAM_STR);
+            $stmt->bindParam(':start_longitude', $start_longitude, PDO::PARAM_STR);
+            $stmt->bindParam(':end_latitude', $end_latitude, PDO::PARAM_STR);
+            $stmt->bindParam(':end_longitude', $end_longitude, PDO::PARAM_STR);
+
+            if ($stmt->execute()) {
+                return [
+                    'success' => true,
+                    'message' => 'Route modifiée avec succès'
+                ];
+            } else {
+                throw new Exception('Échec de la modification de la route');
+            }
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, '/path/to/secure_log_file.log');
+            return [
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de la modification de la route'
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+// =============== Routes ================
