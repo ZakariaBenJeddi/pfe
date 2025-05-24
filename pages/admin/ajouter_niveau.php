@@ -79,12 +79,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
                       </select>
                     </div>
                   </div>
-                  <!-- <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="nombre_heures_max" class="form-control-label">Nombre d'heures max</label>
-                      <input class="form-control" type="number" name="nombre_heures_max" id="nombre_heures_max" required>
-                    </div>
-                  </div> -->
                 </div>
 
                 <div class="row">
