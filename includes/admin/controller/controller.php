@@ -502,6 +502,89 @@ if (file_exists($filePath)) {
         }
     }
 
+    // function ajouterEleve($dbh, $donnees_eleve) {
+    //     try {
+    //         // Validation des données requises
+    //         $champs_requis = ['nom_eleve', 'prenom_eleve', 'date_naissance_eleve', 'email_eleve'];
+    //         foreach ($champs_requis as $champ) {
+    //             if (empty($donnees_eleve[$champ])) {
+    //                 return [
+    //                     'success' => false,
+    //                     'message' => "Le champ $champ est requis."
+    //                 ];
+    //             }
+    //         }
+    
+    //         // Validation de l'email
+    //         if (!filter_var($donnees_eleve['email_eleve'], FILTER_VALIDATE_EMAIL)) {
+    //             return [
+    //                 'success' => false,
+    //                 'message' => "L'adresse email n'est pas valide."
+    //             ];
+    //         }
+    
+    //         // Appel de la procédure stockée
+    //         $sql = "CALL ajouter_eleve(
+    //             :id_niveau, :id_classe, :id_filiere, :code_massare, :nom, :prenom, :date_naissance, :genre, :nationalite,
+    //             :adresse, :telephone, :email, :date_inscription, :statut,
+    //             :historique_scolaire, :langues_parlees, :nom_tuteur,
+    //             :telephone_tuteur, :email_tuteur, :profession_tuteur,
+    //             :besoins_speciaux, :langue_etrangere,
+    //             :niveau_de_satisfaction
+    //         )";
+    
+    //         $stmt = $dbh->prepare($sql);
+    //         $stmt->execute([
+    //             ':id_niveau' => $donnees_eleve['niveau_scolaire_eleve'],
+    //             ':id_classe' => $donnees_eleve['classe_eleve'] ?: null,  // Gérer les valeurs vides
+    //             ':id_filiere' => $donnees_eleve['filiere_eleve'] ?: null, // Gérer les valeurs vides
+    //             ':code_massare' => $donnees_eleve['code_massare'],
+    //             ':nom' => $donnees_eleve['nom_eleve'],
+    //             ':prenom' => $donnees_eleve['prenom_eleve'],
+    //             ':date_naissance' => $donnees_eleve['date_naissance_eleve'],
+    //             ':genre' => $donnees_eleve['genre_eleve'],
+    //             ':nationalite' => $donnees_eleve['nationalite_eleve'],
+    //             ':adresse' => $donnees_eleve['adresse_eleve'],
+    //             ':telephone' => $donnees_eleve['telephone_eleve'],
+    //             ':email' => $donnees_eleve['email_eleve'],
+    //             ':date_inscription' => $donnees_eleve['date_inscription_eleve'],
+    //             ':statut' => $donnees_eleve['statut_eleve'],
+    //             ':historique_scolaire' => $donnees_eleve['historique_scolaire_eleve'] ?: null,
+    //             ':langues_parlees' => $donnees_eleve['langues_parlees_eleve'],
+    //             ':nom_tuteur' => $donnees_eleve['nom_tuteur_eleve'],
+    //             ':telephone_tuteur' => $donnees_eleve['telephone_tuteur_eleve'],
+    //             ':email_tuteur' => $donnees_eleve['email_tuteur_eleve'],
+    //             ':profession_tuteur' => $donnees_eleve['profession_tuteur_eleve'],
+    //             ':besoins_speciaux' => $donnees_eleve['besoins_speciaux_eleve'] ?: null,
+    //             ':langue_etrangere' => $donnees_eleve['langue_etrangere_eleve'],
+    //             ':niveau_de_satisfaction' => $donnees_eleve['niveau_de_satisfaction_eleve']
+    //         ]);
+            
+    //         // Correction: Récupérer correctement le jeu de résultats
+    //         $result = null;
+    //         do {
+    //             if ($stmt->columnCount() > 0) {
+    //                 $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    //                 break;
+    //             }
+    //         } while ($stmt->nextRowset());
+            
+    //         $id_eleve = $result ? $result['id_eleve'] : null;
+    
+    //         return [
+    //             'success' => true,
+    //             'message' => 'Élève ajouté avec succès',
+    //             'id_eleve' => $id_eleve
+    //         ];
+    
+    //     } catch (PDOException $e) {
+    //         error_log($e->getMessage());
+    //         return [
+    //             'success' => false,
+    //             'message' => 'Une erreur est survenue lors de l\'ajout de l\'élève: ' . $e->getMessage()
+    //         ];
+    //     }
+    // }
     function ajouterEleve($dbh, $donnees_eleve) {
         try {
             // Validation des données requises
@@ -514,7 +597,7 @@ if (file_exists($filePath)) {
                     ];
                 }
             }
-    
+
             // Validation de l'email
             if (!filter_var($donnees_eleve['email_eleve'], FILTER_VALIDATE_EMAIL)) {
                 return [
@@ -522,22 +605,45 @@ if (file_exists($filePath)) {
                     'message' => "L'adresse email n'est pas valide."
                 ];
             }
-    
-            // Appel de la procédure stockée
+
+            // Validation des coordonnées GPS (optionnelles mais doivent être numériques si fournies)
+            if (!empty($donnees_eleve['latitude_eleve']) && !is_numeric($donnees_eleve['latitude_eleve'])) {
+                return [
+                    'success' => false,
+                    'message' => "La latitude doit être un nombre valide."
+                ];
+            }
+            
+            if (!empty($donnees_eleve['longitude_eleve']) && !is_numeric($donnees_eleve['longitude_eleve'])) {
+                return [
+                    'success' => false,
+                    'message' => "La longitude doit être un nombre valide."
+                ];
+            }
+
+            // Validation de stop_order (doit être un entier positif si fourni)
+            if (!empty($donnees_eleve['stop_order_eleve']) && (!is_numeric($donnees_eleve['stop_order_eleve']) || $donnees_eleve['stop_order_eleve'] < 0)) {
+                return [
+                    'success' => false,
+                    'message' => "L'ordre d'arrêt doit être un nombre entier positif."
+                ];
+            }
+
+            // Appel de la procédure stockée mise à jour
             $sql = "CALL ajouter_eleve(
                 :id_niveau, :id_classe, :id_filiere, :code_massare, :nom, :prenom, :date_naissance, :genre, :nationalite,
                 :adresse, :telephone, :email, :date_inscription, :statut,
                 :historique_scolaire, :langues_parlees, :nom_tuteur,
                 :telephone_tuteur, :email_tuteur, :profession_tuteur,
                 :besoins_speciaux, :langue_etrangere,
-                :niveau_de_satisfaction
+                :niveau_de_satisfaction, :latitude, :longitude, :route_id, :stop_order
             )";
-    
+
             $stmt = $dbh->prepare($sql);
             $stmt->execute([
                 ':id_niveau' => $donnees_eleve['niveau_scolaire_eleve'],
-                ':id_classe' => $donnees_eleve['classe_eleve'] ?: null,  // Gérer les valeurs vides
-                ':id_filiere' => $donnees_eleve['filiere_eleve'] ?: null, // Gérer les valeurs vides
+                ':id_classe' => $donnees_eleve['classe_eleve'] ?: null,
+                ':id_filiere' => $donnees_eleve['filiere_eleve'] ?: null,
                 ':code_massare' => $donnees_eleve['code_massare'],
                 ':nom' => $donnees_eleve['nom_eleve'],
                 ':prenom' => $donnees_eleve['prenom_eleve'],
@@ -557,7 +663,11 @@ if (file_exists($filePath)) {
                 ':profession_tuteur' => $donnees_eleve['profession_tuteur_eleve'],
                 ':besoins_speciaux' => $donnees_eleve['besoins_speciaux_eleve'] ?: null,
                 ':langue_etrangere' => $donnees_eleve['langue_etrangere_eleve'],
-                ':niveau_de_satisfaction' => $donnees_eleve['niveau_de_satisfaction_eleve']
+                ':niveau_de_satisfaction' => $donnees_eleve['niveau_de_satisfaction_eleve'],
+                ':latitude' => !empty($donnees_eleve['latitude_eleve']) ? $donnees_eleve['latitude_eleve'] : null,
+                ':longitude' => !empty($donnees_eleve['longitude_eleve']) ? $donnees_eleve['longitude_eleve'] : null,
+                ':route_id' => !empty($donnees_eleve['route_id_eleve']) ? $donnees_eleve['route_id_eleve'] : null,
+                ':stop_order' => !empty($donnees_eleve['stop_order_eleve']) ? $donnees_eleve['stop_order_eleve'] : null
             ]);
             
             // Correction: Récupérer correctement le jeu de résultats
@@ -570,13 +680,13 @@ if (file_exists($filePath)) {
             } while ($stmt->nextRowset());
             
             $id_eleve = $result ? $result['id_eleve'] : null;
-    
+
             return [
                 'success' => true,
                 'message' => 'Élève ajouté avec succès',
                 'id_eleve' => $id_eleve
             ];
-    
+
         } catch (PDOException $e) {
             error_log($e->getMessage());
             return [
@@ -611,10 +721,102 @@ if (file_exists($filePath)) {
         }
     }
 
-    function modifierEleve($dbh, $donnees_eleve, $fichier_image = null) {
+    // function modifierEleve($dbh, $donnees_eleve, $fichier_image = null) {
+    //     try {
+    //         // Validation des données requises
+    //         $champs_requis = ['id_eleve', 'nom_eleve', 'prenom_eleve', 'email_eleve'];
+    //         foreach ($champs_requis as $champ) {
+    //             if (empty($donnees_eleve[$champ])) {
+    //                 return [
+    //                     'success' => false,
+    //                     'message' => "Le champ $champ est requis."
+    //                 ];
+    //             }
+    //         }
+    
+    //         // Gestion de l'upload d'image
+    //         $photo = null;
+    //         if ($fichier_image && !empty($fichier_image['name'])) {
+    //             $resultat_upload = gererUploadImage($fichier_image);
+    //             if (!$resultat_upload['success']) {
+    //                 return $resultat_upload;
+    //             }
+    //             $photo = $resultat_upload['filename'];
+    //         }
+    
+    //         // Appel de la procédure stockée
+    //         $sql = "CALL modifier_eleve(
+    //             :id_eleve, :id_niveau, :id_classe, :id_filiere, :nom, :prenom, :date_naissance, :genre, 
+    //             :nationalite, :adresse, :telephone, :email, :date_inscription,
+    //             :statut, :historique_scolaire, :langues_parlees, :nom_tuteur,
+    //             :telephone_tuteur, :email_tuteur, :profession_tuteur,
+    //             :besoins_speciaux, :langue_etrangere,
+    //             :niveau_de_satisfaction, :photo
+    //         )";
+    
+    //         $stmt = $dbh->prepare($sql);
+    //         $stmt->execute([
+    //             ':id_eleve' => $donnees_eleve['id_eleve'],
+    //             ':id_niveau' => $donnees_eleve['niveau_scolaire_eleve'],
+    //             ':id_classe' => $donnees_eleve['classe_eleve'],
+    //             ':id_filiere' => $donnees_eleve['filiere_eleve'],
+    //             ':nom' => $donnees_eleve['nom_eleve'],
+    //             ':prenom' => $donnees_eleve['prenom_eleve'],
+    //             ':date_naissance' => $donnees_eleve['date_naissance_eleve'],
+    //             ':genre' => $donnees_eleve['genre_eleve'],
+    //             ':nationalite' => $donnees_eleve['nationalite_eleve'],
+    //             ':adresse' => $donnees_eleve['adresse_eleve'],
+    //             ':telephone' => $donnees_eleve['telephone_eleve'],
+    //             ':email' => $donnees_eleve['email_eleve'],
+    //             ':date_inscription' => $donnees_eleve['date_inscription_eleve'],
+    //             ':statut' => $donnees_eleve['statut_eleve'],
+    //             ':historique_scolaire' => $donnees_eleve['historique_scolaire_eleve'],
+    //             ':langues_parlees' => $donnees_eleve['langues_parlees_eleve'],
+    //             ':nom_tuteur' => $donnees_eleve['nom_tuteur_eleve'],
+    //             ':telephone_tuteur' => $donnees_eleve['telephone_tuteur_eleve'],
+    //             ':email_tuteur' => $donnees_eleve['email_tuteur_eleve'],
+    //             ':profession_tuteur' => $donnees_eleve['profession_tuteur_eleve'],
+    //             ':besoins_speciaux' => $donnees_eleve['besoins_speciaux_eleve'],
+    //             ':langue_etrangere' => $donnees_eleve['langue_etrangere_eleve'],
+    //             ':niveau_de_satisfaction' => $donnees_eleve['niveau_de_satisfaction_eleve'],
+    //             ':photo' => $photo
+    //         ]);
+    
+    //         return [
+    //             'success' => true,
+    //             'message' => 'Élève modifié avec succès'
+    //         ];
+    
+    //     } catch (PDOException $e) {
+    //         error_log($e->getMessage());
+    //         return [
+    //             'success' => false,
+    //             'message' => "Erreur lors de la modification de l'élève: " . $e->getMessage()
+    //         ];
+    //     }
+    // }
+    function modifierEleve($dbh, $donnees_eleve) {
         try {
+            // CODE DE DÉBOGAGE - À RETIRER APRÈS DIAGNOSTIC
+            error_log("=== DÉBUT DEBUG MODIFIER ELEVE ===");
+            error_log("Données reçues: " . print_r($donnees_eleve, true));
+            
+            // Vérifier spécifiquement les valeurs problématiques
+            error_log("filiere_eleve brut: '" . ($donnees_eleve['filiere_eleve'] ?? 'NON_DEFINI') . "'");
+            error_log("Type filiere_eleve: " . gettype($donnees_eleve['filiere_eleve'] ?? null));
+            error_log("empty() filiere_eleve: " . (empty($donnees_eleve['filiere_eleve']) ? 'true' : 'false'));
+            
+            // Vérifier les filières existantes
+            $stmt_check = $dbh->prepare("SELECT id_filiere, nom_filiere FROM filiere ORDER BY id_filiere");
+            $stmt_check->execute();
+            $filieres_existantes = $stmt_check->fetchAll(PDO::FETCH_ASSOC);
+            error_log("Filières existantes: " . print_r($filieres_existantes, true));
+            
+            error_log("=== FIN DEBUG MODIFIER ELEVE ===");
+            // FIN CODE DE DÉBOGAGE
+
             // Validation des données requises
-            $champs_requis = ['id_eleve', 'nom_eleve', 'prenom_eleve', 'email_eleve'];
+            $champs_requis = ['id_eleve', 'nom_eleve', 'prenom_eleve', 'date_naissance_eleve', 'email_eleve'];
             foreach ($champs_requis as $champ) {
                 if (empty($donnees_eleve[$champ])) {
                     return [
@@ -623,65 +825,126 @@ if (file_exists($filePath)) {
                     ];
                 }
             }
-    
-            // Gestion de l'upload d'image
-            $photo = null;
-            if ($fichier_image && !empty($fichier_image['name'])) {
-                $resultat_upload = gererUploadImage($fichier_image);
-                if (!$resultat_upload['success']) {
-                    return $resultat_upload;
-                }
-                $photo = $resultat_upload['filename'];
+
+            // Validation de l'email
+            if (!filter_var($donnees_eleve['email_eleve'], FILTER_VALIDATE_EMAIL)) {
+                return [
+                    'success' => false,
+                    'message' => "L'adresse email n'est pas valide."
+                ];
             }
-    
+
+            // Gestion spéciale pour id_filiere
+            $id_filiere = null;
+            if (isset($donnees_eleve['filiere_eleve']) && 
+                $donnees_eleve['filiere_eleve'] !== '' && 
+                $donnees_eleve['filiere_eleve'] !== '0' && 
+                $donnees_eleve['filiere_eleve'] !== 0 && 
+                $donnees_eleve['filiere_eleve'] !== null) {
+                
+                $id_filiere = (int)$donnees_eleve['filiere_eleve'];
+                
+                // Vérifier que cette filière existe
+                $stmt = $dbh->prepare("SELECT COUNT(*) FROM filiere WHERE id_filiere = ?");
+                $stmt->execute([$id_filiere]);
+                if ($stmt->fetchColumn() == 0) {
+                    return [
+                        'success' => false,
+                        'message' => "La filière sélectionnée (ID: $id_filiere) n'existe pas dans la base de données."
+                    ];
+                }
+            }
+
+            // Gestion pour id_classe
+            $id_classe = null;
+            if (isset($donnees_eleve['classe_eleve']) && 
+                $donnees_eleve['classe_eleve'] !== '' && 
+                $donnees_eleve['classe_eleve'] !== '0' && 
+                $donnees_eleve['classe_eleve'] !== 0 && 
+                $donnees_eleve['classe_eleve'] !== null) {
+                
+                $id_classe = (int)$donnees_eleve['classe_eleve'];
+                
+                // Vérifier que cette classe existe
+                $stmt = $dbh->prepare("SELECT COUNT(*) FROM classe WHERE id_classe = ?");
+                $stmt->execute([$id_classe]);
+                if ($stmt->fetchColumn() == 0) {
+                    return [
+                        'success' => false,
+                        'message' => "La classe sélectionnée (ID: $id_classe) n'existe pas dans la base de données."
+                    ];
+                }
+            }
+
+            // Log des valeurs finales avant appel procédure
+            error_log("Valeurs finales - id_filiere: " . var_export($id_filiere, true));
+            error_log("Valeurs finales - id_classe: " . var_export($id_classe, true));
+
             // Appel de la procédure stockée
             $sql = "CALL modifier_eleve(
-                :id_eleve, :id_niveau, :id_classe, :id_filiere, :nom, :prenom, :date_naissance, :genre, 
-                :nationalite, :adresse, :telephone, :email, :date_inscription,
-                :statut, :historique_scolaire, :langues_parlees, :nom_tuteur,
+                :id_eleve, :id_niveau, :id_classe, :id_filiere, :code_massare, :nom, :prenom, :date_naissance, :genre, :nationalite,
+                :adresse, :telephone, :email, :date_inscription, :statut,
+                :historique_scolaire, :langues_parlees, :nom_tuteur,
                 :telephone_tuteur, :email_tuteur, :profession_tuteur,
                 :besoins_speciaux, :langue_etrangere,
-                :niveau_de_satisfaction, :photo
+                :niveau_de_satisfaction, :latitude, :longitude, :route_id, :stop_order
             )";
-    
+
             $stmt = $dbh->prepare($sql);
-            $stmt->execute([
+            
+            $params = [
                 ':id_eleve' => $donnees_eleve['id_eleve'],
                 ':id_niveau' => $donnees_eleve['niveau_scolaire_eleve'],
-                ':id_classe' => $donnees_eleve['classe_eleve'],
-                ':id_filiere' => $donnees_eleve['filiere_eleve'],
+                ':id_classe' => $id_classe,
+                ':id_filiere' => $id_filiere,
+                ':code_massare' => $donnees_eleve['code_massare'] ?? null,
                 ':nom' => $donnees_eleve['nom_eleve'],
                 ':prenom' => $donnees_eleve['prenom_eleve'],
                 ':date_naissance' => $donnees_eleve['date_naissance_eleve'],
-                ':genre' => $donnees_eleve['genre_eleve'],
-                ':nationalite' => $donnees_eleve['nationalite_eleve'],
-                ':adresse' => $donnees_eleve['adresse_eleve'],
-                ':telephone' => $donnees_eleve['telephone_eleve'],
+                ':genre' => $donnees_eleve['genre_eleve'] ?? null,
+                ':nationalite' => $donnees_eleve['nationalite_eleve'] ?? null,
+                ':adresse' => $donnees_eleve['adresse_eleve'] ?? null,
+                ':telephone' => $donnees_eleve['telephone_eleve'] ?? null,
                 ':email' => $donnees_eleve['email_eleve'],
-                ':date_inscription' => $donnees_eleve['date_inscription_eleve'],
-                ':statut' => $donnees_eleve['statut_eleve'],
-                ':historique_scolaire' => $donnees_eleve['historique_scolaire_eleve'],
-                ':langues_parlees' => $donnees_eleve['langues_parlees_eleve'],
-                ':nom_tuteur' => $donnees_eleve['nom_tuteur_eleve'],
-                ':telephone_tuteur' => $donnees_eleve['telephone_tuteur_eleve'],
-                ':email_tuteur' => $donnees_eleve['email_tuteur_eleve'],
-                ':profession_tuteur' => $donnees_eleve['profession_tuteur_eleve'],
-                ':besoins_speciaux' => $donnees_eleve['besoins_speciaux_eleve'],
-                ':langue_etrangere' => $donnees_eleve['langue_etrangere_eleve'],
-                ':niveau_de_satisfaction' => $donnees_eleve['niveau_de_satisfaction_eleve'],
-                ':photo' => $photo
-            ]);
-    
-            return [
-                'success' => true,
-                'message' => 'Élève modifié avec succès'
+                ':date_inscription' => $donnees_eleve['date_inscription_eleve'] ?? null,
+                ':statut' => $donnees_eleve['statut_eleve'] ?? null,
+                ':historique_scolaire' => $donnees_eleve['historique_scolaire_eleve'] ?? null,
+                ':langues_parlees' => $donnees_eleve['langues_parlees_eleve'] ?? null,
+                ':nom_tuteur' => $donnees_eleve['nom_tuteur_eleve'] ?? null,
+                ':telephone_tuteur' => $donnees_eleve['telephone_tuteur_eleve'] ?? null,
+                ':email_tuteur' => $donnees_eleve['email_tuteur_eleve'] ?? null,
+                ':profession_tuteur' => $donnees_eleve['profession_tuteur_eleve'] ?? null,
+                ':besoins_speciaux' => $donnees_eleve['besoins_speciaux_eleve'] ?? null,
+                ':langue_etrangere' => $donnees_eleve['langue_etrangere_eleve'] ?? null,
+                ':niveau_de_satisfaction' => !empty($donnees_eleve['niveau_de_satisfaction_eleve']) ? (int)$donnees_eleve['niveau_de_satisfaction_eleve'] : null,
+                ':latitude' => !empty($donnees_eleve['latitude_eleve']) ? (float)$donnees_eleve['latitude_eleve'] : null,
+                ':longitude' => !empty($donnees_eleve['longitude_eleve']) ? (float)$donnees_eleve['longitude_eleve'] : null,
+                ':route_id' => !empty($donnees_eleve['route_id_eleve']) ? (int)$donnees_eleve['route_id_eleve'] : null,
+                ':stop_order' => !empty($donnees_eleve['stop_order_eleve']) ? (int)$donnees_eleve['stop_order_eleve'] : null
             ];
-    
+
+            error_log("Paramètres envoyés à la procédure: " . print_r($params, true));
+
+            $result = $stmt->execute($params);
+
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Élève modifié avec succès'
+                ];
+            } else {
+                return [
+                    'success' => false,
+                    'message' => 'Erreur lors de la modification de l\'élève'
+                ];
+            }
+
         } catch (PDOException $e) {
-            error_log($e->getMessage());
+            error_log("Erreur PDO complète: " . $e->getMessage());
+            error_log("Code erreur PDO: " . $e->getCode());
             return [
                 'success' => false,
-                'message' => "Erreur lors de la modification de l'élève: " . $e->getMessage()
+                'message' => 'Une erreur est survenue lors de la modification de l\'élève: ' . $e->getMessage()
             ];
         }
     }
