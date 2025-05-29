@@ -41,6 +41,13 @@ $filieres = get_filieres_with_niveaux($dbh)['data'];
 $filiere_courante = get_filiere_by_id($dbh, $eleve->id_filiere)['data'];
 $classes = get_all_classes($dbh)['data'];
 $classe_courante = get_classe_by_id($dbh, $eleve->id_classe)['data'];
+
+
+// route
+$sql_routes = "SELECT route_id, route_name FROM routes ORDER BY route_name";
+$stmt_routes = $dbh->prepare($sql_routes);
+$stmt_routes->execute();
+$all_routes = $stmt_routes->fetchAll(PDO::FETCH_OBJ);
 ?>
 
 <!-- HEAD -->
@@ -110,7 +117,6 @@ $classe_courante = get_classe_by_id($dbh, $eleve->id_classe)['data'];
                     </div>
                   </div>
 
-
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="nationalite_eleve" class="form-control-label">Nationalité</label>
@@ -122,6 +128,52 @@ $classe_courante = get_classe_by_id($dbh, $eleve->id_classe)['data'];
                     <div class="form-group">
                       <label for="adresse_eleve" class="form-control-label">Adresse</label>
                       <input class="form-control" type="text" name="adresse_eleve" id="adresse_eleve" value="<?= $eleve->adresse ?>" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="route_id_eleve" class="form-control-label">Route</label>
+                      <select class="form-control" name="route_id_eleve" id="route_id_eleve">
+                        <option value="">-- Sélectionner une route --</option>
+                        <?php foreach ($all_routes as $route) : ?>
+                          <option value="<?= $route->route_id ?>" <?= (isset($eleve->route_id) && $eleve->route_id == $route->route_id) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($route->route_name) ?>
+                          </option>
+                        <?php endforeach; ?>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="stop_order_eleve" class="form-control-label">Ordre d'arrêt</label>
+                      <input class="form-control" type="number" name="stop_order_eleve" id="stop_order_eleve" value="<?= isset($eleve->stop_order) ? $eleve->stop_order : '' ?>" min="1" placeholder="Ordre dans la route">
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="latitude_eleve" class="form-control-label">Latitude</label>
+                      <input class="form-control" type="number" step="any" name="latitude_eleve" id="latitude_eleve" value="<?= isset($eleve->latitude) ? $eleve->latitude : '' ?>" placeholder="Ex: 33.5731">
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="longitude_eleve" class="form-control-label">Longitude</label>
+                      <input class="form-control" type="number" step="any" name="longitude_eleve" id="longitude_eleve" value="<?= isset($eleve->longitude) ? $eleve->longitude : '' ?>" placeholder="Ex: -7.5898">
+                    </div>
+                  </div>
+
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <button type="button" class="btn btn-info btn-sm" onclick="getLocation()">
+                        <i class="fas fa-map-marker-alt"></i> Obtenir ma localisation
+                      </button>
+                      <small class="form-text text-muted">
+                        Cliquez pour remplir automatiquement les coordonnées GPS
+                      </small>
                     </div>
                   </div>
 
@@ -290,6 +342,39 @@ $classe_courante = get_classe_by_id($dbh, $eleve->id_classe)['data'];
   </div>
   <!-- FIXED PLUGIN  -->
   <?php include '../../includes/fixedplugin.php' ?>
+
+  <script>
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            // Correction : utiliser les bons IDs des champs
+            document.getElementById('latitude_eleve').value = position.coords.latitude.toFixed(6);
+            document.getElementById('longitude_eleve').value = position.coords.longitude.toFixed(6);
+            alert('Coordonnées GPS obtenues avec succès !');
+          },
+          function(error) {
+            switch (error.code) {
+              case error.PERMISSION_DENIED:
+                alert("L'accès à la géolocalisation a été refusé.");
+                break;
+              case error.POSITION_UNAVAILABLE:
+                alert("Les informations de localisation ne sont pas disponibles.");
+                break;
+              case error.TIMEOUT:
+                alert("La demande de géolocalisation a expiré.");
+                break;
+              default:
+                alert("Une erreur inconnue s'est produite.");
+                break;
+            }
+          }
+        );
+      } else {
+        alert("La géolocalisation n'est pas supportée par ce navigateur.");
+      }
+    }
+  </script>
 
   <!-- FILIRE ET CLASSE SELON LE NIVEAU -->
   <script src="../../assets/js/ajouter_eleve.js"></script>
