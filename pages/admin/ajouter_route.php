@@ -11,16 +11,16 @@ require('../../includes/deconnexion_5s.php');
 //* Add
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
   $result = add_route(
-      $dbh,
-      $_POST['route_name'],
-      $_POST['start_latitude'],
-      $_POST['start_longitude'],
-      $_POST['end_latitude'],
-      $_POST['end_longitude']
+    $dbh,
+    $_POST['route_name'],
+    $_POST['start_latitude'],
+    $_POST['start_longitude'],
+    $_POST['end_latitude'],
+    $_POST['end_longitude']
   );
   if ($result['success']) {
-      header("Location: routes.php?success=1");
-      exit();
+    header("Location: routes.php?success=1");
+    exit();
   } else {
     $errorMessage = urlencode($result['message']);
     header("Location: routes.php?error={$errorMessage}");
@@ -66,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
                     </div>
                   </div>
                 </div>
-                
+
                 <p class="text-uppercase text-sm mt-4">Coordonnées de Départ</p>
                 <div class="row">
                   <div class="col-md-6">
@@ -101,6 +101,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
                       <small class="text-muted">Valeur entre -180 et 180</small>
                     </div>
                   </div>
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <button type="button" class="btn btn-info btn-sm" onclick="getLocation()">
+                        <i class="fas fa-map-marker-alt"></i> Obtenir ma localisation
+                      </button>
+                      <small class="form-text text-muted">
+                        Cliquez pour remplir automatiquement les coordonnées GPS
+                      </small>
+                    </div>
+                  </div>
                 </div>
 
                 <div class="row mt-4">
@@ -129,11 +139,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
   <script src="../../assets/js/plugins/smooth-scrollbar.min.js"></script>
 
   <script>
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            document.getElementById('start_latitude').value = position.coords.latitude.toFixed(6);
+            document.getElementById('start_longitude').value = position.coords.longitude.toFixed(6);
+            document.getElementById('end_latitude').value = position.coords.latitude.toFixed(6);
+            document.getElementById('end_longitude').value = position.coords.longitude.toFixed(6);
+            alert('Coordonnées GPS obtenues avec succès !');
+          },
+          function(error) {
+            switch (error.code) {
+              case error.PERMISSION_DENIED:
+                alert("L'accès à la géolocalisation a été refusé.");
+                break;
+              case error.POSITION_UNAVAILABLE:
+                alert("Les informations de localisation ne sont pas disponibles.");
+                break;
+              case error.TIMEOUT:
+                alert("La demande de géolocalisation a expiré.");
+                break;
+              default:
+                alert("Une erreur inconnue s'est produite.");
+                break;
+            }
+          }
+        );
+      } else {
+        alert("La géolocalisation n'est pas supportée par ce navigateur.");
+      }
+    }
+  </script>
+
+  <script>
     // Validation côté client pour les coordonnées
     document.addEventListener('DOMContentLoaded', function() {
       const latitudeInputs = document.querySelectorAll('input[name$="_latitude"]');
       const longitudeInputs = document.querySelectorAll('input[name$="_longitude"]');
-      
+
       latitudeInputs.forEach(input => {
         input.addEventListener('input', function() {
           const value = parseFloat(this.value);
@@ -144,7 +188,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
           }
         });
       });
-      
+
       longitudeInputs.forEach(input => {
         input.addEventListener('input', function() {
           const value = parseFloat(this.value);
