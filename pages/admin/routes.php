@@ -117,6 +117,9 @@ if (!empty($_GET['id']) && isset($_GET['del']) && $_GET['del'] === '1') {
                               <a href="edit_route.php?id=<?= $result->route_id ?>" class="dropdown-item">
                                 <i class="fas fa-pencil-alt text-dark opacity-8 fa-sm" aria-hidden="true"></i>
                               </a>
+                              <a href="map.php?route_id=<?= $result->route_id ?>" target="_blank" class="dropdown-item">
+                                <i class="fas fa-eye text-primary opacity-8 fa-sm"></i>
+                              </a>
                               <a href="routes.php?id=<?= $result->route_id ?>&del=1" class="dropdown-item" onClick="return confirmDelete(event, this)">
                                 <i class="fas fa-trash fa-sm text-danger opacity-8"></i>
                               </a>
