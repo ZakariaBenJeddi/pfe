@@ -65,230 +65,227 @@ $routes = $stmt_routes->fetchAll(PDO::FETCH_OBJ);
               </div>
             </div>
             <hr class="horizontal dark">
-              <form method="post">
-                <div class="card-body">
-                  <p class="text-uppercase text-sm">Eleve Information</p>
-                  <div class="row">
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="nom_eleve" class="form-control-label">Nom Élève</label>
-                        <input class="form-control" type="text" name="nom_eleve" id="nom_eleve" required>
-                      </div>
+            <form method="post">
+              <div class="card-body">
+                <p class="text-uppercase text-sm">Eleve Information</p>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="nom_eleve" class="form-control-label">Nom Élève</label>
+                      <input class="form-control" type="text" name="nom_eleve" id="nom_eleve" required>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="prenom_eleve" class="form-control-label">Prénom Élève</label>
-                        <input class="form-control" type="text" name="prenom_eleve" id="prenom_eleve" required>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="prenom_eleve" class="form-control-label">Prénom Élève</label>
+                      <input class="form-control" type="text" name="prenom_eleve" id="prenom_eleve" required>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="code_massare" class="form-control-label">Code Massare</label>
-                        <input class="form-control" type="text" name="code_massare" id="code_massare" required>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="code_massare" class="form-control-label">Code Massare</label>
+                      <input class="form-control" type="text" name="code_massare" id="code_massare" required>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="date_naissance_eleve" class="form-control-label">Date de Naissance</label>
-                        <input class="form-control" type="date" name="date_naissance_eleve" id="date_naissance_eleve" required>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="date_naissance_eleve" class="form-control-label">Date de Naissance</label>
+                      <input class="form-control" type="date" name="date_naissance_eleve" id="date_naissance_eleve" required>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="genre_eleve" class="form-control-label">Genre</label>
-                        <select class="form-select" name="genre_eleve" id="genre_eleve">
-                          <option value="Masculin">Masculin</option>
-                          <option value="Féminin">Féminin</option>
-                        </select>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="genre_eleve" class="form-control-label">Genre</label>
+                      <select class="form-select" name="genre_eleve" id="genre_eleve">
+                        <option value="Masculin">Masculin</option>
+                        <option value="Féminin">Féminin</option>
+                      </select>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="nationalite_eleve" class="form-control-label">Nationalité</label>
-                        <input class="form-control" type="text" name="nationalite_eleve" id="nationalite_eleve" required>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="nationalite_eleve" class="form-control-label">Nationalité</label>
+                      <input class="form-control" type="text" name="nationalite_eleve" id="nationalite_eleve" required>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="adresse_eleve" class="form-control-label">Adresse</label>
-                        <input class="form-control" type="text" name="adresse_eleve" id="adresse_eleve" required>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="adresse_eleve" class="form-control-label">Adresse</label>
+                      <input class="form-control" type="text" name="adresse_eleve" id="adresse_eleve" required>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="telephone_eleve" class="form-control-label">Téléphone</label>
-                        <input class="form-control" type="text" value="+212" name="telephone_eleve" id="telephone_eleve" required>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="telephone_eleve" class="form-control-label">Téléphone</label>
+                      <input class="form-control" type="text" value="+212" name="telephone_eleve" id="telephone_eleve" required>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="email_eleve" class="form-control-label">Email</label>
-                        <input class="form-control" type="email" name="email_eleve" id="email_eleve" required>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="email_eleve" class="form-control-label">Email</label>
+                      <input class="form-control" type="email" name="email_eleve" id="email_eleve" required>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="date_inscription_eleve" class="form-control-label">Date d'Inscription</label>
-                        <input class="form-control" type="date" name="date_inscription_eleve" id="date_inscription_eleve" required>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="date_inscription_eleve" class="form-control-label">Date d'Inscription</label>
+                      <input class="form-control" type="date" name="date_inscription_eleve" id="date_inscription_eleve" required>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="statut_eleve" class="form-control-label">Statut</label>
-                        <select class="form-select" name="statut_eleve" id="statut_eleve" required>
-                          <option value="Actif">Actif</option>
-                          <option value="Inactif">Inactif</option>
-                          <option value="Retraité">Retraité</option>
-                        </select>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="statut_eleve" class="form-control-label">Statut</label>
+                      <select class="form-select" name="statut_eleve" id="statut_eleve" required>
+                        <option value="Actif">Actif</option>
+                        <option value="Inactif">Inactif</option>
+                        <option value="Retraité">Retraité</option>
+                      </select>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="historique_scolaire_eleve" class="form-control-label">Historique Scolaire</label>
-                        <input class="form-control" type="text" name="historique_scolaire_eleve" id="historique_scolaire_eleve">
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="historique_scolaire_eleve" class="form-control-label">Historique Scolaire</label>
+                      <input class="form-control" type="text" name="historique_scolaire_eleve" id="historique_scolaire_eleve">
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="langues_parlees_eleve" class="form-control-label">Langues Parlées</label>
-                        <input class="form-control" type="text" name="langues_parlees_eleve" id="langues_parlees_eleve" required>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="langues_parlees_eleve" class="form-control-label">Langues Parlées</label>
+                      <input class="form-control" type="text" name="langues_parlees_eleve" id="langues_parlees_eleve" required>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="nom_tuteur_eleve" class="form-control-label">Nom Tuteur</label>
-                        <input class="form-control" type="text" name="nom_tuteur_eleve" id="nom_tuteur_eleve" required>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="nom_tuteur_eleve" class="form-control-label">Nom Tuteur</label>
+                      <input class="form-control" type="text" name="nom_tuteur_eleve" id="nom_tuteur_eleve" required>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="telephone_tuteur_eleve" class="form-control-label">Téléphone Tuteur</label>
-                        <input class="form-control" type="text" name="telephone_tuteur_eleve" id="telephone_tuteur_eleve" value="+212" required>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="telephone_tuteur_eleve" class="form-control-label">Téléphone Tuteur</label>
+                      <input class="form-control" type="text" name="telephone_tuteur_eleve" id="telephone_tuteur_eleve" value="+212" required>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="email_tuteur_eleve" class="form-control-label">Email Tuteur</label>
-                        <input class="form-control" type="email" name="email_tuteur_eleve" id="email_tuteur_eleve" required>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="email_tuteur_eleve" class="form-control-label">Email Tuteur</label>
+                      <input class="form-control" type="email" name="email_tuteur_eleve" id="email_tuteur_eleve" required>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="profession_tuteur_eleve" class="form-control-label">Profession Tuteur</label>
-                        <input class="form-control" type="text" name="profession_tuteur_eleve" id="profession_tuteur_eleve" required>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="profession_tuteur_eleve" class="form-control-label">Profession Tuteur</label>
+                      <input class="form-control" type="text" name="profession_tuteur_eleve" id="profession_tuteur_eleve" required>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="niveau_scolaire_eleve" class="form-control-label">Niveau Scolaire</label>
-                        <select class="form-select" name="niveau_scolaire_eleve" id="niveau_scolaire_eleve" required>
-                          <?php foreach ($niveaux as $niveau) : ?>
-                            <option value="<?= $niveau->id_niveau ?>"><?= $niveau->nom_niveau ?></option>
-                          <?php endforeach ?>
-                        </select>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="niveau_scolaire_eleve" class="form-control-label">Niveau Scolaire</label>
+                      <select class="form-select" name="niveau_scolaire_eleve" id="niveau_scolaire_eleve" required>
+                        <?php foreach ($niveaux as $niveau) : ?>
+                          <option value="<?= $niveau->id_niveau ?>"><?= $niveau->nom_niveau ?></option>
+                        <?php endforeach ?>
+                      </select>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="filiere_eleve" class="form-control-label">Filière</label>
-                        <select class="form-select" name="filiere_eleve" id="filiere_eleve" disabled>
-                          <option value="">Sélectionner une filière</option>
-                        </select>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="filiere_eleve" class="form-control-label">Filière</label>
+                      <select class="form-select" name="filiere_eleve" id="filiere_eleve" disabled>
+                        <option value="">Sélectionner une filière</option>
+                      </select>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="classe_eleve" class="form-control-label">Classe</label>
-                        <select class="form-select" name="classe_eleve" id="classe_eleve" disabled>
-                          <option value="">Sélectionner une classe</option>
-                        </select>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="classe_eleve" class="form-control-label">Classe</label>
+                      <select class="form-select" name="classe_eleve" id="classe_eleve" disabled>
+                        <option value="">Sélectionner une classe</option>
+                      </select>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="besoins_speciaux_eleve" class="form-control-label">Besoins Spéciaux</label>
-                        <input class="form-control" type="text" name="besoins_speciaux_eleve" id="besoins_speciaux_eleve">
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="besoins_speciaux_eleve" class="form-control-label">Besoins Spéciaux</label>
+                      <input class="form-control" type="text" name="besoins_speciaux_eleve" id="besoins_speciaux_eleve">
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="langue_etrangere_eleve" class="form-control-label">Langue Étrangère</label>
-                        <select class="form-select" name="langue_etrangere_eleve" id="langue_etrangere_eleve" required>
-                          <option value="français">français</option>
-                          <option value="anglais">anglais</option>
-                          <option value="allemand">allemand</option>
-                        </select>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="langue_etrangere_eleve" class="form-control-label">Langue Étrangère</label>
+                      <select class="form-select" name="langue_etrangere_eleve" id="langue_etrangere_eleve" required>
+                        <option value="français">français</option>
+                        <option value="anglais">anglais</option>
+                        <option value="allemand">allemand</option>
+                      </select>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="niveau_de_satisfaction_eleve" class="form-control-label">Niveau de Satisfaction</label>
-                        <input class="form-control" type="text" name="niveau_de_satisfaction_eleve" id="niveau_de_satisfaction_eleve" required>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="niveau_de_satisfaction_eleve" class="form-control-label">Niveau de Satisfaction</label>
+                      <input class="form-control" type="text" name="niveau_de_satisfaction_eleve" id="niveau_de_satisfaction_eleve" required>
                     </div>
+                  </div>
 
-                    <!-- NOUVEAUX CHAMPS AJOUTÉS -->
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="route_id_eleve" class="form-control-label">Route de Transport</label>
-                        <select class="form-select" name="route_id_eleve" id="route_id_eleve">
-                          <option value="">Aucune route assignée</option>
-                          <?php foreach ($routes as $route) : ?>
-                            <option value="<?= $route->route_id ?>"><?= htmlspecialchars($route->route_name) ?></option>
-                          <?php endforeach ?>
-                        </select>
-                      </div>
+                  <!-- NOUVEAUX CHAMPS AJOUTÉS -->
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="route_id_eleve" class="form-control-label">Route de Transport</label>
+                      <select class="form-select" name="route_id_eleve" id="route_id_eleve">
+                        <option value="">Aucune route assignée</option>
+                        <?php foreach ($routes as $route) : ?>
+                          <option value="<?= $route->route_id ?>"><?= htmlspecialchars($route->route_name) ?></option>
+                        <?php endforeach ?>
+                      </select>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="stop_order_eleve" class="form-control-label">Ordre d'Arrêt</label>
-                        <input class="form-control" type="number" name="stop_order_eleve" id="stop_order_eleve" min="1" 
-                              placeholder="Ordre dans la route (ex: 1, 2, 3...)">
-                        <small class="form-text text-muted">Ordre de passage dans la route de transport</small>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="stop_order_eleve" class="form-control-label">Ordre d'Arrêt</label>
+                      <input class="form-control" type="number" name="stop_order_eleve" id="stop_order_eleve" min="1" placeholder="Ordre dans la route (ex: 1, 2, 3...)">
+                      <small class="form-text text-muted">Ordre de passage dans la route de transport</small>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="latitude_eleve" class="form-control-label">Latitude</label>
-                        <input class="form-control" type="number" step="0.0000001" name="latitude_eleve" id="latitude" 
-                              placeholder="Ex: 33.5731">
-                        <small class="form-text text-muted">Coordonnée GPS</small>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="latitude_eleve" class="form-control-label">Latitude</label>
+                      <input class="form-control" type="number" step="0.00000001" name="latitude_eleve" id="latitude" placeholder="Ex: 33.5731">
+                      <small class="form-text text-muted">Coordonnée GPS</small>
                     </div>
+                  </div>
 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="longitude_eleve" class="form-control-label">Longitude</label>
-                        <input class="form-control" type="number" step="0.0000001" name="longitude_eleve" id="longitude" 
-                              placeholder="Ex: -7.5898">
-                        <small class="form-text text-muted">Coordonnée GPS</small>
-                      </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="longitude_eleve" class="form-control-label">Longitude</label>
+                      <input class="form-control" type="number" step="0.00000001" name="longitude_eleve" id="longitude" placeholder="Ex: -7.5898">
+                      <small class="form-text text-muted">Coordonnée GPS</small>
                     </div>
-                                      <div class="col-md-12">
+                  </div>
+                  <div class="col-md-12">
                     <div class="form-group">
                       <button type="button" class="btn btn-info btn-sm" onclick="getLocation()">
                         <i class="fas fa-map-marker-alt"></i> Obtenir ma localisation
@@ -299,12 +296,12 @@ $routes = $stmt_routes->fetchAll(PDO::FETCH_OBJ);
                     </div>
                   </div>
 
-                  </div>
-                  <div class="row">
-                    <input class="btn btn-primary" type="submit" value="Ajouter" name="ajouter">
-                  </div>
                 </div>
-              </form>
+                <div class="row">
+                  <input class="btn btn-primary" type="submit" value="Ajouter" name="ajouter">
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       </div>
