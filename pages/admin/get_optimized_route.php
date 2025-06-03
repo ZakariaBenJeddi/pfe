@@ -168,6 +168,7 @@ try {
     $stmtStudents = $conn->prepare("SELECT 
         eleves.id_eleve, 
         eleves.nom, 
+        eleves.prenom, 
         eleves.id_classe, 
         eleves.adresse, 
         eleves.latitude, 
@@ -246,6 +247,7 @@ try {
             $studentDetailsMap[$coordKey] = [
             'id_eleve' => $student['id_eleve'],
             'nom' => $student['nom'],
+            'prenom' => $student['prenom'],
             'id_classe' => $student['id_classe'],
             'nom_classe' => $student['nom_classe'], // ← CORRECTION: Assurer que nom_classe est inclus
             'adresse' => $student['adresse'],
@@ -318,6 +320,7 @@ try {
              $detail = $studentDetailsMap[$coordKey];
              $orderedStops[] = [
                  'name' => $detail['nom'] ?? $detail['name'] ?? 'Waypoint',
+                 'prenom' => $detail['prenom'] ?? $detail['prenom'] ?? 'Waypoint',
                  'lat' => $detail['lat'], // Use the stored/geocoded lat
                  'lng' => $detail['lng'], // Use the stored/geocoded lng
                  'id_classe' => $detail['id_classe'] ?? null,
